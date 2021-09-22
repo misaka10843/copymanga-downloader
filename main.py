@@ -1,26 +1,39 @@
 # -*- coding: UTF-8 -*-
-
+import sys
 import os
 import json
 import requests
+import time
 
 
 def get_settings():
     global download_path
+    # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
     if not os.path.isfile("./settings.json"):
+        file = open('./settings.json', 'w')
+        file.close()
+        # *打开
         first_initialization = 1
     elif os.path.getsize("./settings.json") == 0:
+        # *打开
         first_initialization = 1
+    # *如果为第一次初始化
     if first_initialization == 1:
         download_path = input(
             "您似乎是第一次启动此程序，请您先输入您需要下载的路径(请输入E:\manga这种格式,不要最后一个斜杠哦qwq)：")
+        # *将反斜杠转成正斜杠
         download_path = download_path.replace('\\', '/')
-        with open('./settings.json', 'wb', encoding='utf8')as fp:
-            fp.write('{"download_path" : "%s"}' % download_path)
-    with open('./settings.json', 'r', encoding='utf8')as fp:
+        # *写入文件
+        with open('./settings.json', 'wb')as fp:
+            fp.write(('{"download_path" : "%s"}' % download_path).encode())
+    print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
+    with open('./settings.json', 'r')as fp:
         json_data = json.load(fp)
         download_path = json_data["download_path"]
+    # *检测是否有此目录，没有就创建
+    if not os.path.exists("%s/" % (download_path)):
+        os.mkdir("%s/" % (download_path))
 
 
 def manga_search(manga_name):
@@ -51,12 +64,13 @@ def manga_search(manga_name):
             get_list_num)]["name"]
     else:
         # *报告远程服务器无法连接的状态码
-        print("服务器似乎无法连接了qwq\n")
+        print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
         print("返回的状态码是：%d" % response.status_code)
+        sys.exit(0)
 
 
 def manga_chapter_list():
-    global alldownload, startdownload, enddownload, manga_chapter
+    global all_chapter, start_chapter, end_chapter, manga_chapter
     # *获取章节列表
     headers = {}
     headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
@@ -66,24 +80,32 @@ def manga_chapter_list():
     if manga_chapter.status_code == 200:
         # *将api解析成json
         manga_chapter_list = manga_chapter.json()
-        print("我们获取了%s话的内容，请问是如何下载呢？" % manga_chapter_list["results"]["total"])
+        print("我们获取了\033[1;33m %s\033[37m 话的内容，请问是如何下载呢？" %
+              manga_chapter_list["results"]["total"])
         # *判断用户需要怎么下载
         how_downlaod = input("1->全本下载\n2->范围下载\n3->单话下载\n您的选择是：")
-        alldownload = 0   # !防止误触发
+        all_chapter = 0   # !防止误触发
         if int(how_downlaod) == 1:
-            alldownload = 1
+            all_chapter = 1
         elif int(how_downlaod) == 2:
-            startdownload = input("从第几话？")
-            enddownload = input("到第几话？")
+            start_chapter = input("从第几话？")
+            end_chapter = input("到第几话？")
         elif int(how_downlaod) == 3:
-            startdownload = enddownload = input("下载第几话？")
+            start_chapter = end_chapter = input("下载第几话？")
+    else:
+        # *报告远程服务器无法连接的状态码
+        print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
+        print("返回的状态码是：%d" % manga_chapter.status_code)
+        sys.exit(0)
+
+# TODO 下面一个def中，因为一下int not str,一下srt not int 所以就一修运行一次，然后修的有点乱，可能以后会重新写一下吧qwq
 
 
 def manga_download():
+    # *解析全局传输的json
+    manga_chapter_list = manga_chapter.json()
     # *判断是否为全本下载
-    if alldownload == 1:
-        # *解析全局传输的json
-        manga_chapter_list = manga_chapter.json()
+    if all_chapter == 1:
         # *开始循环
         for i in manga_chapter_list["results"]["list"]:
             # *获取每章的图片url以及顺序
@@ -98,26 +120,59 @@ def manga_download():
                 img_url = response["results"]["chapter"]["contents"][j]["url"]
                 img_path = response["results"]["chapter"]["words"][j]
                 r = requests.get(img_url)
-                print("正在写入%s/%s/%s/%s.jpg" % (download_path, get_list_manga,
-                      response["results"]["chapter"]["name"], img_path))
+                print("正在写入%s/%s/%s/%s.jpg\r" % (download_path, get_list_manga,
+                      response["results"]["chapter"]["name"], img_path), end="")
+                # *检测是否有此目录，没有就创建
+                if not os.path.exists("%s/%s/" % (download_path, get_list_manga)):
+                    os.mkdir("%s/%s/" % (download_path, get_list_manga))
+                if not os.path.exists("%s/%s/%s/" % (download_path, get_list_manga, response["results"]["chapter"]["name"])):
+                    os.mkdir("%s/%s/%s/" % (download_path, get_list_manga,
+                             response["results"]["chapter"]["name"]))
+                # !请保证目录没有此文件，不然可能会重写
+
                 with open("%s/%s/%s/%s.jpg" % (download_path, get_list_manga, response["results"]["chapter"]["name"], img_path), "wb") as code:
                     code.write(r.content)
                 j = j + 1
-    elif alldownload == 0:
-        while int(enddownload) >= int(startdownload):
+        # *试图跳出循环
+        print("这个漫画已经全部下载完了qwq")
+        time.sleep(10)
+        sys.exit(0)
+    elif all_chapter == 0:
+        # *通过输入的数量来循环
+        startchapter = start_chapter
+        print(startchapter)
+        while int(end_chapter) >= int(startchapter):
+            # ?因为数组为0开始，所以必须减去1
+            startchapter_id = int(startchapter) - 1
+            # *获取每章的图片url以及顺序
             headers = {}
             headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
-                'https://api.copymanga.com/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, startdownload), headers=headers)
+                'https://api.copymanga.com/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers)
             response = response.json()
-            img_url = response["results"]["chapter"]["contents"][startdownload]["url"]
-            img_path = response["results"]["chapter"]["words"][startdownload]
-            r = requests.get(img_url)
-            print("正在写入,s/,s/,s/,s.jpg" % (download_path, get_list_manga,
-                  response["results"]["chapter"]["name"], img_path))
-            with open("%s/%s/%s/%s.jpg" % (download_path, get_list_manga, response["results"]["chapter"]["name"], img_path), "wb") as code:
-                code.write(r.content)
-            startdownload = startdownload + 1
+            j = 0
+            # *通过获取的数量来循环
+            while manga_chapter_list["results"]["list"][startchapter_id]["size"] > j:
+                img_url = response["results"]["chapter"]["contents"][j]["url"]
+                img_path = response["results"]["chapter"]["words"][j]
+                r = requests.get(img_url)
+                print("正在写入%s/%s/%s/%s.jpg\r" % (download_path, get_list_manga,
+                      response["results"]["chapter"]["name"], img_path), end="")
+                # *检测是否有此目录，没有就创建
+                if not os.path.exists("%s/%s/" % (download_path, get_list_manga)):
+                    os.mkdir("%s/%s/" % (download_path, get_list_manga))
+                if not os.path.exists("%s/%s/%s/" % (download_path, get_list_manga, response["results"]["chapter"]["name"])):
+                    os.mkdir("%s/%s/%s/" % (download_path, get_list_manga,
+                             response["results"]["chapter"]["name"]))
+                # !请保证目录没有此文件，不然可能会重写
+                with open("%s/%s/%s/%s.jpg" % (download_path, get_list_manga, response["results"]["chapter"]["name"], img_path), "wb") as code:
+                    code.write(r.content)
+                j = j + 1
+            startchapter = int(startchapter) + 1
+        # *试图跳出循环
+        print("这个漫画已经全部下载完了qwq")
+        time.sleep(10)
+        sys.exit(0)
 
 
 if __name__ == "__main__":
