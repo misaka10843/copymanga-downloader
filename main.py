@@ -134,7 +134,8 @@ def manga_download():
                     code.write(r.content)
                 j = j + 1
         # *试图跳出循环
-        print("这个漫画已经全部下载完了qwq\r", end="")
+        print(
+            "这个漫画已经全部下载完了qwq                                                     \r", end="")
         time.sleep(10)
         sys.exit(0)
     elif all_chapter == 0:
@@ -169,7 +170,8 @@ def manga_download():
                 j = j + 1
             startchapter = int(startchapter) + 1
         # *试图跳出循环
-        print("这个漫画已经全部下载完了qwq\r", end="")
+        print(
+            "这个漫画已经全部下载完了qwq                                                     \r", end="")
         time.sleep(10)
         sys.exit(0)
 
