@@ -27,7 +27,7 @@ def get_settings():
         # *写入文件
         with open('./settings.json', 'wb')as fp:
             fp.write(('{"download_path" : "%s"}' % download_path).encode())
-    print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
+        print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
     with open('./settings.json', 'r')as fp:
         json_data = json.load(fp)
         download_path = json_data["download_path"]
