@@ -32,6 +32,7 @@ def manga_search(manga_name):
 
 
 def manga_chapter_list():
+    global alldownload, startdownload, enddownload
     # *获取章节列表
     headers = {}
     headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
@@ -42,6 +43,15 @@ def manga_chapter_list():
         # *将api解析成json
         manga_chapter_list = response.json()
         print("我们获取了%s话的内容，请问是如何下载呢？" % manga_chapter_list["results"]["total"])
+        # *判断用户需要怎么下载
+        how_downlaod = input("1->全本下载\n2->范围下载\n3->单话下载")
+        if how_downlaod == 1:
+            alldownload = True
+        elif how_downlaod == 2:
+            startdownload = input("从第几话？")
+            enddownload = input("到第几话？")
+        elif how_downlaod == 3:
+            startdownload = enddownload = input("下载第几话？")
 
 
 if __name__ == "__main__":
