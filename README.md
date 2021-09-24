@@ -32,7 +32,7 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 ### 立即使用(仅限Windows)
 
-1.点击[这里](https://github.com/misaka10843/copymanga-download/releases)下载最新的编译exe版本
+1.点击[这里](https://github.com/misaka10843/copymanga-download/releases)下载最新的编译exe版本(无法保证与源代码运行方式的同步更新)
 
 2.将此程序放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
