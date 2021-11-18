@@ -7,7 +7,7 @@ import time
 
 
 def get_settings():
-    global download_path
+    global download_path, authorization
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
     if not os.path.isfile("./settings.json"):
@@ -24,13 +24,18 @@ def get_settings():
             "您似乎是第一次启动此程序，请您先输入您需要下载的路径(请输入E:\manga这种格式,不要最后一个斜杠哦qwq)：")
         # *将反斜杠转成正斜杠
         download_path = download_path.replace('\\', '/')
+        print("\n接下来填写的是获取您的收藏漫画需要的参数，请认真填写哦qwq(如果不想获取的话也可以直接填写null)\n")
+        cookies_get = input(
+            "请输入您的authorization(如不会获取请看https://github.com/misaka10843/copymanga-download#如何获取authorization(此为获取用户收藏漫画))：")
         # *写入文件
         with open('./settings.json', 'wb')as fp:
-            fp.write(('{"download_path" : "%s"}' % download_path).encode())
+            fp.write(('{"download_path" : "%s","authorization":"%s"}' %
+                     (download_path.encode(), cookies_get.encode(),)))
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
     with open('./settings.json', 'r')as fp:
         json_data = json.load(fp)
         download_path = json_data["download_path"]
+        authorization = json_data["authorization"]
     # *检测是否有此目录，没有就创建
     if not os.path.exists("%s/" % (download_path)):
         os.mkdir("%s/" % (download_path))
@@ -176,10 +181,60 @@ def manga_download():
         sys.exit(0)
 
 
+def manga_collection(offset):
+    global get_list_name, get_list_manga
+    manga_search_list = ""
+    print("正在查询中...\r", end="")
+    headers = {}
+    headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
+    headers['authorization'] = authorization
+    response = requests.get(
+        'https://copymanga.com/api/v3/member/collect/comics?limit=50&offset={%s}&free_type=1&ordering=-datetime_modifier' % offset, headers=headers)
+    print("搜索完毕啦！  \n")
+    # !简要判断是否服务器无法连接
+    if response.status_code == 200:
+        # *将api解析成json
+        manga_search_list = response.json()
+        # *初始化列表的序号
+        list_num = 0
+
+        # print("已查询出以下漫画(输入pn为下一页，pu为上一页)：")
+        print("已查询出以下漫画(暂且只能查询前50个)：")
+        # *循环输出搜索列表
+        for i in manga_search_list["results"]["list"]:
+            print(list_num, '->', i["comic"]["name"])
+            list_num = list_num + 1
+        get_list_num = input("您需要下载的漫画是序号几？：")
+        if get_list_num == "pn":
+            offsetnum = offset + 12
+            print(offsetnum)
+            manga_collection(offsetnum)
+        elif get_list_num == "pu":
+            if offset == "0":
+                print("没有上一页了qwq")
+                manga_collection()
+            else:
+                offsetnum = offset - 12
+                manga_collection(offsetnum)
+        get_list_name = manga_search_list["results"]["list"][int(
+            get_list_num)]["comic"]["path_word"]
+        get_list_manga = manga_search_list["results"]["list"][int(
+            get_list_num)]["comic"]["name"]
+    else:
+        # *报告远程服务器无法连接的状态码
+        print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
+        print("返回的状态码是：%d" % response.status_code)
+        sys.exit(0)
+
+
 if __name__ == "__main__":
     get_settings()
-    manga_name = input("请输入漫画名称:")
-    manga_search(manga_name)
+    issearch = input("您是想搜索还是查看您的收藏？(1:搜索，2:收藏  默认1):")
+    if issearch == "2":
+        manga_collection(0)
+    else:
+        manga_name = input("请输入漫画名称:")
+        manga_search(manga_name)
     manga_chapter_list()
     manga_download()
 
