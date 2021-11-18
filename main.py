@@ -29,8 +29,9 @@ def get_settings():
             "请输入您的authorization(如不会获取请看https://github.com/misaka10843/copymanga-download#如何获取authorization(此为获取用户收藏漫画))：")
         # *写入文件
         with open('./settings.json', 'wb')as fp:
-            fp.write(('{"download_path" : "%s","authorization":"%s"}' %
-                     (download_path.encode(), cookies_get.encode(),)))
+            jsonsrt = '{"download_path" : "%s","authorization":"%s"}' % (
+                download_path, cookies_get)
+            fp.write(jsonsrt.encode())
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
     with open('./settings.json', 'r')as fp:
         json_data = json.load(fp)
