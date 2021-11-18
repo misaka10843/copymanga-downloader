@@ -83,6 +83,9 @@ https://api.copymanga.com/api/v3/comic/{漫画path_word}/group/default/chapters?
 
 漫画每章图片获取：
 https://api.copymanga.com/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
+
+用户收藏漫画获取（需要设置headers['authorization']）:
+https://copymanga.com/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
 ```
 
 ### 关于代码
