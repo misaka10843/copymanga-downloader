@@ -63,7 +63,7 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 4.在**请求标头**中找到`authorization: Token {各有各的不同}`，复制`Token {各有各的不同}`即可，如`Token 1293asd123s8adhh2juhsada2`
 
-图片：
+图片（[大图查看](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)）：
 
 ![图文](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)
 
