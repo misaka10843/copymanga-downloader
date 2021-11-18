@@ -59,7 +59,7 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 图片：
 
-[这里](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)
+![图文](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)
 
 ## 注意
 
