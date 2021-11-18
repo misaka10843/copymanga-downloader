@@ -177,8 +177,8 @@ def manga_download():
         # *试图跳出循环
         print(
             "这个漫画已经全部下载完了qwq                                                     ")
-        time.sleep(10)
-        sys.exit(0)
+        # *返回到初始界面
+        welcome()
 
 
 def manga_collection(offset):
@@ -227,14 +227,18 @@ def manga_collection(offset):
         sys.exit(0)
 
 
-if __name__ == "__main__":
-    get_settings()
+def welcome():
     issearch = input("您是想搜索还是查看您的收藏？(1:搜索，2:收藏  默认1):")
     if issearch == "2":
         manga_collection(0)
     else:
         manga_name = input("请输入漫画名称:")
         manga_search(manga_name)
+
+
+if __name__ == "__main__":
+    get_settings()
+    welcome()
     manga_chapter_list()
     manga_download()
 
