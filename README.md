@@ -48,6 +48,19 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 4.然后运行`python main.py`即可
 
+### 如何获取authorization(此为获取用户收藏漫画)
+1.访问https://copymanga.com/web/person/shujia
+
+2.按下F12后刷新页面
+
+3.找到类似`comics?limit=12&offset=0&free_type=1&ordering=-datetime_modifier`的文件(?)后点击
+
+4.在**请求标头**中找到`authorization: Token {各有各的不同}`，复制`Token {各有各的不同}`即可，如`Token 1293asd123s8adhh2juhsada2`
+
+图片：
+
+[这里](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)
+
 ## 注意
 
 ### 关于api
