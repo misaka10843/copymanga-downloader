@@ -33,7 +33,7 @@ def get_settings():
                 download_path, cookies_get)
             fp.write(jsonsrt.encode())
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
-    with open('./settings.json', 'r')as fp:
+    with open('./settings.json', 'rb')as fp:
         json_data = json.load(fp)
         download_path = json_data["download_path"]
         authorization = json_data["authorization"]
@@ -71,6 +71,7 @@ def manga_search(manga_name):
     else:
         # *报告远程服务器无法连接的状态码
         print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
+        print("如需使用代理，可使用命令，如：set https_proxy=http://127.0.0.1:7890")
         print("返回的状态码是：%d" % response.status_code)
         sys.exit(0)
 
