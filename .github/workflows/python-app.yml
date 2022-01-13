@@ -1,25 +1,35 @@
-name: Package Application with Pyinstaller
+name: python compile(windows)
 
 on:
+  release:
+    types: [published]
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Package Application
-      uses: JackMcKew/pyinstaller-action-windows@main
-      with:
-        path: src
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: name-of-artifact
-        path: src/dist/windows
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Compile exe
+        run: |
+          pyinstaller -n copymanga-download -F main.py 
+      - name : upload exe
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: xupdate_exe
+          path: ${{ github.workspace }}/app/build/outputs/exe/release
