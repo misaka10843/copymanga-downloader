@@ -1,4 +1,4 @@
-name: python compile(windows)
+name: python compile(Linux)
 
 on:
   release:
@@ -31,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@master
         if: always()
         with:
-          name: copymanga-download-windows
+          name: copymanga-download-Linux
           path: ${{ github.workspace }}/dist/
