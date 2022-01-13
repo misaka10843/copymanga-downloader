@@ -32,4 +32,4 @@ jobs:
         if: always()
         with:
           name: xupdate_exe
-          path: ${{ github.workspace }}/app/build/outputs/exe/release
+          path: ${{ github.workspace }}/dist/
