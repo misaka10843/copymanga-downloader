@@ -21,7 +21,9 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 ## 更新
 
 ### 重大更新：
+
 2022/1/14：Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions)
+
 2021/11/18：增加获取用户收藏的漫画并且支持下载
 
 
