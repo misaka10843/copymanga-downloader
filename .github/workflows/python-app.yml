@@ -31,5 +31,5 @@ jobs:
         uses: actions/upload-artifact@master
         if: always()
         with:
-          name: xupdate_exe
+          name: copymanga-download-windows
           path: ${{ github.workspace }}/dist/
