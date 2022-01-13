@@ -207,17 +207,19 @@ def manga_collection(offset):
             print(list_num, '->', i["comic"]["name"])
             list_num = list_num + 1
         get_list_num = input("您需要下载的漫画是序号几？：")
-        if get_list_num == "pn":
-            offsetnum = offset + 12
-            print(offsetnum)
-            manga_collection(offsetnum)
-        elif get_list_num == "pu":
-            if offset == "0":
-                print("没有上一页了qwq")
-                manga_collection()
-            else:
-                offsetnum = offset - 12
-                manga_collection(offsetnum)
+        #if get_list_num == "pn":
+        #    offsetnum = offset + 12
+        #    print(offsetnum)
+        #    manga_collection(offsetnum)
+        #elif get_list_num == "pu":
+        #    if offset == "0":
+        #        print("没有上一页了qwq")
+        #        manga_collection()
+        #    else:
+        #        offsetnum = offset - 12
+        #        manga_collection(offsetnum)
+        offsetnum = offset - 12
+        manga_collection(offsetnum)
         get_list_name = manga_search_list["results"]["list"][int(
             get_list_num)]["comic"]["path_word"]
         get_list_manga = manga_search_list["results"]["list"][int(
