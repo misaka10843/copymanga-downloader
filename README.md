@@ -22,7 +22,9 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 ### 重大更新：
 
-2022/1/14：Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions)
+2022/2/13：Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)
+
+2022/1/14：Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app.yml)
 
 2021/11/18：增加获取用户收藏的漫画并且支持下载
 
@@ -41,7 +43,7 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 ### 立即使用(Windows)
 
-1.点击[这里](https://github.com/misaka10843/copymanga-download/releases/latest)下载最新的编译exe版本(无法保证与源代码运行方式的同步更新)
+1.点击[这里](https://github.com/misaka10843/copymanga-download/releases/latest)下载最新的从作者电脑中编译的exe版本，或者下载GitHub中的编译文件[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)(稳定无法保证)
 
 2.将此程序放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
