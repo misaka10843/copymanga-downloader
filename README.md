@@ -73,7 +73,7 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 4.然后运行`python main.py`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画)
-1.访问https://copymanga.com/web/person/shujia
+1.访问https://copymanga.net/web/person/shujia
 
 2.按下F12后刷新页面
 
@@ -94,16 +94,16 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 ```text
 漫画搜索：
-https://api.copymanga.com/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={关键词}
+https://api.copymanga.net/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={关键词}
 
 漫画章节获取：
-https://api.copymanga.com/api/v3/comic/{漫画path_word}/group/default/chapters?limit=500&offset=0&platform=3
+https://api.copymanga.net/api/v3/comic/{漫画path_word}/group/default/chapters?limit=500&offset=0&platform=3
 
 漫画每章图片获取：
-https://api.copymanga.com/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
+https://api.copymanga.net/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
 
 用户收藏漫画获取（需要设置headers['authorization']）:
-https://copymanga.com/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
+https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
 ```
 
 ### 关于代码
