@@ -49,7 +49,7 @@ def manga_search(manga_name):
     headers = {}
     headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     response = requests.get(
-        'https://api.copymanga.com/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name, headers=headers)
+        'https://api.copymanga.net/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name, headers=headers)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
     if response.status_code == 200:
@@ -82,7 +82,7 @@ def manga_chapter_list():
     headers = {}
     headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     manga_chapter = requests.get(
-        'https://api.copymanga.com/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3' % get_list_name, headers=headers)
+        'https://api.copymanga.net/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3' % get_list_name, headers=headers)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
         # *将api解析成json
@@ -119,7 +119,7 @@ def manga_download():
             headers = {}
             headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
-                'https://api.copymanga.com/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]), headers=headers)
+                'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]), headers=headers)
             response = response.json()
             j = 0
             # *通过获取的数量来循环
@@ -155,7 +155,7 @@ def manga_download():
             headers = {}
             headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
-                'https://api.copymanga.com/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers)
+                'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers)
             response = response.json()
             j = 0
             # *通过获取的数量来循环
@@ -191,7 +191,7 @@ def manga_collection(offset):
     headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     headers['authorization'] = authorization
     response = requests.get(
-        'https://copymanga.com/api/v3/member/collect/comics?limit=50&offset={%s}&free_type=1&ordering=-datetime_modifier' % offset, headers=headers)
+        'https://copymanga.net/api/v3/member/collect/comics?limit=50&offset={%s}&free_type=1&ordering=-datetime_modifier' % offset, headers=headers)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
     if response.status_code == 200:
