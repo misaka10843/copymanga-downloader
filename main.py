@@ -1,10 +1,10 @@
 # -*- coding: UTF-8 -*-
-import sys
-import os
 import json
-import requests
+import os
+import sys
 import time
 
+import requests
 from tqdm import tqdm
 
 
@@ -52,7 +52,7 @@ def manga_search(manga_name):
     headers[
         'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     response = requests.get(
-        'https://api.copymanga.net/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name,
+        'https://%s/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % (WebUrl, manga_name),
         headers=headers)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
@@ -87,7 +87,7 @@ def manga_chapter_list():
     headers[
         'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     manga_chapter = requests.get(
-        'https://api.copymanga.net/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3' % get_list_name,
+        'https://%s/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3' % (WebUrl, get_list_name),
         headers=headers)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
@@ -147,7 +147,7 @@ def manga_download():
             headers[
                 'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
-                'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]),
+                'https://%s/api/v3/comic/%s/chapter2/%s?platform=3' % (WebUrl, get_list_name, i["uuid"]),
                 headers=headers)
             response = response.json()
             j = 0
@@ -183,8 +183,9 @@ def manga_download():
             headers[
                 'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
-                'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (
-                get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers)
+                'https://%s/api/v3/comic/%s/chapter2/%s?platform=3' % (
+                    WebUrl, get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]),
+                headers=headers)
             response = response.json()
             j = 0
             # *通过获取的数量来循环
@@ -221,7 +222,8 @@ def manga_collection(offset):
         'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     headers['authorization'] = authorization
     response = requests.get(
-        'https://copymanga.net/api/v3/member/collect/comics?limit=50&offset={%s}&free_type=1&ordering=-datetime_modifier' % offset,
+        'https://%s/api/v3/member/collect/comics?limit=50&offset=%s&free_type=1&ordering=-datetime_modifier' % (
+        WebUrl, offset),
         headers=headers)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
@@ -262,8 +264,14 @@ def manga_collection(offset):
 
 
 def welcome():
-    issearch = input("您是想搜索还是查看您的收藏？(1:搜索，2:收藏  默认1):")
-    if issearch == "2":
+    global WebUrl
+    SwithWeb = input("您想从哪个网站获取资源？(1:copymanga，2:热辣漫画(copymnaga姊妹网站)  默认1)：")
+    if SwithWeb == "2":
+        WebUrl = "www.manga2022.com"
+    else:
+        WebUrl = "api.copymanga.net"
+    IsSearch = input("您是想搜索还是查看您的收藏？(1:搜索，2:收藏  默认1):")
+    if IsSearch == "2":
         manga_collection(0)
     else:
         manga_name = input("请输入漫画名称:")

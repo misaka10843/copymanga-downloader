@@ -1,6 +1,6 @@
 # copymanga-download
 
-copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
+copymanga与热辣漫画网站的一个小爬虫，来使用python下载copymanga与热辣漫画中的漫画
 
 ## 技术栈
 
@@ -8,7 +8,9 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 ## 简介
 
-此程序使用`python`来下载copymanga中的漫画
+此程序使用`python`来下载copymanga中的漫画(和姊妹网站热辣漫画中的漫画)
+
+下面所有copymanga也可以视作热辣漫画
 
 并且支持全本下载以及范围下载(例如`10-20`话,或者是`11`话)
 
@@ -73,7 +75,8 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 4.然后运行`python main.py`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画)
-1.访问https://copymanga.net/web/person/shujia
+
+1.访问https://copymanga.net/web/person/shujia （热辣漫画：https://www.manga2022.com/web/person/shujia ）
 
 2.按下F12后刷新页面
 
@@ -103,7 +106,7 @@ https://api.copymanga.net/api/v3/comic/{漫画path_word}/group/default/chapters?
 https://api.copymanga.net/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
 
 用户收藏漫画获取（需要设置headers['authorization']）:
-https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
+https://api.copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
 ```
 
 ### 关于代码
