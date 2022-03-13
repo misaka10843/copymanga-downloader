@@ -18,6 +18,8 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
 （如果不是那就重新下载一遍，如果还有的话就发**issuse**吧qwq）
 
+如果您是安卓用户，那么您可以使用[fumiama](https://github.com/fumiama/)的[copymanga](https://github.com/fumiama/copymanga)客户端尝试下载
+
 ## 更新
 
 ### 重大更新：
