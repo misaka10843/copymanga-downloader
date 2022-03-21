@@ -275,10 +275,3 @@ if __name__ == "__main__":
     welcome()
     manga_chapter_list()
     manga_download()
-
-# !防止用户CTRL+C导致程序报错
-try:
-    while 1:
-        pass
-except KeyboardInterrupt:
-    pass
