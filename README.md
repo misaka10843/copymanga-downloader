@@ -2,6 +2,10 @@
 
 copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
+## 注意！
+
+**如果您的issue已经过了几天还没有被我受理，还请您发送邮件到misaka10843@outlook.jp来通知我，十分感谢！**
+
 ## 技术栈
 
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
