@@ -7,9 +7,13 @@ import time
 
 from tqdm import tqdm
 
+# 全局化headers，节省空间
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'}
+proxies = {}
 
 def get_settings():
-    global download_path, authorization
+    global download_path, authorization,proxies
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
     if not os.path.isfile("./settings.json"):
@@ -23,37 +27,49 @@ def get_settings():
     # *如果为第一次初始化
     if first_initialization == 1:
         download_path = input(
-            "您似乎是第一次启动此程序，请您先输入您需要下载的路径(请输入E:\manga这种格式,不要最后一个斜杠哦qwq)：")
+            "您似乎是第一次启动此程序，请您先输入您需要下载的路径(请输入E:\\manga这种格式,不要最后一个斜杠哦qwq)：")
         # *将反斜杠转成正斜杠
         download_path = download_path.replace('\\', '/')
         print("\n接下来填写的是获取您的收藏漫画需要的参数，请认真填写哦qwq(如果不想获取的话也可以直接填写null)\n")
         cookies_get = input(
-            "请输入您的authorization(如不会获取请看https://github.com/misaka10843/copymanga-download#如何获取authorization(此为获取用户收藏漫画))：")
+            "请输入您的authorization(如不会获取请看https://github.com/misaka10843/copymanga-download#如何获取authorization("
+            "此为获取用户收藏漫画))：")
         # *写入文件
         with open('./settings.json', 'wb') as fp:
             jsonsrt = '{"download_path" : "%s","authorization":"%s"}' % (
                 download_path, cookies_get)
+            fp.write(jsonsrt.encode())
+        #获取proxies状态
+        proxies_get = input(
+            "您是否使用了代理？如果是，请填写代理IP(如127.0.0.1:8099，存储在proxies.txt)：")
+        # *写入文件
+        with open('./proxies.txt', 'wb') as fp:
+            jsonsrt = '%s' % (proxies_get)
             fp.write(jsonsrt.encode())
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改路径的话可以直接到程序根目录的settings.json更改qwq")
     with open('./settings.json', 'rb') as fp:
         json_data = json.load(fp)
         download_path = json_data["download_path"]
         authorization = json_data["authorization"]
+    with open('./proxies.txt', 'rb') as fp:
+        proxies_set = fp.read()
+    if proxies_set:
+        proxies = {
+            'http': proxies_set,
+            'https': proxies_set
+        }
     # *检测是否有此目录，没有就创建
-    if not os.path.exists("%s/" % (download_path)):
-        os.mkdir("%s/" % (download_path))
+    if not os.path.exists("%s/" % download_path):
+        os.mkdir("%s/" % download_path)
 
 
 def manga_search(manga_name):
     global get_list_name, get_list_manga
     print("正在搜索中...\r", end="")
     # *获取搜索结果
-    headers = {}
-    headers[
-        'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     response = requests.get(
         'https://api.copymanga.net/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name,
-        headers=headers)
+        headers=headers,proxies=proxies)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
     if response.status_code == 200:
@@ -83,12 +99,9 @@ def manga_search(manga_name):
 def manga_chapter_list():
     global all_chapter, start_chapter, end_chapter, manga_chapter
     # *获取章节列表
-    headers = {}
-    headers[
-        'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
     manga_chapter = requests.get(
-        'https://api.copymanga.net/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3' % get_list_name,
-        headers=headers)
+        'https://api.copymanga.net/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
+        % get_list_name, headers=headers,proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
         # *将api解析成json
@@ -143,12 +156,9 @@ def manga_download():
         # *开始循环
         for i in manga_chapter_list["results"]["list"]:
             # *获取每章的图片url以及顺序
-            headers = {}
-            headers[
-                'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
                 'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]),
-                headers=headers)
+                headers=headers,proxies=proxies)
             response = response.json()
             j = 0
             # *通过获取的数量来循环
@@ -164,10 +174,11 @@ def manga_download():
                                             response["results"]["chapter"]["name"]))
                 # 分析图片位置以及名称
                 img_path = "%s/%s/%s/%s.jpg" % (
-                download_path, get_list_manga, response["results"]["chapter"]["name"], img_num)
+                    download_path, get_list_manga, response["results"]["chapter"]["name"], img_num)
                 download(img_url, img_path, img_num)
                 j = j + 1
         # *试图跳出循环
+        os.system("clear")
         print(
             "这个漫画已经全部下载完了qwq                                                     ")
         time.sleep(10)
@@ -179,12 +190,9 @@ def manga_download():
             # ?因为数组为0开始，所以必须减去1
             startchapter_id = int(startchapter) - 1
             # *获取每章的图片url以及顺序
-            headers = {}
-            headers[
-                'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
             response = requests.get(
                 'https://api.copymanga.net/api/v3/comic/%s/chapter2/%s?platform=3' % (
-                get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers)
+                    get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=headers,proxies=proxies)
             response = response.json()
             j = 0
             # *通过获取的数量来循环
@@ -200,12 +208,12 @@ def manga_download():
                                             response["results"]["chapter"]["name"]))
                 # 分析图片位置以及名称
                 img_path = "%s/%s/%s/%s.jpg" % (
-                download_path, get_list_manga, response["results"]["chapter"]["name"], img_num)
+                    download_path, get_list_manga, response["results"]["chapter"]["name"], img_num)
                 download(img_url, img_path, img_num)
                 j = j + 1
             startchapter = int(startchapter) + 1
         # *试图跳出循环
-        os.system("cls")
+        os.system("clear")
         print(
             "这个漫画已经全部下载完了qwq                                                     ")
         # *返回到初始界面
@@ -216,13 +224,13 @@ def manga_collection(offset):
     global get_list_name, get_list_manga
     manga_search_list = ""
     print("正在查询中...\r", end="")
-    headers = {}
-    headers[
-        'User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36'
-    headers['authorization'] = authorization
+    header = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0',
+        'authorization': authorization}
     response = requests.get(
-        'https://copymanga.net/api/v3/member/collect/comics?limit=50&offset={%s}&free_type=1&ordering=-datetime_modifier' % offset,
-        headers=headers)
+        'https://copymanga.net/api/v3/member/collect/comics?limit=50&offset={'
+        '%s}&free_type=1&ordering=-datetime_modifier' % offset,
+        headers=header,proxies=proxies)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
     if response.status_code == 200:
@@ -275,10 +283,3 @@ if __name__ == "__main__":
     welcome()
     manga_chapter_list()
     manga_download()
-
-# !防止用户CTRL+C导致程序报错
-try:
-    while 1:
-        pass
-except KeyboardInterrupt:
-    pass
