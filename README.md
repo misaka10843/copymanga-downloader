@@ -27,6 +27,8 @@ copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 ## 更新
 
 ### 重大更新：
+2022/3/24：暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-download/issues/8)提交相关信息
+
 2022/2/25：修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
 
 2022/2/13：Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)
