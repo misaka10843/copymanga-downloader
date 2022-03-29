@@ -150,6 +150,13 @@ https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1
 
 所以建议您也安装此插件来获取更好的代码理解
 
+
+## Thanks
+
+* [Z-fly](https://github.com/Z-fly)(贡献与提出代理问题)
+
+* [zhongfly](https://github.com/zhongfly)(提供代理问题解决方法)
+
 ---
 
 更多资料还在编写中....
