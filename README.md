@@ -2,21 +2,27 @@
 
 copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
 
-## 注意！
+## 注意！ ‼️
 
 **如果您的issue已经过了几天还没有被我受理，还请您发送邮件到misaka10843@outlook.jp来通知我，十分感谢！**
 
-### 代理问题
+### 代理问题 🐛
 
 clash等一些全局代理可能会导致urllib出现问题（具体可以看[copymanga-download #8](https://github.com/misaka10843/copymanga-download/issues/8) )
 
 解决方法：[clash_for_windows_pkg #1787](https://github.com/Fndroid/clash_for_windows_pkg/issues/1787)
 
-## 技术栈
+## 技术栈 ⚒️
 
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
 
-## 简介
+## Thanks 🎁
+
+* [Z-fly](https://github.com/Z-fly)(贡献与提出代理问题)
+
+* [zhongfly](https://github.com/zhongfly)(贡献与提供代理问题解决方法和优化代码)
+
+## 简介 🗒️
 
 此程序使用`python`来下载copymanga中的漫画
 
@@ -30,18 +36,20 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 如果您是安卓用户，那么您可以使用[fumiama](https://github.com/fumiama/)的[copymanga](https://github.com/fumiama/copymanga)客户端尝试下载
 
-## 更新
+## 更新 🔬
 
-### 重大更新：
-2022/3/24：暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-download/issues/8)提交相关信息
+### 重大更新 📈：
+2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了socks5代理，并~~可能~~修复了代理问题，而且还顺便帮忙优化了下代码www
 
-2022/2/25：修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
+2022/3/24: 暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-download/issues/8)提交相关信息
 
-2022/2/13：Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)
+2022/2/25: 修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
 
-2022/1/14：Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app.yml)
+2022/2/13: Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)
 
-2021/11/18：增加获取用户收藏的漫画并且支持下载
+2022/1/14: Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app.yml)
+
+2021/11/18: 增加获取用户收藏的漫画并且支持下载
 
 
 ## 放几张截图qwq（时效性不敢保证）
@@ -54,7 +62,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ![img2](./doc/img2.png)
 
-## 如何使用
+## 如何使用 🖥️
 
 ### 立即使用(Windows)
 
@@ -86,7 +94,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 4.然后运行`python main.py`即可
 
-### 如何获取authorization(此为获取用户收藏漫画)
+### 如何获取authorization(此为获取用户收藏漫画) 📒
 1.访问https://copymanga.net/web/person/shujia
 
 2.按下F12后刷新页面
@@ -99,7 +107,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ![图文](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)
 
-## 注意
+## 注意 ‼️
 
 ### 关于api
 
@@ -108,13 +116,13 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ```text
 漫画搜索：
-https://api.copymanga.net/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={关键词}
+https://api.copymanga.info/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={关键词}
 
 漫画章节获取：
-https://api.copymanga.net/api/v3/comic/{漫画path_word}/group/default/chapters?limit=500&offset=0&platform=3
+https://api.copymanga.info/api/v3/comic/{漫画path_word}/group/default/chapters?limit=500&offset=0&platform=3
 
 漫画每章图片获取：
-https://api.copymanga.net/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
+https://api.copymanga.info/api/v3/comic/{漫画path_word}/chapter2/{章节UUID}?platform=3
 
 用户收藏漫画获取（需要设置headers['authorization']）:
 https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
@@ -149,13 +157,6 @@ https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1
 因为代码注解时使用了VScode的`Better Comments`插件来使注解有对应颜色来让开发者更加明了地分析代码，
 
 所以建议您也安装此插件来获取更好的代码理解
-
-
-## Thanks
-
-* [Z-fly](https://github.com/Z-fly)(贡献与提出代理问题)
-
-* [zhongfly](https://github.com/zhongfly)(贡献与提供代理问题解决方法)
 
 ---
 
