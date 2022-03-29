@@ -55,8 +55,8 @@ def get_settings():
         proxies_set = fp.read()
     if proxies_set:
         proxies = {
-            'http': proxies_set,
-            'https': proxies_set
+            'http': 'http://'+proxies_set,
+            'https': 'http://'+proxies_set
         }
     # *检测是否有此目录，没有就创建
     if not os.path.exists("%s/" % download_path):
