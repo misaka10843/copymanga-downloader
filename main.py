@@ -53,7 +53,7 @@ def get_settings():
             json_data["use_webp"] = False
         #获取proxies状态
         proxies_get = input(
-            "您是否使用了代理？如果是，请填写代理IP(如127.0.0.1:8099，存储在proxies.txt)：")
+            "您是否使用了代理？如果是，请填写代理地址(如http://127.0.0.1:8099或者socks5://127.0.0.1:8099)：")
         json_data["proxies"] = proxies_get
         # *写入文件
         with open('./settings.json', 'w', encoding="utf-8") as fp:
@@ -72,9 +72,12 @@ def get_settings():
             api_headers["webp"] = '1'
 
     if proxies_set:
+        # 如果代理不存在协议前缀，则视为http代理
+        if proxies_set.find('://') == -1:
+            proxies_set = 'http://'+proxies_set
         proxies = {
-            'http': 'http://'+proxies_set,
-            'https': 'http://'+proxies_set
+            'http': proxies_set,
+            'https': proxies_set
         }
     # *检测是否有此目录，没有就创建
     if not os.path.exists("%s/" % download_path):
