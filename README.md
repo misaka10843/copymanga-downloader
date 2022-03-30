@@ -126,16 +126,6 @@ https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1
 
 ### 关于代码
 
-#### 关于manga_download的def
-
-因为一下int not str,
-
-一下srt not int 所以就一修运行一次，
-
-然后修的有点乱，
-
-可能以后会重新写一下吧qwq
-
 #### 关于有时候下载会卡住
 
 这应该是copymanga的服务器限制
