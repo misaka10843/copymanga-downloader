@@ -54,13 +54,9 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ## 放几张截图qwq（时效性不敢保证）
 
-这张是第一次初始化之后的qwq
+第一次初始化
 
-![img1](./doc/img1.png)
-
-这张是第一次初始化的qwq
-
-![img2](./doc/img2.png)
+![图片.png](https://s2.loli.net/2022/03/30/XFBOybZdUPj53G9.png)
 
 ## 如何使用 🖥️
 
