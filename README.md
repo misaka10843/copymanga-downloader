@@ -1,6 +1,6 @@
-# copymanga-download
+# copymanga-downloader
 
-copymanga网站的一个小爬虫，来使用python下载copymanga中的漫画
+![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
 
 ## 注意！ ‼️
 
