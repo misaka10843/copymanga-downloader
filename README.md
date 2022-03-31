@@ -8,7 +8,7 @@
 
 ### 代理问题 🐛
 
-clash等一些全局代理可能会导致urllib出现问题（具体可以看[copymanga-download #8](https://github.com/misaka10843/copymanga-download/issues/8) )
+clash等一些全局代理可能会导致urllib出现问题（具体可以看[copymanga-download #8](https://github.com/misaka10843/copymanga-downloader/issues/8) )
 
 解决方法：[clash_for_windows_pkg #1787](https://github.com/Fndroid/clash_for_windows_pkg/issues/1787)
 
@@ -41,13 +41,13 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 ### 重大更新 📈：
 2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了socks5代理，并~~可能~~修复了代理问题，而且还顺便帮忙优化了下代码www
 
-2022/3/24: 暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-download/issues/8)提交相关信息
+2022/3/24: 暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-downloader/issues/8)提交相关信息
 
 2022/2/25: 修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
 
-2022/2/13: Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)
+2022/2/13: Github自动编译Windows EXE文件！[actions](https://github.com/misaka10843/copymanga-downloader/actions/)
 
-2022/1/14: Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app.yml)
+2022/1/14: Github自动编译Linux(应该)二进制文件！[actions](https://github.com/misaka10843/copymanga-downloader/actions/)
 
 2021/11/18: 增加获取用户收藏的漫画并且支持下载
 
@@ -62,7 +62,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ### 立即使用(Windows)
 
-1.点击[这里](https://github.com/misaka10843/copymanga-download/releases/latest)下载最新的从作者电脑中编译的exe版本，或者下载GitHub中的编译文件[actions](https://github.com/misaka10843/copymanga-download/actions/workflows/python-app-Windows.yml)(稳定无法保证)
+1.点击[这里](https://github.com/misaka10843/copymanga-downloader/releases/latest)下载最新的从作者电脑中编译的exe版本，或者下载GitHub中的编译文件[actions](https://github.com/misaka10843/copymanga-downloader/actions/)(稳定无法保证)
 
 2.将此程序放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
@@ -70,7 +70,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ### 立即使用(Linux,无法保证能否运行)
 
-1.点击[actions](https://github.com/misaka10843/copymanga-download/actions)选择最新的编译(100%同步更新，但不能保障是否能运行)
+1.点击[actions](https://github.com/misaka10843/copymanga-downloader/actions)选择最新的编译(100%同步更新，但不能保障是否能运行)
 
 2.下载`附件`中的`copymanga-download-Linux`压缩包
 
@@ -82,7 +82,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 ### 编译/原代码使用(所有系统均支持)
 
-1.点击[这里](https://github.com/misaka10843/copymanga-download/archive/refs/heads/master.zip)直接下载最新的源码包
+1.点击[这里](https://github.com/misaka10843/copymanga-downloader/archive/refs/heads/master.zip)直接下载最新的源码包
 
 2.解压后放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
