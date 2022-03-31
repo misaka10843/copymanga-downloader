@@ -56,7 +56,7 @@ clash等一些全局代理可能会导致urllib出现问题（具体可以看[co
 
 第一次初始化
 
-![图片.png](https://s2.loli.net/2022/03/30/XFBOybZdUPj53G9.png)
+![图片.png](https://s2.loli.net/2022/03/31/qKhZVtbguEAwQcJ.png)
 
 ## 如何使用 🖥️
 
