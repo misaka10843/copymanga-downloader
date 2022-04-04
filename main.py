@@ -14,7 +14,7 @@ api_headers = {
     'User-Agent': 'Dart/2.15(dart:io)',
     'source': 'copyApp',
     'version': '1.3.1',
-    'region': '0',
+    'region': '1',
     'webp': '0',
 }
 proxies = {}
@@ -68,7 +68,7 @@ def get_settings():
         headers["authorization"] = json_data["authorization"]
         proxies_set = json_data["proxies"]
         if json_data["use_oversea_cdn"] == True:
-            api_headers["region"] = '1'
+            api_headers["region"] = '0'
         if json_data["use_webp"] == True:
             api_headers["webp"] = '1'
 
