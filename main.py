@@ -149,7 +149,7 @@ def manga_chapter_list():
 
 def download(url: str, fname: str, img_num: str):
     # 用流stream的方式获取url的数据
-    resp = requests.get(url, stream=True)
+    resp = requests.get(url, stream=True, verify=False)
     # 拿到文件的长度，并把total初始化为0
     total = int(resp.headers.get('content-length', 0))
     # 打开当前目录的fname文件(名字你来传入)
@@ -164,7 +164,7 @@ def download(url: str, fname: str, img_num: str):
         for data in resp.iter_content(chunk_size=1024):
             size = file.write(data)
             bar.update(size)
-            bar.set_description("\r正在下载第%s张: %s" % (img_num, size))
+            bar.set_description("\r正在下载[%s]第%s张: %s" % (fname, img_num, size))
 
 
 def manga_download():
@@ -221,17 +221,17 @@ def manga_download():
 def chapter_analysis(response, j):
     img_url = response["results"]["chapter"]["contents"][j]["url"]
     img_num = response["results"]["chapter"]["words"][j]
+    chapter_index = response["results"]["chapter"]["index"] + 1
+    chapter_name = response["results"]["chapter"]["name"]
     # *检测是否有此目录，没有就创建
     if not os.path.exists("%s/%s/" % (download_path, get_list_manga)):
         os.mkdir("%s/%s/" % (download_path, get_list_manga))
-    if not os.path.exists(
-            "%s/%s/%s/" % (download_path, get_list_manga, response["results"]["chapter"]["name"])):
-        os.mkdir("%s/%s/%s/" % (download_path, get_list_manga,
-                                response["results"]["chapter"]["name"]))
+    if not os.path.exists("%s/%s/%.3d - %s/" % (download_path, get_list_manga, chapter_index, chapter_name)):
+        os.mkdir("%s/%s/%.3d - %s/" % (download_path, get_list_manga, chapter_index, chapter_name))
     # 分析图片位置以及名称
     img_ext = 'webp' if img_url.endswith('webp') else 'jpg'
-    img_path = "%s/%s/%s/%s.%s" % (
-        download_path, get_list_manga, response["results"]["chapter"]["name"], img_num, img_ext)
+    img_path = "%s/%s/%.3d - %s/%s.%s" % (
+        download_path, get_list_manga, chapter_index, chapter_name, img_num, img_ext)
     download(img_url, img_path, img_num)
 
 
@@ -292,6 +292,7 @@ def welcome():
 
 
 if __name__ == "__main__":
+    requests.packages.urllib3.disable_warnings()
     get_settings()
     welcome()
     manga_chapter_list()
