@@ -35,9 +35,9 @@
 ## 更新 🔬
 
 ### 重大更新 📈：
-2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了socks5代理，并~~可能~~修复了代理问题，而且还顺便帮忙优化了下代码www
+2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了一些功能，并~~可能~~修复了问题，而且还顺便帮忙优化了下代码www
 
-2022/3/24: 暂时支持设置代理(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-downloader/issues/8)提交相关信息
+2022/3/24: 暂时支持设置一个功能(但是大概率无法下载，请注意，如果出现问题请在![ 这里 ](https://github.com/misaka10843/copymanga-downloader/issues/)提交相关信息
 
 2022/2/25: 修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
 
