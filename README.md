@@ -6,21 +6,15 @@
 
 **如果您的issue已经过了几天还没有被我受理，还请您发送邮件到misaka10843@outlook.jp来通知我，十分感谢！**
 
-### 代理问题 🐛
-
-clash等一些全局代理可能会导致urllib出现问题（具体可以看[copymanga-download #8](https://github.com/misaka10843/copymanga-downloader/issues/8) )
-
-解决方法：[clash_for_windows_pkg #1787](https://github.com/Fndroid/clash_for_windows_pkg/issues/1787)
-
 ## 技术栈 ⚒️
 
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
 
 ## Thanks 🎁
 
-* [Z-fly](https://github.com/Z-fly)(贡献与提出代理问题)
+* [Z-fly](https://github.com/Z-fly)(贡献与提出一些问题)
 
-* [zhongfly](https://github.com/zhongfly)(贡献与提供代理问题解决方法和优化代码)
+* [zhongfly](https://github.com/zhongfly)(贡献与提供一些问题解决方法和优化代码)
 
 ## 简介 🗒️
 
