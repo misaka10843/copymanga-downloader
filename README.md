@@ -17,7 +17,7 @@ QQ `3594254539`（不常工作时间上线）
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
 
 ## Thanks 🎁
-
+* [KILLER2017](https://github.com/KILLER2017)(优化下载阅读体验)
 * [Z-fly](https://github.com/Z-fly)(贡献与提出一些问题)
 
 * [zhongfly](https://github.com/zhongfly)(贡献与提供一些问题解决方法和优化代码)
