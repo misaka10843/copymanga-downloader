@@ -186,7 +186,10 @@ def manga_download():
                 chapter_analysis(response, j)
                 j = j + 1
         # *试图跳出循环
-        os.system("clear")
+        if(platform.system()=='Windows'):
+            os.system("cls")
+        else:
+            os.system("clear")
         print(
             "这个漫画已经全部下载完了qwq                                                     ")
         time.sleep(10)
@@ -211,7 +214,10 @@ def manga_download():
                 j = j + 1
             startchapter = int(startchapter) + 1
         # *试图跳出循环
-        os.system("clear")
+        if(platform.system()=='Windows'):
+            os.system("cls")
+        else:
+            os.system("clear")
         print(
             "这个漫画已经全部下载完了qwq                                                     ")
         # *返回到初始界面
