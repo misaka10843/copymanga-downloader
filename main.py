@@ -90,7 +90,7 @@ def manga_search(manga_name):
     print("正在搜索中...\r", end="")
     # *获取搜索结果
     response = requests.get(
-        'https://api.copymanga.info/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name,
+        'https://api.copymanga.org/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name,
         headers=api_headers, proxies=proxies)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
@@ -122,7 +122,7 @@ def manga_chapter_list():
     global all_chapter, start_chapter, end_chapter, manga_chapter
     # *获取章节列表
     manga_chapter = requests.get(
-        'https://api.copymanga.info/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
+        'https://api.copymanga.org/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
         % get_list_name, headers=api_headers, proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
@@ -176,7 +176,7 @@ def manga_download():
         for i in manga_chapter_list["results"]["list"]:
             # *获取每章的图片url以及顺序
             response = requests.get(
-                'https://api.copymanga.info/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]),
+                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]),
                 headers=api_headers, proxies=proxies)
             response = response.json()
             j = 0
@@ -199,7 +199,7 @@ def manga_download():
             startchapter_id = int(startchapter) - 1
             # *获取每章的图片url以及顺序
             response = requests.get(
-                'https://api.copymanga.info/api/v3/comic/%s/chapter2/%s?platform=3' % (
+                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (
                     get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=api_headers,
                 proxies=proxies)
             response = response.json()
@@ -240,7 +240,7 @@ def manga_collection(offset):
     manga_search_list = ""
     print("正在查询中...\r", end="")
     response = requests.get(
-        'https://copymanga.net/api/v3/member/collect/comics?limit=50&offset={'
+        'https://copymanga.org/api/v3/member/collect/comics?limit=50&offset={'
         '%s}&free_type=1&ordering=-datetime_modifier' % offset,
         headers=headers, proxies=proxies)
     print("搜索完毕啦！  \n")
