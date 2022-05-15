@@ -176,7 +176,8 @@ def manga_download():
         for i in manga_chapter_list["results"]["list"]:
             # *获取每章的图片url以及顺序
             response = requests.get(
-                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (get_list_name, i["uuid"]),
+                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (
+                    get_list_name, i["uuid"]),
                 headers=api_headers, proxies=proxies)
             response = response.json()
             j = 0
@@ -186,7 +187,7 @@ def manga_download():
                 chapter_analysis(response, j)
                 j = j + 1
         # *试图跳出循环
-        if(platform.system()=='Windows'):
+        if(platform.system() == 'Windows'):
             os.system("cls")
         else:
             os.system("clear")
@@ -214,7 +215,7 @@ def manga_download():
                 j = j + 1
             startchapter = int(startchapter) + 1
         # *试图跳出循环
-        if(platform.system()=='Windows'):
+        if(platform.system() == 'Windows'):
             os.system("cls")
         else:
             os.system("clear")
@@ -233,7 +234,8 @@ def chapter_analysis(response, j):
     if not os.path.exists("%s/%s/" % (download_path, get_list_manga)):
         os.mkdir("%s/%s/" % (download_path, get_list_manga))
     if not os.path.exists("%s/%s/%.3d - %s/" % (download_path, get_list_manga, chapter_index, chapter_name)):
-        os.mkdir("%s/%s/%.3d - %s/" % (download_path, get_list_manga, chapter_index, chapter_name))
+        os.mkdir("%s/%s/%.3d - %s/" %
+                 (download_path, get_list_manga, chapter_index, chapter_name))
     # 分析图片位置以及名称
     img_ext = 'webp' if img_url.endswith('webp') else 'jpg'
     img_path = "%s/%s/%.3d - %s/%s.%s" % (
@@ -246,7 +248,7 @@ def manga_collection(offset):
     manga_search_list = ""
     print("正在查询中...\r", end="")
     response = requests.get(
-        'https://copymanga.org/api/v3/member/collect/comics?limit=50&offset={'
+        'https://copymanga.org/api/v3/member/collect/comics?limit=12&offset={'
         '%s}&free_type=1&ordering=-datetime_modifier' % offset,
         headers=headers, proxies=proxies)
     print("搜索完毕啦！  \n")
@@ -288,10 +290,41 @@ def manga_collection(offset):
         sys.exit(0)
 
 
+def manga_collection_backup():
+    global get_list_name, get_list_manga
+    manga_search_list = ""
+    print("正在查询中...\r", end="")
+    response = requests.get(
+        'https://copymanga.org/api/v3/member/collect/comics?limit=500&offset=0&free_type=1&ordering=-datetime_modifier',
+        headers=headers, proxies=proxies)
+    print("查询完毕啦！  \n")
+    # !简要判断是否服务器无法连接
+    if response.status_code == 200:
+        # *将api解析成json
+        manga_search_list = response.json()
+        # *初始化列表的序号
+        manga_list = manga_search_list["results"]["list"]
+        # print("已查询出以下漫画(输入pn为下一页，pu为上一页)：")
+        print("正在输出到程序目录下的backup.txt....")
+        f = open("./backup.txt", "w")
+        for line in manga_list:
+            f.write(line["comic"]["name"]+'\n', encoding='utf-8')
+        f.close()
+        print("写入完成！")
+        welcome()
+    else:
+        # *报告远程服务器无法连接的状态码
+        print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
+        print("返回的状态码是：%d" % response.status_code)
+        sys.exit(0)
+
+
 def welcome():
-    is_search = input("您是想搜索还是查看您的收藏？(1:搜索，2:收藏  默认1):")
+    is_search = input("您是想搜索还是查看您的收藏？(0:导出收藏,1:搜索,2:收藏  默认1):")
     if is_search == "2":
         manga_collection(0)
+    elif is_search == "0":
+        manga_collection_backup()
     else:
         manga_name = input("请输入漫画名称:")
         manga_search(manga_name)
