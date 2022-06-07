@@ -125,10 +125,26 @@ def manga_chapter_list():
     manga_chapter = requests.get(
         'https://api.copymanga.org/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
         % get_list_name, headers=api_headers, proxies=proxies)
+    other_chapter = requests.get(
+        'https://api.copymanga.com/api/v3/comic/%s/group/other_group/chapters?limit=500&offset=0&platform=3'
+        % get_list_name, headers=api_headers, proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
         # *将api解析成json
         chapter_list = manga_chapter.json()
+        if other_chapter.status_code == 200:
+            other_chapter_list = other_chapter.json()
+            if int(other_chapter_list["results"]["total"])>0:
+                print("获取到了\033[1;33m %s\033[37m 话的默认内容和\033[1;33m %s\033[37m 话的其他内容，请问是下载哪个呢？" %
+                  (chapter_list["results"]["total"], other_chapter_list["results"]["total"]))
+                which_download = input("1->默认\n2->其他\n您的选择是(默认1)：")
+                if len(which_download) == 0:
+                    pass
+                elif int(which_download) == 1:
+                    pass
+                elif int(which_download) == 2:
+                    chapter_list = other_chapter_list
+                    manga_chapter = other_chapter
         print("我们获取了\033[1;33m %s\033[37m 话的内容，请问是如何下载呢？" %
               chapter_list["results"]["total"])
         # *判断用户需要怎么下载
