@@ -2,6 +2,10 @@
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
 
+## README 语言
+
+**简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/master/README-EN.md)
+
 ## 注意！ ‼️
 
 **如果您的issue已经过了几天还没有被我受理，还请您发送邮件到misaka10843@outlook.jp来通知我，十分感谢！**
@@ -11,6 +15,8 @@
 discord `misaka10843#2282`（早上，中午以及下午5-6点）
 
 QQ `3594254539`（不常工作时间上线）
+
+因为copymanga为简体/繁体中文的漫画网站，所以此程序预计不会添加其他语言，还请谅解
 
 ## 技术栈 ⚒️
 
@@ -44,7 +50,7 @@ QQ `3594254539`（不常工作时间上线）
 ## 更新 🔬
 
 ### 重大更新 📈：
-2022/6/8: 添加“其他”内容的下载
+2022/6/8: 在[@zaazwm](https://github.com/zaazwm)帮助下实现了“其他”内容的下载
 
 2022/5/15: 新增收藏导出功能（最高支持500个）
 
