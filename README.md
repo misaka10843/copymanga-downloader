@@ -37,7 +37,7 @@ QQ `3594254539`（不常工作时间上线）
 
 （如果不是那就重新下载一遍，如果还有的话就发**issuse**吧qwq）
 
-如果您是安卓用户，那么您可以使用[fumiama](https://github.com/fumiama/)的[copymanga](https://github.com/fumiama/copymanga)客户端尝试下载
+如果您是安卓用户，那么您可以使用[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)客户端尝试下载（但是需要安装`copymanga`的插件）
 
 如果您需要**从右到左**的拼接图片，并且两张为一组的话，您可以尝试使用[这个版本](https://github.com/misaka10843/copymanga-downloader/releases/tag/v2.2)中的`Image_stitching.exe`来实现(只提供简单功能，并未做出优化)
 
