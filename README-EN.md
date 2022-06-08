@@ -29,12 +29,10 @@ QQ `3594254539` (not always online during working hours)
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
 
 ## Thanks 🎁
+
 * [KILLER2017](https://github.com/KILLER2017)(Optimize download reading experience)
-
 * [Z-fly](https://github.com/Z-fly)(Contribute and ask some questions)
-
 * [zhongfly](https://github.com/zhongfly)(Contribute with some problem solving and optimization code)
-
 * [zaazwm](https://github.com/zaazwm)(add other content for download)
 
 ## Introduction 🗒️
@@ -55,14 +53,15 @@ If you need to stitch images **right to left** and in groups of two, you can try
 
 ## Updates 🔬
 
-### Major updates 📈.
-2022/6/8: Implemented support 'other' group with the help of [@zaazwm](https://github.com/zaazwm)
+### Major updates 📈
+
+2022/6/8: Implemented support 'other' group with the help of [@zaazwm](https://github.com/zaazwm) ，Fix collection export problem and export csv
 
 2022/5/15: Added the ability to export favorites (up to 500)
 
 2022/3/29: Supported some features with the help of [@zhongfly](https://github.com/zhongfly), and ~~may~~ fix the problem, and also helped optimize the code by the way www
 
-2022/3/24: temporarily support setting a function (but the probability of not being able to download, please note that if there is a problem, please add it to the [ here ](https://github.com/misaka10843/copymanga-downloader/issues/) to submit relevant information
+2022/3/24: temporarily support setting a function (but the probability of not being able to download, please note that if there is a problem, please add it to the [here](https://github.com/misaka10843/copymanga-downloader/issues/) to submit relevant information
 
 2022/2/25: Fix url problem with copymanga (copymanga.com seems to have been abandoned and replaced with copymanga.net)
 
@@ -71,7 +70,6 @@ If you need to stitch images **right to left** and in groups of two, you can try
 2022/1/14: Github automatically compiles Linux (should) binaries! [actions](https://github.com/misaka10843/copymanga-downloader/actions/)
 
 2021/11/18: add get user favorite comics and support download
-
 
 ## Put a few screenshots qwq (timeliness not guaranteed)
 
@@ -84,40 +82,31 @@ First initialization
 ### Use now (Windows)
 
 1. Click [here](https://github.com/misaka10843/copymanga-downloader/releases/latest) to download the latest version of the exe compiled from the author's computer, or download the compiled file from GitHub [actions](https:/ /github.com/misaka10843/copymanga-downloader/actions/) (stability is not guaranteed)
-
 2. Put this program into an empty folder (no problem if you don't put it, that is, the data will be written to the current folder)
-
 3. directly double-click the exe can be qwq
 
 ### immediately use (Linux, can not guarantee whether to run)
 
 1. Click [actions](https://github.com/misaka10843/copymanga-downloader/actions) to select the latest compilation (100% synchronization update, but can not guarantee whether it can run)
-
 2. Download the `copymanga-download-Linux` zip package in the `attachment`.
 
 3.Unzip the `copymanga-download-Linux` package
 
 4. Put this program into an empty folder (no problem if you don't put it, that is, the data will be written to the current folder)
-
 5. Just run it qwq
 
 ### Compile / original code use (all systems are supported)
 
 1. Click [here](https://github.com/misaka10843/copymanga-downloader/archive/refs/heads/master.zip) to directly download the latest source code package
-
 2. unzip it and put it into an empty folder (no problem if you don't, that is, the data will be written to the current folder)
-
-3. first run this to install the dependency `pip install requirements.txt` (in fact, there is only a `requests` need to install, the other are python comes with (￣▽￣))
-
+3. first run this to install the dependency `pip install requirements.txt` (in fact, there is only a `requests,tqdm and pysocks` need to install, the other are python comes with (￣▽￣))
 4. Then run `python main.py` to
 
 ### how to get authorization(this is to get user collection comics) 📒
-1. Visit https://copymanga.net/web/person/shujia
 
+1. Visit [https://copymanga.net/web/person/shujia](https://copymanga.net/web/person/shujia)
 2. Press F12 and refresh the page
-
-3. Find a file like `comics?limit=12&offset=0&free_type=1&ordering=-datetime_modifier`(?) and click
-
+3. Find a file like `comics?limit=12&offset=0&free_type=1&ordering=-datetime_modifier` and click
 4. In the **request header** find `authorization: Token {each different}`, copy `Token {each different}`, e.g. `Token 1293asd123s8adhh2juhsada2`
 
 Image ([larger view](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)).
@@ -132,17 +121,17 @@ All the APIs used by this program to obtain information are official APIs
 The specific use is as follows
 
 ```text
-Comic search.
-https://api.copymanga.info/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={keyword}
+Comic search: 
+https://api.copymanga.org/api/v3/search/comic?format=json&limit=18&offset=0&platform=3&q={keyword}
 
-Manga chapter fetching: {manga_path_word}/group/default/chapters
-https://api.copymanga.info/api/v3/comic/{comic_path_word}/group/default/chapters?limit=500&offset=0&platform=3
+Manga chapter fetching: 
+https://api.copymanga.org/api/v3/comic/{comic_path_word}/group/default/chapters?limit=500&offset=0&platform=3
 
-Comic chapter images are available at
-https://api.copymanga.info/api/v3/comic/{manga_path_word}/chapter2/{chapterUUUID}?platform=3
+Comic chapter images are available at:
+https://api.copymanga.org/api/v3/comic/{manga_path_word}/chapter2/{chapterUUUID}?platform=3
 
 User favorite manga fetching (need to set headers['authorization']):
-https://copymanga.net/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
+https://copymanga.org/api/v3/member/collect/comics?limit=50&offset=0&free_type=1&ordering=-datetime_modifier
 ```
 
 ### About the code

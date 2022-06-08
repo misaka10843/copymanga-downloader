@@ -134,9 +134,9 @@ def manga_chapter_list():
         chapter_list = manga_chapter.json()
         if other_chapter.status_code == 200:
             other_chapter_list = other_chapter.json()
-            if int(other_chapter_list["results"]["total"])>0:
+            if int(other_chapter_list["results"]["total"]) > 0:
                 print("获取到了\033[1;33m %s\033[37m 话的默认内容和\033[1;33m %s\033[37m 话的其他内容，请问是下载哪个呢？" %
-                  (chapter_list["results"]["total"], other_chapter_list["results"]["total"]))
+                      (chapter_list["results"]["total"], other_chapter_list["results"]["total"]))
                 which_download = input("1->默认\n2->其他\n您的选择是(默认1)：")
                 if len(which_download) == 0:
                     pass
@@ -283,6 +283,7 @@ def manga_collection(offset):
             print(list_num, '->', i["comic"]["name"])
             list_num = list_num + 1
         get_list_num = input("您需要下载的漫画是序号几？：")
+        # Todo：查询漫画时翻页功能
         # 因为一些原因，无法使用下列方法查询其他页数漫画
         # if get_list_num == "pn":
         #    offsetnum = offset + 12
@@ -321,13 +322,21 @@ def manga_collection_backup():
         manga_search_list = response.json()
         # *初始化列表的序号
         manga_list = manga_search_list["results"]["list"]
-        # print("已查询出以下漫画(输入pn为下一页，pu为上一页)：")
-        print("正在输出到程序目录下的backup.txt....")
-        f = open("./backup.txt", "w")
+        # 输出txt
+        print("正在输出到程序目录下的backup.csv....")
+        f = open("./backup.csv", "w", encoding='GBK')
+        f.write('漫画名,最后更新时间\n')
         for line in manga_list:
-            f.write(line["comic"]["name"]+'\n', encoding='utf-8')
+            f.write('%s,%s\n' % (line["comic"]["name"],
+                    line["comic"]["datetime_updated"]))
         f.close()
-        print("写入完成！")
+        f = open("./backup.txt", "w", encoding='utf-8')
+        # 输出txt
+        print("正在输出到程序目录下的backup.txt....")
+        for line in manga_list:
+            f.write('%s\n' % line["comic"]["name"])
+        f.close()
+        print("写入完成！(SCV请用Excel打开，编码为GBK)")
         welcome()
     else:
         # *报告远程服务器无法连接的状态码
