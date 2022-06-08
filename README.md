@@ -4,7 +4,7 @@
 
 ## README 语言
 
-**简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/master/README-EN.md)
+**简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/blob/master/README-EN.md)
 
 ## 注意！ ‼️
 
