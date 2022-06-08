@@ -18,9 +18,12 @@ QQ `3594254539`（不常工作时间上线）
 
 ## Thanks 🎁
 * [KILLER2017](https://github.com/KILLER2017)(优化下载阅读体验)
+
 * [Z-fly](https://github.com/Z-fly)(贡献与提出一些问题)
 
 * [zhongfly](https://github.com/zhongfly)(贡献与提供一些问题解决方法和优化代码)
+
+* [zaazwm](https://github.com/zaazwm)(添加其他内容的下载)
 
 ## 简介 🗒️
 
@@ -41,6 +44,8 @@ QQ `3594254539`（不常工作时间上线）
 ## 更新 🔬
 
 ### 重大更新 📈：
+2022/6/8: 添加“其他”内容的下载
+
 2022/5/15: 新增收藏导出功能（最高支持500个）
 
 2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了一些功能，并~~可能~~修复了问题，而且还顺便帮忙优化了下代码www
