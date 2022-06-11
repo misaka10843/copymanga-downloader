@@ -126,7 +126,7 @@ def manga_chapter_list():
         'https://api.copymanga.org/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
         % get_list_name, headers=api_headers, proxies=proxies)
     other_chapter = requests.get(
-        'https://api.copymanga.com/api/v3/comic/%s/group/other_group/chapters?limit=500&offset=0&platform=3'
+        'https://api.copymanga.org/api/v3/comic/%s/group/other_group/chapters?limit=500&offset=0&platform=3'
         % get_list_name, headers=api_headers, proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
