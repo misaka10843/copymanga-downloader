@@ -42,8 +42,8 @@ def get_settings():
         json_data["download_path"] = download_path.replace('\\', '/')
         print("\n接下来填写的是获取您的收藏漫画需要的参数，请认真填写哦qwq(如果不想获取的话也可以直接填写null)\n")
         cookies_get = input(
-            "请输入您的authorization(如不会获取请看https://github.com/misaka10843/copymanga-download#如何获取authorization("
-            "此为获取用户收藏漫画))：")
+            "请输入您的authorization(如不会获取请看https://t.hk.uy/bdFu ("
+            "此为获取用户收藏漫画,下载服务不受影响))：")
         json_data["authorization"] = cookies_get
         if input("是否使用海外CDN？(y/n)：").lower() == 'y':
             json_data["use_oversea_cdn"] = True
@@ -114,7 +114,7 @@ def manga_search(manga_name):
     else:
         # *报告远程服务器无法连接的状态码
         print("服务器似乎\033[1;31m 无法连接\033[37m 了qwq\n")
-        print("如需使用代理，可使用命令，如：set https_proxy=http://127.0.0.1:7890")
+        print("如需使用代理，可使用命令，如：set https_proxy=http://127.0.0.1:7890，或者在settings.json中设置代理")
         print("返回的状态码是：%d" % response.status_code)
         sys.exit(0)
 
