@@ -1,4 +1,14 @@
 ### Python template
+# User file
+backup.csv
+backup.txt
+settings.json
+*.jpg
+*.webp
+
+# Vscode
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
