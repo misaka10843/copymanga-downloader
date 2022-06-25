@@ -105,7 +105,7 @@ QQ `3594254539`（不常工作时间上线）
 
 ### 如何获取authorization(此为获取用户收藏漫画) 📒
 
-1.访问[https://copymanga.net/web/person/shujia](https://copymanga.net/web/person/shujia)
+1.访问[https://copymanga.org/web/person/shujia](https://copymanga.org/web/person/shujia)
 
 2.按下F12后刷新页面
 
