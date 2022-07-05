@@ -4,6 +4,8 @@ import os
 import platform
 import sys
 import time
+from turtle import width
+from typing import Counter
 
 import requests
 from tqdm import tqdm
@@ -119,32 +121,41 @@ def manga_search(manga_name):
         sys.exit(0)
 
 
+def manga_chapter_group(Manga_pathWord):
+    chapter_group = requests.get(
+        'https://api.copymanga.org/api/v3/comic2/%s'
+        % Manga_pathWord, headers=api_headers, proxies=proxies)
+    chapter_group_list = chapter_group.json()
+    if chapter_group.status_code == 200:
+        print("我们获取到了一些不同的分组，请输入需要下载的分组序号(默认为‘默認’):")
+        # * 获取group值并强转list
+        group_list = list(chapter_group_list["results"]["groups"].keys())
+        list_num = 0
+        # *循环输出
+        while list_num < len(group_list):
+            print(list_num, '->',
+                  chapter_group_list["results"]["groups"][group_list[list_num]]["name"])
+            list_num = list_num + 1
+        # *获取选项
+        Get_group = input()
+        # *添加默认选项
+        if len(Get_group) == 0:
+            Get_group = 0
+        # *将path_word传给manga_chapter_list
+        return chapter_group_list["results"]["groups"][group_list[Get_group]]["path_word"]
+
+
 def manga_chapter_list():
     global all_chapter, start_chapter, end_chapter, manga_chapter
+    group_name = manga_chapter_group(get_list_name)
     # *获取章节列表
     manga_chapter = requests.get(
-        'https://api.copymanga.org/api/v3/comic/%s/group/default/chapters?limit=500&offset=0&platform=3'
-        % get_list_name, headers=api_headers, proxies=proxies)
-    other_chapter = requests.get(
-        'https://api.copymanga.org/api/v3/comic/%s/group/other_group/chapters?limit=500&offset=0&platform=3'
-        % get_list_name, headers=api_headers, proxies=proxies)
+        'https://api.copymanga.org/api/v3/comic/%s/group/%s/chapters?limit=500&offset=0&platform=3'
+        % (get_list_name, group_name), headers=api_headers, proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
         # *将api解析成json
         chapter_list = manga_chapter.json()
-        if other_chapter.status_code == 200:
-            other_chapter_list = other_chapter.json()
-            if int(other_chapter_list["results"]["total"]) > 0:
-                print("获取到了\033[1;33m %s\033[37m 话的默认内容和\033[1;33m %s\033[37m 话的其他内容，请问是下载哪个呢？" %
-                      (chapter_list["results"]["total"], other_chapter_list["results"]["total"]))
-                which_download = input("1->默认\n2->其他\n您的选择是(默认1)：")
-                if len(which_download) == 0:
-                    pass
-                elif int(which_download) == 1:
-                    pass
-                elif int(which_download) == 2:
-                    chapter_list = other_chapter_list
-                    manga_chapter = other_chapter
         print("我们获取了\033[1;33m %s\033[37m 话的内容，请问是如何下载呢？" %
               chapter_list["results"]["total"])
         # *判断用户需要怎么下载
