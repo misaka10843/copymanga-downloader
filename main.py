@@ -127,22 +127,25 @@ def manga_chapter_group(Manga_pathWord):
         % Manga_pathWord, headers=api_headers, proxies=proxies)
     chapter_group_list = chapter_group.json()
     if chapter_group.status_code == 200:
-        print("我们获取到了一些不同的分组，请输入需要下载的分组序号(默认为‘默認’):")
         # * 获取group值并强转list
         group_list = list(chapter_group_list["results"]["groups"].keys())
-        list_num = 0
-        # *循环输出
-        while list_num < len(group_list):
-            print(list_num, '->',
-                  chapter_group_list["results"]["groups"][group_list[list_num]]["name"])
-            list_num = list_num + 1
-        # *获取选项
-        Get_group = input()
-        # *添加默认选项
-        if len(Get_group) == 0:
-            Get_group = 0
-        # *将path_word传给manga_chapter_list
-        return chapter_group_list["results"]["groups"][group_list[Get_group]]["path_word"]
+        if len(group_list) == 1:
+            return "default"
+        else:
+            print("我们获取到了一些不同的分组，请输入需要下载的分组序号(默认为‘默認’):")
+            list_num = 0
+            # *循环输出
+            while list_num < len(group_list):
+                print(list_num, '->',
+                      chapter_group_list["results"]["groups"][group_list[list_num]]["name"])
+                list_num = list_num + 1
+            # *获取选项
+            Get_group = input()
+            # *添加默认选项
+            if len(Get_group) == 0:
+                Get_group = 0
+            # *将path_word传给manga_chapter_list
+            return chapter_group_list["results"]["groups"][group_list[Get_group]]["path_word"]
 
 
 def manga_chapter_list():
