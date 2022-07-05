@@ -45,9 +45,15 @@ QQ `3594254539`（不常工作时间上线）
 
 如果您需要**从右到左**的拼接图片，并且两张为一组的话，您可以尝试使用[这个版本](https://github.com/misaka10843/copymanga-downloader/releases/tag/v2.2)中的 `Image_stitching.exe`来实现(只提供简单功能，并未做出优化)
 
+如果发现无法获取/下载的时候，请多试几次，如果不行的话请删除下图中标明的字段，触发设置缺损备份旧设置并重新初始化(**请不要删除双引号！**)
+
+![image.png](https://s2.loli.net/2022/07/05/iXJTlowxnO2GCfc.png)
+
 ## 更新 🔬
 
 ### 重大更新 📈
+
+2022/7/5: 修复漫画分组只显示“默认”与“其他”的问题，添加从GitHub中获取copymanga的url列表，添加设置缺损后报错并备份老设置文件后重新进入初始化
 
 2022/6/8: 在[@zaazwm](https://github.com/zaazwm)帮助下实现了“其他”内容的下载，修复收藏导出问题与导出csv
 
