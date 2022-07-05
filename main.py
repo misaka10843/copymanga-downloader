@@ -108,7 +108,9 @@ def manga_search(manga_name):
         for i in manga_search_list["results"]["list"]:
             print(list_num, '->', i["name"])
             list_num = list_num + 1
-        get_list_num = input("您需要下载的漫画是序号几？：")
+        get_list_num = input("您需要下载的漫画是序号几？(默认0)：")
+        if len(get_list_num) == 0:
+            get_list_num = 0
         get_list_name = manga_search_list["results"]["list"][int(
             get_list_num)]["path_word"]
         get_list_manga = manga_search_list["results"]["list"][int(
@@ -162,8 +164,10 @@ def manga_chapter_list():
         print("我们获取了\033[1;33m %s\033[37m 话的内容，请问是如何下载呢？" %
               chapter_list["results"]["total"])
         # *判断用户需要怎么下载
-        how_download = input("1->全本下载\n2->范围下载\n3->单话下载\n您的选择是：")
+        how_download = input("1->全本下载\n2->范围下载\n3->单话下载\n您的选择是(默认全本下载)：")
         all_chapter = 0  # !防止误触发
+        if len(how_download) == 0:
+            how_download = 1
         if int(how_download) == 1:
             all_chapter = 1
         elif int(how_download) == 2:
@@ -296,7 +300,9 @@ def manga_collection(offset):
         for i in manga_search_list["results"]["list"]:
             print(list_num, '->', i["comic"]["name"])
             list_num = list_num + 1
-        get_list_num = input("您需要下载的漫画是序号几？：")
+        get_list_num = input("您需要下载的漫画是序号几？(默认0)：")
+        if len(get_list_num) == 0:
+            get_list_num = 0
         # Todo：查询漫画时翻页功能
         # 因为一些原因，无法使用下列方法查询其他页数漫画
         # if get_list_num == "pn":
