@@ -51,9 +51,15 @@ If you are an Android user, then you can use the [tachiyomi](https://github.com/
 
 If you need to stitch images **right to left** and in groups of two, you can try using `Image_ stitching.exe` in [this version]() to achieve this (only simple functions are provided, no optimization is made)
 
+If you find that you can't get/download, please try a few more times, if not please delete the fields marked in the figure below, trigger the setting deficiency to backup the old settings and reinitialize ( **please don't delete the double quotes!** )
+
+![image.png](https://s2.loli.net/2022/07/05/iXJTlowxnO2GCfc.png)
+
 ## Updates 🔬
 
 ### Major updates 📈
+
+2022/7/5: Fix the problem that the comic group only shows "default" and "other", add the list of URLs to get copymanga from GitHub, add an error when setting is missing and backup the old settings file and re-enter Initialization
 
 2022/6/8: Implemented support 'other' group with the help of [@zaazwm](https://github.com/zaazwm) ，Fix collection export problem and export csv
 

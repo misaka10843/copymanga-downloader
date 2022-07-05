@@ -23,8 +23,42 @@ api_headers = {
 proxies = {}
 
 
+def get_url():
+    # *从GitHub(首先两个为CDN，方便中国大陆用户获取)中获取url的信息
+    response = requests.get(
+        'https://raw.fastgit.org/misaka10843/copymanga-downloader/master/url.json',
+        headers=headers)
+    if response.status_code != 200:
+        print("您的网络似乎不支持fastgit，我们正在切换新的请求地址")
+        response = requests.get(
+            'https://fastly.jsdelivr.net/gh/misaka10843/copymanga-downloader@master/url.json',
+            headers=headers)
+        if response.status_code != 200:
+            print("您的网络似乎也不支持jsdelivr，我们只能请求GitHub原站了")
+            response = requests.get(
+                'https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json',
+                headers=headers)
+            if response.status_code != 200:
+                print("我们无法获取到相关信息，请检查网络后重试")
+                # *直接退出
+                exit()
+    url_list = response.json()
+    print("我们获取到copymanga有以下域名，请选择您希望使用的域名来确保连接通畅:")
+    list_num = 0
+    for i in url_list:
+        # *循环输出url信息
+        print(list_num, '->', i)
+        list_num = list_num + 1
+    get_url_list_num = input("您希望通过第几个域名来获取相关信息?(默认0)：")
+    if len(get_url_list_num) == 0:
+        get_url_list_num = 0
+    # *从用户选择中获取到url信息并返回
+    url = url_list[int(get_url_list_num)]
+    return url
+
+
 def get_settings():
-    global download_path, proxies
+    global download_path, proxies, Api_url, Authorization
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
     if not os.path.isfile("./settings.json"):
@@ -51,25 +85,39 @@ def get_settings():
             json_data["use_oversea_cdn"] = True
         else:
             json_data["use_oversea_cdn"] = False
-        if input("是否下载webp格式图片？(y/n)：").lower() == 'y':
+        # *是否为了节省服务器带宽而使用webp
+        if input("是否下载webp格式图片(可以节省服务器资源)？(y/n)：").lower() == 'y':
             json_data["use_webp"] = True
         else:
             json_data["use_webp"] = False
-        # 获取proxies状态
+        # *获取proxies状态
         proxies_get = input(
             "您是否使用了代理？如果是，请填写代理地址(如http://127.0.0.1:8099或者socks5://127.0.0.1:8099)：")
         json_data["proxies"] = proxies_get
+        # *获取最新的域名状态
+        json_data["api_url"] = get_url()
         # *写入文件
         with open('./settings.json', 'w', encoding="utf-8") as fp:
             json.dump(json_data, fp, indent=2, ensure_ascii=False)
 
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改设置的话可以直接到程序根目录的settings.json更改qwq")
-
+    # *读取设置内容
     with open('./settings.json', 'r', encoding="utf-8") as fp:
         json_data = json.load(fp)
+        #! 只要下载路径/请求地址是空，那么就直接报错
+        if not json_data["download_path"] or not json_data["api_url"]:
+            print("\033[1;31m 您的设置似乎出现了问题导致部分设置丢失，请您重新启动此程序后重新设置\033[37m")
+            fp.close()
+            os.rename("./settings.json", "./settings_old.json")
+            exit()
         download_path = json_data["download_path"]
-        headers["authorization"] = json_data["authorization"]
+        if json_data["authorization"]:
+            headers["authorization"] = json_data["authorization"]
+        else:
+            headers["authorization"] = "null"
+            Authorization = 0
         proxies_set = json_data["proxies"]
+        Api_url = json_data["api_url"]
         if json_data["use_oversea_cdn"] == True:
             api_headers["region"] = '0'
         if json_data["use_webp"] == True:
@@ -93,7 +141,8 @@ def manga_search(manga_name):
     print("正在搜索中...\r", end="")
     # *获取搜索结果
     response = requests.get(
-        'https://api.copymanga.org/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % manga_name,
+        'https://api.%s/api/v3/search/comic?format=json&limit=20&offset=0&platform=3&q=%s' % (
+            Api_url, manga_name),
         headers=api_headers, proxies=proxies)
     print("搜索完毕啦！  \n")
     # !简要判断是否服务器无法连接
@@ -125,8 +174,8 @@ def manga_search(manga_name):
 
 def manga_chapter_group(Manga_pathWord):
     chapter_group = requests.get(
-        'https://api.copymanga.org/api/v3/comic2/%s'
-        % Manga_pathWord, headers=api_headers, proxies=proxies)
+        'https://api.%s/api/v3/comic2/%s'
+        % (Api_url, Manga_pathWord), headers=api_headers, proxies=proxies)
     chapter_group_list = chapter_group.json()
     if chapter_group.status_code == 200:
         # * 获取group值并强转list
@@ -155,8 +204,8 @@ def manga_chapter_list():
     group_name = manga_chapter_group(get_list_name)
     # *获取章节列表
     manga_chapter = requests.get(
-        'https://api.copymanga.org/api/v3/comic/%s/group/%s/chapters?limit=500&offset=0&platform=3'
-        % (get_list_name, group_name), headers=api_headers, proxies=proxies)
+        'https://api.%s/api/v3/comic/%s/group/%s/chapters?limit=500&offset=0&platform=3'
+        % (Api_url, get_list_name, group_name), headers=api_headers, proxies=proxies)
     # !简要判断是否服务器无法连接
     if manga_chapter.status_code == 200:
         # *将api解析成json
@@ -211,8 +260,8 @@ def manga_download():
         for i in manga_chapter_list["results"]["list"]:
             # *获取每章的图片url以及顺序
             response = requests.get(
-                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (
-                    get_list_name, i["uuid"]),
+                'https://api.%s/api/v3/comic/%s/chapter2/%s?platform=3' % (
+                    Api_url, get_list_name, i["uuid"]),
                 headers=api_headers, proxies=proxies)
             response = response.json()
             j = 0
@@ -238,8 +287,8 @@ def manga_download():
             startchapter_id = int(startchapter) - 1
             # *获取每章的图片url以及顺序
             response = requests.get(
-                'https://api.copymanga.org/api/v3/comic/%s/chapter2/%s?platform=3' % (
-                    get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=api_headers,
+                'https://api.%s/api/v3/comic/%s/chapter2/%s?platform=3' % (
+                    Api_url, get_list_name, manga_chapter_list["results"]["list"][startchapter_id]["uuid"]), headers=api_headers,
                 proxies=proxies)
             response = response.json()
             j = 0
@@ -280,13 +329,17 @@ def chapter_analysis(response, j):
 
 def manga_collection(offset):
     global get_list_name, get_list_manga
+    if Authorization == 0:
+        print(
+            "您并未填写Authorization，请按照https://t.hk.uy/bdFu填写并添加到settings.json中的authorization字段")
+        return
     manga_search_list = ""
     print("正在查询中...\r", end="")
     response = requests.get(
-        'https://copymanga.org/api/v3/member/collect/comics?limit=12&offset={'
-        '%s}&free_type=1&ordering=-datetime_modifier' % offset,
+        'https://%s/api/v3/member/collect/comics?limit=12&offset={'
+        '%s}&free_type=1&ordering=-datetime_modifier' % (Api_url, offset),
         headers=headers, proxies=proxies)
-    print("搜索完毕啦！  \n")
+    print("查询完毕啦！  \n")
     # !简要判断是否服务器无法连接
     if response.status_code == 200:
         # *将api解析成json
@@ -330,10 +383,14 @@ def manga_collection(offset):
 
 def manga_collection_backup():
     global get_list_name, get_list_manga
+    if Authorization == 0:
+        print(
+            "您并未填写Authorization，请按照https://t.hk.uy/bdFu填写并添加到settings.json中的authorization字段")
+        return
     manga_search_list = ""
     print("正在查询中...\r", end="")
     response = requests.get(
-        'https://copymanga.org/api/v3/member/collect/comics?limit=500&offset=0&free_type=1&ordering=-datetime_modifier',
+        'https://%s/api/v3/member/collect/comics?limit=500&offset=0&free_type=1&ordering=-datetime_modifier' % Api_url,
         headers=headers, proxies=proxies)
     print("查询完毕啦！  \n")
     # !简要判断是否服务器无法连接

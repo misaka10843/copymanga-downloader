@@ -3,6 +3,7 @@
 backup.csv
 backup.txt
 settings.json
+settings_old.json
 *.jpg
 *.webp
 
