@@ -55,28 +55,31 @@ jobs:
         with:
           name: copymanga-downloader-windows
           path: dist/copymanga-downloader.exe
-
+          
   macos-build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out git repository
+        uses: actions/checkout@v2.4.2
+      
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v4.0.0
         with:
           python-version: "3.10"
+          
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          if (Test-Path -path "requirements.txt" -PathType Leaf) {
-            pip install -r requirements.txt
-          }
-      - name: Compile exe
+          pip3 install pyinstaller
+          pip3 install -r requirements.txt
+          
+      - name: Compile
         run: |
-          pyinstaller -n copymanga-downloader -F main.py -i icon.ico
-      - name : upload exe
+          pyinstaller -F main.py
+          pyinstaller main.spec
+          
+      - name : upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: copymanga-downloader-macos-test
+          name: macos-latest
           path: dist/
 
