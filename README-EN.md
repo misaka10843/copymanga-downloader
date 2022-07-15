@@ -6,6 +6,13 @@
 
 [简体中文](https://github.com/misaka10843/copymanga-downloader)|**English**
 
+
+## Disclaimer 📢
+
+We made this tool purely because we can't download comics on PC, and we don't want individual users to rely on this tool all the time and increase the burden on the server with long/multiple file downloads.
+
+The use of this tool should be for small/short downloads, not large/long downloads, and we will not accept problems if they occur as a result.
+
 ## Remarks
 
 This is an English README that is not officially supported, because this file is translated using a translator and is not proofread, please refer to the Chinese README!
