@@ -195,6 +195,8 @@ def manga_chapter_group(Manga_pathWord):
             # *添加默认选项
             if len(Get_group) == 0:
                 Get_group = 0
+            else:
+              Get_group = int(Get_group)
             # *将path_word传给manga_chapter_list
             return chapter_group_list["results"]["groups"][group_list[Get_group]]["path_word"]
 
