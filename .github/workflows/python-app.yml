@@ -25,7 +25,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Compile exe
         run: |
-          pyinstaller -n copymanga-downloader -F main.py -i icon.ico
+          pyinstaller -n Linux-copymanga-downloader -F main.py -i icon.ico
       - name : upload exe
         uses: actions/upload-artifact@master
         with:
@@ -74,12 +74,12 @@ jobs:
           
       - name: Compile
         run: |
-          pyinstaller -F main.py
+          pyinstaller -n Macos-copymanga-downloader -F main.py -i icon.ico
           pyinstaller main.spec
           
       - name : upload artifact
         uses: actions/upload-artifact@master
         with:
-          name: macos-latest
+          name: copymanga-downloader-macos
           path: dist/
 
