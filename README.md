@@ -1,3 +1,5 @@
+**对不起！因为本人个人原因，今年是没有什么精力维护此仓库，如果有什么问题的话建议直接发邮箱，还请谅解！**
+
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
