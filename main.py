@@ -6,6 +6,7 @@ import sys
 import time
 from turtle import width
 from typing import Counter
+from retrying import retry
 
 import requests
 from tqdm import tqdm
@@ -234,6 +235,7 @@ def manga_chapter_list():
 
 
 def download(url: str, fname: str, img_num: str):
+    @retry
     # 用流stream的方式获取url的数据
     resp = requests.get(url, stream=True, verify=False)
     # 拿到文件的长度，并把total初始化为0
