@@ -11,15 +11,21 @@ from retrying import retry
 import requests
 from tqdm import tqdm
 
+import datetime
+
+now = datetime.datetime.now()
+
 # 全局化headers，节省空间
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'}
 api_headers = {
-    'User-Agent': 'Dart/2.15(dart:io)',
-    'source': 'copyApp',
-    'version': '1.3.1',
-    'region': '1',
+    'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
+    'version': now.strftime("%Y.%m.%d"),
+    'region': '0',
     'webp': '0',
+    "platform" : "1",
+    "referer" : "https://www.copymanga.site/"
+
 }
 proxies = {}
 
@@ -233,9 +239,9 @@ def manga_chapter_list():
         print("返回的状态码是：%d" % manga_chapter.status_code)
         sys.exit(0)
 
-
+@retry(wait_fixed=3000,stop_max_attempt_number=10)
 def download(url: str, fname: str, img_num: str):
-    @retry
+    
     # 用流stream的方式获取url的数据
     resp = requests.get(url, stream=True, verify=False)
     # 拿到文件的长度，并把total初始化为0
@@ -253,7 +259,6 @@ def download(url: str, fname: str, img_num: str):
             size = file.write(data)
             bar.update(size)
             bar.set_description("\r正在下载[%s]第%s张: %s" % (fname, img_num, size))
-
 
 def manga_download():
     # *解析全局传输的json
