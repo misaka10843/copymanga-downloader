@@ -1,5 +1,7 @@
 **对不起！因为本人个人原因，今年是没有什么精力维护此仓库，如果有什么问题的话建议直接发邮箱或者发issue，但是本人基本上不可能会在今年进行提交，还请谅解！**
 
+在ReMake时发现copymanga似乎更改了许多东西，导致下载API无法正常开始下载，因为开发重心不在此，所以暂停此维护！
+
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
