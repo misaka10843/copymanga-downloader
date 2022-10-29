@@ -13,8 +13,29 @@ from tqdm import tqdm
 
 from rich import print as print
 from rich.prompt import Prompt
+from rich.progress import track
 
 import datetime
+
+import argparse
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--MangaPath',help='漫画的全拼，https://copymanga.site/comic/{这部分}')
+
+parser.add_argument('--Url',help='copymanga的域名,如使用copymanga.site，那就输入site')
+
+parser.add_argument('--Output',help='输出文件夹')
+
+parser.add_argument('--subscribe',help='是否切换到自动更新订阅模式(True/False，默认关闭)',default=False)
+
+parser.add_argument('--MangaStart',help='漫画开始下载话')
+
+parser.add_argument('--MangaEnd',help='漫画结束下载话(如果只想下载一话请与MangaStart相同)')
+
+args = parser.parse_args()
+
+if args:
+  CmdMode = True
 
 now = datetime.datetime.now()
 
@@ -166,7 +187,7 @@ def manga_search(manga_name):
         for i in manga_search_list["results"]["list"]:
             print(list_num, '->', i["name"])
             list_num = list_num + 1
-        get_list_num = Prompt.ask("您需要下载的漫画是序号几？[italic green](默认0)[/italic green]：")
+        get_list_num = Prompt.ask("您需要下载的漫画是序号几？[italic green](默认0)[/italic green]")
         if len(get_list_num) == 0:
             get_list_num = 0
         get_list_name = manga_search_list["results"]["list"][int(
@@ -192,7 +213,7 @@ def manga_chapter_group(Manga_pathWord):
         if len(group_list) == 1:
             return "default"
         else:
-            print("我们获取到了一些不同的分组，请输入需要下载的分组序号[italic green](默认为‘默認’)[/italic green]:")
+            print()
             list_num = 0
             # *循环输出
             while list_num < len(group_list):
@@ -200,7 +221,7 @@ def manga_chapter_group(Manga_pathWord):
                       chapter_group_list["results"]["groups"][group_list[list_num]]["name"])
                 list_num = list_num + 1
             # *获取选项
-            Get_group = Prompt.ask()
+            Get_group = Prompt.ask("我们获取到了一些不同的分组，请输入需要下载的分组序号[italic green](默认为0)[/italic green]",default="0")
             # *添加默认选项
             if len(Get_group) == 0:
                 Get_group = 0
@@ -224,10 +245,8 @@ def manga_chapter_list():
         print("我们获取了[italic yellow]%s[/italic yellow]话的内容，请问是如何下载呢？" %
               chapter_list["results"]["total"])
         # *判断用户需要怎么下载
-        how_download = Prompt.ask("[bold yellow]1->全本下载\n2->范围下载\n3->单话下载[bold yellow]\n您的选择是[italic green](默认全本下载)[/italic greeb]：")
+        how_download = Prompt.ask("[bold yellow]1->全本下载\n2->范围下载\n3->单话下载[bold yellow]\n您的选择是[italic green](默认全本下载)[/italic green]", choices=["1", "2", "3"], default="1")
         all_chapter = 0  # !防止误触发
-        if len(how_download) == 0:
-            how_download = 1
         if int(how_download) == 1:
             all_chapter = 1
         elif int(how_download) == 2:
@@ -262,6 +281,7 @@ def download(url: str, fname: str, img_num: str):
             bar.set_description("\r正在下载[%s]第%s张: %s" % (fname, img_num, size))
 
 def manga_download():
+    print("[italic yellow]开始安排下载ing[/italic yellow]")
     # *解析全局传输的json
     manga_chapter_list = manga_chapter.json()
     # *判断是否为全本下载
@@ -363,7 +383,7 @@ def manga_collection(offset):
         for i in manga_search_list["results"]["list"]:
             print(list_num, '->', i["comic"]["name"])
             list_num = list_num + 1
-        get_list_num = Prompt.ask("您需要下载的漫画是序号几？[italic green](默认0)[/italic green]：")
+        get_list_num = Prompt.ask("您需要下载的漫画是序号几？[italic green](默认0)[/italic green]")
         if len(get_list_num) == 0:
             get_list_num = 0
         # Todo：查询漫画时翻页功能
