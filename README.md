@@ -2,6 +2,8 @@
 
 在ReMake时发现copymanga似乎更改了许多东西，导致下载API无法正常开始下载，因为开发重心不在此，所以暂停此维护！
 
+请在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
+
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
