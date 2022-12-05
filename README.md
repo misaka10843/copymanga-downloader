@@ -67,6 +67,8 @@ QQ `3594254539`（不常工作时间上线）
 
 ### 重大更新 📈
 
+2022//12/5: 添加命令行支持（下载setup.py后python setup.py install）感谢[@blacklein](https://github.com/blacklein)提供的文件！
+
 2022/7/26: HotFix分组输入数字导致报错(str未转int)
 
 2022/7/5: 修复漫画分组只显示“默认”与“其他”的问题，添加从GitHub中获取copymanga的url列表，添加设置缺损后报错并备份老设置文件后重新进入初始化
@@ -124,6 +126,14 @@ QQ `3594254539`（不常工作时间上线）
 3.先运行这个来安装依赖 `pip install requirements.txt`(其实也就只有个 `requests`需要安装，其他都是python自带的(￣▽￣))
 
 4.然后运行 `python main.py`即可
+
+### 命令行使用(beta)
+
+1.下载仓库中的`setup.py`
+
+2.切换到下载目录中运行`python setup.py install`
+
+3.输入`copymanga-dl`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画) 📒
 
