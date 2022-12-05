@@ -68,12 +68,12 @@ def get_settings():
     global download_path, proxies, Api_url, Authorization
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
-    if not os.path.isfile("./settings.json"):
-        file = open('./settings.json', 'w')
+    if not os.path.isfile((os.curdir)+'.settings.json'):
+        file = open((os.curdir)+'.settings.json', 'w')
         file.close()
         # *打开
         first_initialization = 1
-    elif os.path.getsize("./settings.json") == 0:
+    elif os.path.getsize((os.curdir)+'.settings.json') == 0:
         # *打开
         first_initialization = 1
     # *如果为第一次初始化
@@ -104,18 +104,18 @@ def get_settings():
         # *获取最新的域名状态
         json_data["api_url"] = get_url()
         # *写入文件
-        with open('./settings.json', 'w', encoding="utf-8") as fp:
+        with open((os.curdir)+'.settings.json', 'w', encoding="utf-8") as fp:
             json.dump(json_data, fp, indent=2, ensure_ascii=False)
 
         print("恭喜您已经完成初始化啦！\n我们将立即执行主要程序，\n如果您需要修改设置的话可以直接到程序根目录的settings.json更改qwq")
     # *读取设置内容
-    with open('./settings.json', 'r', encoding="utf-8") as fp:
+    with open((os.curdir)+'.settings.json', 'r', encoding="utf-8") as fp:
         json_data = json.load(fp)
         #! 只要下载路径/请求地址是空，那么就直接报错
         if not json_data["download_path"] or not json_data["api_url"]:
             print("\033[1;31m 您的设置似乎出现了问题导致部分设置丢失，请您重新启动此程序后重新设置\033[37m")
             fp.close()
-            os.rename("./settings.json", "./settings_old.json")
+            os.rename((os.curdir)+'.settings.json', (os.curdir)+'.settings_old.json')
             exit()
         download_path = json_data["download_path"]
         if json_data["authorization"]:
@@ -442,9 +442,13 @@ def welcome():
         manga_search(manga_name)
 
 
-if __name__ == "__main__":
+def main():
+    import __main__
     requests.packages.urllib3.disable_warnings()
     get_settings()
     welcome()
     manga_chapter_list()
     manga_download()
+
+if __name__ == "__main__":
+    main()
