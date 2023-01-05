@@ -63,6 +63,12 @@ QQ `3594254539`（不常工作时间上线）
 
 ![image.png](https://s2.loli.net/2022/07/05/iXJTlowxnO2GCfc.png)
 
+## Todo List📝
+
+- [ ] 直接从对应文件进行获取所有需要下载的漫画，并且运行后自动下载
+
+其余可能在[Remake](https://github.com/misaka10843/copymanga-downloader/pull/38)分支
+
 ## 更新 🔬
 
 ### 重大更新 📈
