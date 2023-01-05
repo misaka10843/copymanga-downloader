@@ -50,11 +50,12 @@ parser.add_argument('--MangaEnd', help='漫画结束下载话(如果只想下载
 
 parser.add_argument('--MangaList', help='漫画下载列表txt(每行一个漫画的全拼，具体请看Readme)')
 
+parser.add_argument('--Proxy', help='设置代理')
+
 args = parser.parse_args()
 
 if args:
     CmdMode = True
-print(CmdMode)
 now = datetime.datetime.now()
 
 # 全局化headers，节省空间
@@ -197,7 +198,6 @@ def get_settings():
         download_path = args.Output
         # *检测是否有此目录，没有就创建
         if not os.path.exists("%s/" % download_path):
-            print("qwq")
             os.mkdir("%s/" % download_path)
         # *获取API
         if not args.Url:
@@ -218,10 +218,9 @@ def get_settings():
                 'http': proxies_set,
                 'https': proxies_set
             }
-            print(proxies_set)
         if not args.MangaPath or not args.MangaEnd or not args.MangaStart:
             print("[italic red]重要参数MangaPath/MangaStart/MangaEnd丢失，请确认填写[/italic red]")
-        sys.exit(0)
+            sys.exit(0)
 
 
 def manga_search(manga_name):
@@ -262,13 +261,19 @@ def manga_search(manga_name):
 
 
 def manga_chapter_group(Manga_pathWord):
+    if CmdMode:
+        global get_list_manga
     chapter_group = requests.get(
         'https://api.%s/api/v3/comic2/%s'
         % (Api_url, Manga_pathWord), headers=api_headers, proxies=proxies)
     chapter_group_list = chapter_group.json()
+
     if chapter_group.status_code == 200:
         # * 获取group值并强转list
         group_list = list(chapter_group_list["results"]["groups"].keys())
+        if CmdMode:
+            get_list_manga = chapter_group_list["results"]["comic"]["name"]
+            return "default"
         if len(group_list) == 1:
             return "default"
         else:
@@ -301,22 +306,28 @@ def manga_chapter_list():
     if manga_chapter.status_code == 200:
         # *将api解析成json
         chapter_list = manga_chapter.json()
-        print("我们获取了[italic yellow]%s[/italic yellow]话的内容，请问是如何下载呢？" %
-              chapter_list["results"]["total"])
-        # *判断用户需要怎么下载
-        how_download = Prompt.ask(
-            "[bold yellow]1->全本下载\n2->范围下载\n3->单话下载[bold yellow]\n您的选择是[italic green](默认全本下载)[/italic green]", choices=["1", "2", "3"], default="1")
-        all_chapter = 0  # !防止误触发
-        if len(how_download) == 0:
-            how_download = 1
-        if int(how_download) == 1:
-            all_chapter = 1
-        elif int(how_download) == 2:
-            start_chapter = Prompt.ask("[bold yellow]从第几话？[/bold yellow]")
-            end_chapter = Prompt.ask("[bold yellow]到第几话？[/bold yellow]")
-        elif int(how_download) == 3:
-            start_chapter = end_chapter = Prompt.ask(
-                "[bold yellow]下载第几话？[/bold yellow]")
+        if not CmdMode:
+            print("我们获取了[italic yellow]%s[/italic yellow]话的内容，请问是如何下载呢？" %
+                  chapter_list["results"]["total"])
+            # *判断用户需要怎么下载
+            how_download = Prompt.ask(
+                "[bold yellow]1->全本下载\n2->范围下载\n3->单话下载[bold yellow]\n您的选择是[italic green](默认全本下载)[/italic green]", choices=["1", "2", "3"], default="1")
+            all_chapter = 0  # !防止误触发
+
+            if len(how_download) == 0:
+                how_download = 1
+            if int(how_download) == 1:
+                all_chapter = 1
+            elif int(how_download) == 2:
+                start_chapter = Prompt.ask("[bold yellow]从第几话？[/bold yellow]")
+                end_chapter = Prompt.ask("[bold yellow]到第几话？[/bold yellow]")
+            elif int(how_download) == 3:
+                start_chapter = end_chapter = Prompt.ask(
+                    "[bold yellow]下载第几话？[/bold yellow]")
+        else:
+            start_chapter = args.MangaStart
+            end_chapter = args.MangaEnd
+            all_chapter = 0
     else:
         # *报告远程服务器无法连接的状态码
         print("[italic yellow]服务器似乎[/italic yellow][italic red]无法连接[/italic red][italic yellow]了qwq[/italic yellow]\n")
@@ -325,7 +336,7 @@ def manga_chapter_list():
         sys.exit(0)
 
 
-@retry(wait_fixed=3000, stop_max_attempt_number=10)
+@retry(wait_fixed=30, stop_max_attempt_number=3)
 def download(url: str, fname: str, img_num: str):
 
     # 用流stream的方式获取url的数据
@@ -537,15 +548,18 @@ def manga_collection_backup():
 
 
 def welcome():
-    is_search = Prompt.ask(
-        "您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏  默认1)[/italic yellow]", choices=["0", "1", "2"], default="1")
-    if is_search == "2":
-        manga_collection(0)
-    elif is_search == "0":
-        manga_collection_backup()
-    else:
+    if not CmdMode:
+        is_search = Prompt.ask(
+            "您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏  默认1)[/italic yellow]", choices=["0", "1", "2"], default="1")
+        if is_search == "2":
+            manga_collection(0)
+        elif is_search == "0":
+            manga_collection_backup()
         manga_name = input("请输入漫画名称:")
         manga_search(manga_name)
+    else:
+        global get_list_name
+        get_list_name = args.MangaPath
 
 
 def main():
