@@ -1,3 +1,10 @@
+
+# copymanga-downloader
+
+![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
+
+## 前言💭
+
 在ReMake时发现copymanga似乎更改了许多东西，导致下载API无法正常开始下载，因为开发重心不在此，所以可能会缓慢维护！
 
 推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
@@ -6,11 +13,12 @@
 
 此程序只是方便下载，而不是进行订阅操作(下载与订阅系统不稳定)
 
-# copymanga-downloader
 
-![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
+**我们已经正式基本支持命令行参数下载啦！**
 
-## README 语言
+请看[命令行参数](https://github.com/misaka10843/copymanga-downloader##命令行参数)部分！
+
+## README 语言🌐
 
 **简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/blob/master/README-EN.md)
 
@@ -65,6 +73,64 @@ QQ `3594254539`（不常工作时间上线）
 
 ![image.png](https://s2.loli.net/2022/07/05/iXJTlowxnO2GCfc.png)
 
+
+## 命令行参数🖥️
+
+您可以在命令行中输入 `{copymanga-downloader的文件名} -h`查看现在所支持的参数
+
+```bash
+usage: main.py [-h] [--MangaPath MANGAPATH] [--Url URL] [--Output OUTPUT]
+               [--subscribe SUBSCRIBE] [--UseWebp USEWEBP]
+               [--UseOSCdn USEOSCDN] [--MangaStart MANGASTART]
+               [--MangaEnd MANGAEND] [--MangaList MANGALIST] [--Proxy PROXY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --MangaPath MANGAPATH
+                        漫画的全拼，https://copymanga.site/comic/这部分
+  --Url URL             copymanga的域名,如使用copymanga.site，那就输入site
+  --Output OUTPUT       输出文件夹
+  --subscribe SUBSCRIBE
+                        是否切换到自动更新订阅模式(1/0，默认关闭(0))
+  --UseWebp USEWEBP     是否使用Webp(1/0，默认开启(1))
+  --UseOSCdn USEOSCDN   是否使用海外cdn(1/0，默认关闭(0))
+  --MangaStart MANGASTART
+                        漫画开始下载话
+  --MangaEnd MANGAEND   漫画结束下载话(如果只想下载一话请与MangaStart相同)
+  --MangaList MANGALIST
+                        漫画下载列表txt(每行一个漫画的全拼，具体请看Readme)
+  --Proxy PROXY         设置代理
+```
+
+其中，`MangaPath/MangaStart/MangaEnd`三个参数是**必填项**
+
+而且，`MangaPath`是 `https://{copymanga域名}/comic/{这一部分}`
+
+比如我想下载*別哭啊魔王醬*
+
+那么我应该像图中一样复制红框中选择的字母
+
+[高清图片链接](https://s2.loli.net/2023/01/06/FWklObHX6523CYs.png)
+
+![img](https://s2.loli.net/2023/01/06/FWklObHX6523CYs.png)
+
+
+### 命令示例
+
+#### 如果我想下载*別哭啊魔王醬*的第一话
+
+我可以这样输入
+
+`python main.py --Url copymanga.site --MangaPath biekuamowangjiang --MangaStart 1 --MangaEnd 1 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
+
+#### 如果我想下载*星靈感應*的全话
+
+我可以这样输入
+
+`python main.py --Url copymanga.site --MangaPath xinglingganying --MangaStart 1 --MangaEnd 38 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
+
+**（注意！虽然说是下载全话，其实就是将范围定在了1话-最新话，所以如果下载其他漫画的全话请参考漫画更新到多少话了，然后再替换38）**
+
 ## Todo List📝
 
 - [ ] 直接从对应文件进行获取所有需要下载的漫画，并且运行后自动下载
@@ -75,7 +141,9 @@ QQ `3594254539`（不常工作时间上线）
 
 ### 重大更新 📈
 
-2022//12/5: 添加命令行支持（下载setup.py后python setup.py install）感谢[@blacklein](https://github.com/blacklein)提供的文件！
+2023/1/6(重大):添加直接使用命令参数进行下载，并且使用命令参数进行下载时不会出现任何输入框，优化download，修复download中并未使用代理以及headers
+
+2022/12/5: 添加命令行支持（下载setup.py后python setup.py install）感谢[@blacklein](https://github.com/blacklein)提供的文件！
 
 2022/7/26: HotFix分组输入数字导致报错(str未转int)
 
@@ -137,11 +205,11 @@ QQ `3594254539`（不常工作时间上线）
 
 ### 命令行使用(beta)
 
-1.下载仓库中的`setup.py`
+1.下载仓库中的 `setup.py`
 
-2.切换到下载目录中运行`python setup.py install`
+2.切换到下载目录中运行 `python setup.py install`
 
-3.输入`copymanga-dl`即可
+3.输入 `copymanga-dl`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画) 📒
 

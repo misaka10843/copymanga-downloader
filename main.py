@@ -209,6 +209,19 @@ def get_settings():
             api_headers["region"] = '0'
         if args.UseWebp != "0":
             api_headers["webp"] = '1'
+        if args.Proxy:
+            # 如果代理不存在协议前缀，则视为http代理
+            proxies_set = args.Proxy
+            if proxies_set.find('://') == -1:
+                proxies_set = 'http://' + proxies_set
+            proxies = {
+                'http': proxies_set,
+                'https': proxies_set
+            }
+            print(proxies_set)
+        if not args.MangaPath or not args.MangaEnd or not args.MangaStart:
+            print("[italic red]重要参数MangaPath/MangaStart/MangaEnd丢失，请确认填写[/italic red]")
+        sys.exit(0)
 
 
 def manga_search(manga_name):
@@ -316,7 +329,8 @@ def manga_chapter_list():
 def download(url: str, fname: str, img_num: str):
 
     # 用流stream的方式获取url的数据
-    resp = requests.get(url, stream=True, verify=False)
+    resp = requests.get(url, stream=True, verify=False,
+                        headers=api_headers, proxies=proxies)
     # 拿到文件的长度，并把total初始化为0
     total = int(resp.headers.get('content-length', 0))
     # 打开当前目录的fname文件(名字你来传入)
