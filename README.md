@@ -16,7 +16,7 @@
 
 **我们已经正式基本支持命令行参数下载啦！**
 
-请看[命令行参数](https://github.com/misaka10843/copymanga-downloader##命令行参数)部分！
+请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)的部分！
 
 ## README 语言🌐
 
