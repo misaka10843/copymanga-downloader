@@ -11,7 +11,7 @@ on:
 
 jobs:
   linux-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.6
@@ -23,10 +23,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Compile exe
+      - name: Compile bin
         run: |
           pyinstaller -n Linux-copymanga-downloader -F main.py -i icon.ico
-      - name : upload exe
+      - name : upload bin
         uses: actions/upload-artifact@master
         with:
           name: copymanga-downloader-Linux
