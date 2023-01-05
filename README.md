@@ -1,4 +1,10 @@
-**对不起！因为本人个人原因，今年是没有什么精力维护此仓库，如果有什么问题的话建议直接发邮箱或者发issue，但是本人基本上不可能会在今年进行提交，还请谅解！**
+在ReMake时发现copymanga似乎更改了许多东西，导致下载API无法正常开始下载，因为开发重心不在此，所以可能会缓慢维护！
+
+推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
+
+因为这样可以尽可能的保证下载稳定与订阅系统正常
+
+此程序只是方便下载，而不是进行订阅操作(下载与订阅系统不稳定)
 
 # copymanga-downloader
 
@@ -59,9 +65,17 @@ QQ `3594254539`（不常工作时间上线）
 
 ![image.png](https://s2.loli.net/2022/07/05/iXJTlowxnO2GCfc.png)
 
+## Todo List📝
+
+- [ ] 直接从对应文件进行获取所有需要下载的漫画，并且运行后自动下载
+
+其余可能在[Remake](https://github.com/misaka10843/copymanga-downloader/pull/38)分支
+
 ## 更新 🔬
 
 ### 重大更新 📈
+
+2022//12/5: 添加命令行支持（下载setup.py后python setup.py install）感谢[@blacklein](https://github.com/blacklein)提供的文件！
 
 2022/7/26: HotFix分组输入数字导致报错(str未转int)
 
@@ -120,6 +134,14 @@ QQ `3594254539`（不常工作时间上线）
 3.先运行这个来安装依赖 `pip install requirements.txt`(其实也就只有个 `requests`需要安装，其他都是python自带的(￣▽￣))
 
 4.然后运行 `python main.py`即可
+
+### 命令行使用(beta)
+
+1.下载仓库中的`setup.py`
+
+2.切换到下载目录中运行`python setup.py install`
+
+3.输入`copymanga-dl`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画) 📒
 
