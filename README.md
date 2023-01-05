@@ -2,7 +2,9 @@
 
 推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
 
-因为这样可以尽可能的保证
+因为这样可以尽可能的保证下载稳定与订阅系统正常
+
+此程序只是方便下载，而不是进行订阅操作(下载与订阅系统不稳定)
 
 # copymanga-downloader
 
