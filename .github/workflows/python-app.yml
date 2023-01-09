@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python 3.6
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6"
+          python-version: '3.6'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -26,12 +26,12 @@ jobs:
       - name: Compile bin
         run: |
           pyinstaller -n Linux-copymanga-downloader -F main.py -i icon.ico
-      - name : upload bin
+      - name: upload bin
         uses: actions/upload-artifact@master
         with:
           name: copymanga-downloader-Linux
-          path: dist/copymanga-downloader
-  
+          path: dist/
+
   windows-build:
     runs-on: windows-latest
     steps:
@@ -39,7 +39,7 @@ jobs:
       - name: Set up Python 3.6
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6"
+          python-version: '3.6'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -50,9 +50,8 @@ jobs:
       - name: Compile exe
         run: |
           pyinstaller -n copymanga-downloader -F main.py -i icon.ico
-      - name : upload exe
+      - name: upload exe
         uses: actions/upload-artifact@master
         with:
           name: copymanga-downloader-windows
           path: dist/copymanga-downloader.exe
-          

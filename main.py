@@ -54,8 +54,11 @@ parser.add_argument('--Proxy', help='设置代理')
 
 args = parser.parse_args()
 
-if args:
+CmdMode = False
+if args.MangaStart:
     CmdMode = True
+else:
+    print("[italic yellow]命令行重要参数丢失，默认启动用户输入模式[/italic yellow]")
 now = datetime.datetime.now()
 
 # 全局化headers，节省空间
