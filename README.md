@@ -1,3 +1,4 @@
+**请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
 
 # copymanga-downloader
 
