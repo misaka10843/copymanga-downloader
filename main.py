@@ -75,6 +75,7 @@ api_headers = {
 }
 proxies = {}
 
+Authorization = 0
 
 def get_url():
     # *从GitHub(首先两个为CDN，方便中国大陆用户获取)中获取url的信息
@@ -453,7 +454,7 @@ def chapter_analysis(response, j):
 
 def manga_collection(offset):
     global get_list_name, get_list_manga
-    if Authorization == 0:
+    if headers["authorization"] == "null":
         print(
             "[italic yellow]您并未填写Authorization，请按照https://shorturl.at/bevHW 填写并添加到settings.json中的authorization字段[/italic yellow]")
         return
@@ -509,7 +510,7 @@ def manga_collection(offset):
 
 def manga_collection_backup():
     global get_list_name, get_list_manga
-    if Authorization == 0:
+    if headers["authorization"] == "null":
         print(
             "[italic yellow]您并未填写Authorization，请按照https://shorturl.at/bevHW 填写并添加到settings.json中的authorization字段[/italic yellow]")
         return
