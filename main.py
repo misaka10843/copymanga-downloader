@@ -4,13 +4,12 @@ import os
 import platform
 import sys
 import time
-from turtle import width
-from typing import Counter
 from retrying import retry
 
 import requests
 from tqdm import tqdm
 
+# 格式化输出
 from rich import print as print
 from rich.prompt import Prompt
 from rich.progress import track
@@ -18,6 +17,8 @@ from rich.progress import track
 import datetime
 
 import argparse
+
+# 进行命令行参数设置
 parser = argparse.ArgumentParser()
 
 parser.add_argument(
@@ -75,8 +76,6 @@ api_headers = {
 }
 proxies = {}
 
-Authorization = 0
-
 def get_url():
     # *从GitHub(首先两个为CDN，方便中国大陆用户获取)中获取url的信息
     response = requests.get(
@@ -113,7 +112,7 @@ def get_url():
 
 
 def get_settings():
-    global download_path, proxies, Api_url, Authorization
+    global download_path, proxies, Api_url
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
     if not os.path.isfile((os.curdir) + 'settings.json') and not CmdMode:
@@ -176,7 +175,6 @@ def get_settings():
                 headers["authorization"] = json_data["authorization"]
             else:
                 headers["authorization"] = "null"
-                Authorization = 0
             proxies_set = json_data["proxies"]
             Api_url = json_data["api_url"]
             if json_data["use_oversea_cdn"]:
