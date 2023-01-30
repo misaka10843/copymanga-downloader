@@ -19,7 +19,7 @@ setup(
     packages=[''],
     package_data={'': ['*.json']},
     python_requires='>=3.10',
-    install_requires=['certifi', 'charset-normalizer', 'colorama', 'idna', 'PySocks', 'requests', 'retrying', 'six', 'tqdm','urllib3','typing_extensions'],
+    install_requires=['certifi', 'charset-normalizer', 'colorama', 'idna', 'PySocks', 'requests', 'retrying', 'six', 'tqdm','urllib3', 'typing_extensions', 'rich'],
     entry_points={'console_scripts': ['copymanga-dl=main:main']},
     classifiers=[
         "Programming Language :: Python",
