@@ -205,7 +205,7 @@ optional arguments:
 ### 编译/原代码使用(所有系统均支持)
 
 ⭐️ 建议pipx安装
-···
+```bash
 # 安装pipx
 brew install pipx
 
@@ -214,7 +214,7 @@ pipx install git+https://github.com/misaka10843/copymanga-downloader.git
 
 # 通过镜像站从远程仓库安装copymanga-dl
 pipx install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-downloader.git
-···
+```
 
 1.点击[这里](https://github.com/misaka10843/copymanga-downloader/archive/refs/heads/master.zip)直接下载最新的源码包
 
