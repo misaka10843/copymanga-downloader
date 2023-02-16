@@ -204,6 +204,30 @@ optional arguments:
 
 ### 编译/原代码使用(所有系统均支持)
 
+⭐️ 建议pip安装（如果有本地有多个Python版本，建议用pipx安装）
+```bash
+# macOS安装pipx
+brew install pipx
+pipx ensurepath
+
+# Linux安装pipx
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+
+# Windows安装pipx
+python -m pip install --user pipx
+
+# 从远程仓库安装copymanga-dl
+pip install git+https://github.com/misaka10843/copymanga-downloader.git
+或
+pipx install git+https://github.com/misaka10843/copymanga-downloader.git
+
+# 通过镜像站从远程仓库安装copymanga-dl
+pip install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-downloader.git
+或
+pipx install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-downloader.git
+```
+
 1.点击[这里](https://github.com/misaka10843/copymanga-downloader/archive/refs/heads/master.zip)直接下载最新的源码包
 
 2.解压后放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
