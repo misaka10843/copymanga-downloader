@@ -1,22 +1,18 @@
 # -*- coding: UTF-8 -*-
+import argparse
+import datetime
 import json
 import os
 import platform
 import sys
 import time
-from retrying import retry
 
 import requests
-from tqdm import tqdm
-
+from retrying import retry
 # 格式化输出
 from rich import print as print
 from rich.prompt import Prompt
-from rich.progress import track
-
-import datetime
-
-import argparse
+from tqdm import tqdm
 
 # 进行命令行参数设置
 parser = argparse.ArgumentParser()
@@ -115,12 +111,12 @@ def get_settings():
     global download_path, proxies, Api_url
     # *初始化第一次初始化的开关（默认为关）
     first_initialization = 0
-    if not os.path.isfile((os.curdir) + 'settings.json') and not CmdMode:
-        file = open((os.curdir) + 'settings.json', 'w')
+    if not os.path.isfile(os.curdir + 'settings.json') and not CmdMode:
+        file = open(os.curdir + 'settings.json', 'w')
         file.close()
         # *打开
         first_initialization = 1
-    elif not CmdMode and os.path.getsize((os.curdir) + 'settings.json') == 0:
+    elif not CmdMode and os.path.getsize(os.curdir + 'settings.json') == 0:
         # *打开
         first_initialization = 1
     # *如果为第一次初始化
@@ -152,22 +148,22 @@ def get_settings():
         # *获取最新的域名状态
         json_data["api_url"] = get_url()
         # *写入文件
-        with open((os.curdir) + 'settings.json', 'w', encoding="utf-8") as fp:
+        with open(os.curdir + 'settings.json', 'w', encoding="utf-8") as fp:
             json.dump(json_data, fp, indent=2, ensure_ascii=False)
 
         print("[italic green]恭喜您已经完成初始化啦！[/italic green]\n我们将立即执行主要程序，\n[italic blue]如果您需要修改设置的话可以直接到程序根目录的settings.json更改qwq[/italic blue]")
     # *读取设置内容
     if not CmdMode:
-        with open((os.curdir) + 'settings.json', 'r', encoding="utf-8") as fp:
+        with open(os.curdir + 'settings.json', 'r', encoding="utf-8") as fp:
             json_data = json.load(fp)
             #! 只要下载路径/请求地址是空，那么就直接报错
             if not json_data["download_path"] or not json_data["api_url"]:
                 print("[italic red]您的设置似乎出现了问题导致部分设置丢失，请您重新启动此程序后重新设置[/italic red]")
                 fp.close()
                 os.rename(
-                    (os.curdir) +
+                    os.curdir +
                     'settings.json',
-                    (os.curdir) +
+                    os.curdir +
                     'settings_old.json')
                 exit()
             download_path = json_data["download_path"]
@@ -196,7 +192,7 @@ def get_settings():
         # *获取下载路径
         if not args.Output:
             print("[italic yellow]重要参数丢失，将默认为目录下的None文件夹[/italic yellow]")
-            download_path = (os.curdir) + "None"
+            download_path = os.curdir + "None"
         download_path = args.Output
         # *检测是否有此目录，没有就创建
         if not os.path.exists("%s/" % download_path):
@@ -262,12 +258,12 @@ def manga_search(manga_name):
         sys.exit(0)
 
 
-def manga_chapter_group(Manga_pathWord):
+def manga_chapter_group(manga_pathWord):
     if CmdMode:
         global get_list_manga
     chapter_group = requests.get(
         'https://api.%s/api/v3/comic2/%s'
-        % (Api_url, Manga_pathWord), headers=api_headers, proxies=proxies)
+        % (Api_url, manga_pathWord), headers=api_headers, proxies=proxies)
     chapter_group_list = chapter_group.json()
 
     if chapter_group.status_code == 200:
@@ -565,7 +561,6 @@ def welcome():
 
 
 def main():
-    import __main__
     requests.packages.urllib3.disable_warnings()
     get_settings()
     welcome()
