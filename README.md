@@ -19,6 +19,20 @@
 
 请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)的部分！
 
+## 下载
+
+[pypi(稳定)](https://pypi.org/project/copymanga-dl)
+
+[releases(稳定)](https://github.com/misaka10843/copymanga-downloader/releases)
+
+[actions(测试)](https://github.com/misaka10843/copymanga-downloader/actions/workflows/python-app.yml)
+
+or
+
+`git clone https://github.com/misaka10843/copymanga-downloader.git && cd copymanga-downloader && python setup.py install`
+
+`git clone https://github.com/misaka10843/copymanga-downloader.git && cd copymanga-downloader && pip install -r requirements.txt && python main.py`
+
 ## README 语言🌐
 
 **简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/blob/master/README-EN.md)
