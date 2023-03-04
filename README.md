@@ -67,6 +67,7 @@ QQ `3594254539`（不常工作时间上线）
 * [Z-fly](https://github.com/Z-fly)(贡献与提出一些问题)
 * [zhongfly](https://github.com/zhongfly)(贡献与提供一些问题解决方法和优化代码)
 * [zaazwm](https://github.com/zaazwm)(添加其他内容的下载)
+* [blacklein](https://github.com/blacklein)(添加setup.py与发布到pypi)
 
 ## 简介 🗒️
 
