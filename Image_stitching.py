@@ -24,7 +24,7 @@ def join(png1, png2, NewImageName, SavePath):
     joint.save('%s%s.png' % (SavePath,NewImageName))  # 输出
  
  
-if __name__ == '__main__':
+def main():
     ImgPath = input("图片文件夹位置(以/结尾)：")
     SavePath = input("拼接后图片存放的位置(以/结尾)：")
     image = file_name("ImgPath")  # 获取当前目录下指定文件
@@ -33,3 +33,6 @@ if __name__ == '__main__':
             NewImage = "%s-%s"%(j+1,j) #拼接之后的图片的文件名
             join(image[j], image[j+1],NewImage,SavePath)  # 如果是第一次就直接两图合并
             j = j + 1
+
+if __name__ == '__main__':
+    main()
