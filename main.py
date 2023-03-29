@@ -8,9 +8,8 @@ from rich.prompt import Prompt, Confirm, IntPrompt
 import requests as requests
 
 # 全局化headers，节省空间
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0'}
-api_headers = {
+
+API_HEADER = {
     'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
     'version': datetime.datetime.now().strftime("%Y.%m.%d"),
     'region': '0',
@@ -18,7 +17,9 @@ api_headers = {
     "platform": "1",
     "referer": "https://www.copymanga.site/"
 }
-proxies = {}
+PROXIES = {}
+# 全局化设置
+SETTINGS = None
 
 
 def parse_args():
@@ -61,6 +62,14 @@ def parse_args():
     return args
 
 
+def welcome():
+    Prompt.ask(
+        "您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/italic yellow]",
+        choices=["0", "1", "2"], default="1")
+
+
+# 设置相关
+
 def get_org_url():
     print("[italic yellow]正在获取CopyManga网站Url...[/italic yellow]")
     url = "https://cdn.jsdelivr.net/gh/misaka10843/copymanga-downloader@master/url.json"
@@ -83,7 +92,7 @@ def get_org_url():
 
 def set_settings():
     # 获取用户输入
-    download_path = Prompt.ask("请输入下载路径")
+    download_path = Prompt.ask("请输入保存路径")
     authorization = Prompt.ask("请输入账号Token")
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/italic yellow]",
@@ -114,10 +123,37 @@ def set_settings():
     }
 
     # 写入settings.json文件
-    with open(os.path.join(os.getcwd(), "settings.json"), "w") as f:
+    with open(os.path.join(os.getcwd(), "copymanga-downloader.json"), "w") as f:
         json.dump(settings, f)
 
 
-# 按间距中的绿色按钮以运行脚本。
+def load_settings():
+    global SETTINGS
+    # 获取用户目录的路径
+    home_dir = os.path.expanduser("~")
+    settings_path = os.path.join(home_dir, "copymanga-downloader.json")
+    print(settings_path)
+    # 检查是否有文件
+    if not os.path.exists(settings_path):
+        return False, "settings.json文件不存在"
+    # 读取json配置文件
+    with open(settings_path, 'r') as f:
+        settings = json.load(f)
+
+    # 判断必要的字段是否存在
+    necessary_fields = ["download_path", "authorization", "use_oversea_cdn", "use_webp", "proxies", "api_url"]
+    for field in necessary_fields:
+        if field not in settings:
+            return False, "copymanga-downloader.json中缺少必要字段{}".format(field)
+    SETTINGS = settings
+
+
+def main():
+    loaded_settings = load_settings()
+    if not loaded_settings[0]:
+        print(f"[bold red]{loaded_settings[1]},我们将重新为您设置[/bold red]")
+        set_settings()
+
+
 if __name__ == '__main__':
-    set_settings()
+    main()
