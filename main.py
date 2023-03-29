@@ -19,7 +19,14 @@ API_HEADER = {
 }
 PROXIES = {}
 # 全局化设置
-SETTINGS = None
+SETTINGS = {
+    "download_path": None,
+    "authorization": None,
+    "use_oversea_cdn": None,
+    "use_webp": None,
+    "proxies": None,
+    "api_url": None
+}
 
 
 def parse_args():
@@ -63,9 +70,92 @@ def parse_args():
 
 
 def welcome():
-    Prompt.ask(
-        "您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/italic yellow]",
-        choices=["0", "1", "2"], default="1")
+    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/italic yellow]",
+                             choices=["0", "1", "2"], default="1"))
+    if want_to == 0:
+        print()
+    if want_to == 1:
+        choice_manga_path_word = search()
+        manga_group_path_word = manga_group(choice_manga_path_word)
+    if want_to == 2:
+        print()
+
+
+# 搜索相关
+
+def search():
+    search_content = Prompt.ask("您需要搜索什么漫画呢")
+    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
+        SETTINGS["api_url"], search_content)
+    offset = 0
+    current_page_count = 1
+    while True:
+        # 发送GET请求
+        response = requests.get(url.format(offset), headers=API_HEADER, proxies=PROXIES)
+        # 解析JSON数据
+        data = response.json()
+
+        # 输出每个comic的名称和对应的序号
+        for i, comic in enumerate(data["results"]["list"]):
+            print("[{}] {}".format(i + 1, comic["name"]))
+
+        # 让用户输入数字来选择comic
+        print(f"[italic blue]当前为第{current_page_count}页[/italic blue]")
+        selection = Prompt.ask("请选择一个漫画[italic yellow]（输入Q退出,U为上一页,D为下一页）[/italic yellow]")
+        if selection.upper() == "Q":
+            break
+        try:
+            # 将用户输入的字符串转换为整数
+            index = int(selection) - 1
+            # 获取用户选择的comic的名称并输出
+            print("你选择了：{}".format(data["results"]["list"][index]["name"]))
+            # 返回pathWord
+            return data["results"]["list"][index]["path_word"]
+
+        except (ValueError, IndexError):
+            # 判断是否是输入的U/D
+            # 根据用户输入更新offset
+            if selection.upper() == "U":
+                offset -= data["results"]["limit"]
+                if offset < 0:
+                    offset = 0
+                else:
+                    current_page_count -= 1
+            elif selection.upper() == "D":
+                offset += data["results"]["limit"]
+                if offset > data["results"]["total"]:
+                    offset = data["results"]["total"] - data["results"]["limit"]
+                else:
+                    current_page_count += 1
+            else:
+                # 处理输入错误的情况
+                print("[italic red]无效的选择！[italic red]")
+
+
+# 漫画详细相关
+
+def manga_group(manga_path_word):
+    manga_group_json = None
+    try:
+        response = requests.get(f"https://api.{SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
+                                headers=API_HEADER, proxies=PROXIES)
+        response.raise_for_status()
+        manga_group_json = response.json()
+    except:
+        print("[bold red]无法链接CopyManga,请稍后重试,或检查设置与网络[/bold red]")
+        exit()
+    # 判断是否只有默认组
+    if len(manga_group_json["results"]["groups"]) == 1:
+        return "default"
+
+    manga_group_path_word_list = []
+    # 获取group值并强转list
+    for i, manga_group_list in enumerate(manga_group_json["results"]["groups"]):
+        print(f"{i + 1}->{manga_group_json['results']['groups'][manga_group_list]['name']}")
+        # 将分组的path_word添加到数组中
+        manga_group_path_word_list.append(manga_group_json['results']['groups'][manga_group_list]['path_word'])
+    choice = IntPrompt.ask("请输入要下载的分组前面的数字")
+    return manga_group_path_word_list[choice - 1]
 
 
 # 设置相关
@@ -121,9 +211,10 @@ def set_settings():
         "proxies": proxy,
         "api_url": api_urls[choice - 1]
     }
-
+    home_dir = os.path.expanduser("~")
+    settings_path = os.path.join(home_dir, "copymanga-downloader.json")
     # 写入settings.json文件
-    with open(os.path.join(os.getcwd(), "copymanga-downloader.json"), "w") as f:
+    with open(settings_path, "w") as f:
         json.dump(settings, f)
 
 
@@ -146,6 +237,7 @@ def load_settings():
         if field not in settings:
             return False, "copymanga-downloader.json中缺少必要字段{}".format(field)
     SETTINGS = settings
+    return True, None
 
 
 def main():
@@ -153,6 +245,7 @@ def main():
     if not loaded_settings[0]:
         print(f"[bold red]{loaded_settings[1]},我们将重新为您设置[/bold red]")
         set_settings()
+    welcome()
 
 
 if __name__ == '__main__':
