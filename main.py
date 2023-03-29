@@ -3,14 +3,17 @@ import datetime
 import json
 import os
 from rich import print as print
+from rich.console import Console
 from rich.prompt import Prompt, Confirm, IntPrompt
 
 import requests as requests
 
+console = Console(color_system='256', style=None)
 # 全局化headers，节省空间
 
 API_HEADER = {
-    'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
+    'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, '
+                  'like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
     'version': datetime.datetime.now().strftime("%Y.%m.%d"),
     'region': '0',
     'webp': '0',
@@ -77,6 +80,7 @@ def welcome():
     if want_to == 1:
         choice_manga_path_word = search()
         manga_group_path_word = manga_group(choice_manga_path_word)
+        print(manga_chapter(choice_manga_path_word, manga_group_path_word))
     if want_to == 2:
         print()
 
@@ -95,12 +99,12 @@ def search():
         # 解析JSON数据
         data = response.json()
 
+        console.rule(f"[bold blue]当前为第{current_page_count}页")
         # 输出每个comic的名称和对应的序号
         for i, comic in enumerate(data["results"]["list"]):
             print("[{}] {}".format(i + 1, comic["name"]))
 
         # 让用户输入数字来选择comic
-        print(f"[italic blue]当前为第{current_page_count}页[/italic blue]")
         selection = Prompt.ask("请选择一个漫画[italic yellow]（输入Q退出,U为上一页,D为下一页）[/italic yellow]")
         if selection.upper() == "Q":
             break
@@ -136,14 +140,10 @@ def search():
 
 def manga_group(manga_path_word):
     manga_group_json = None
-    try:
-        response = requests.get(f"https://api.{SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
-                                headers=API_HEADER, proxies=PROXIES)
-        response.raise_for_status()
-        manga_group_json = response.json()
-    except:
-        print("[bold red]无法链接CopyManga,请稍后重试,或检查设置与网络[/bold red]")
-        exit()
+    response = requests.get(f"https://api.{SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
+                            headers=API_HEADER, proxies=PROXIES)
+    response.raise_for_status()
+    manga_group_json = response.json()
     # 判断是否只有默认组
     if len(manga_group_json["results"]["groups"]) == 1:
         return "default"
@@ -156,6 +156,42 @@ def manga_group(manga_path_word):
         manga_group_path_word_list.append(manga_group_json['results']['groups'][manga_group_list]['path_word'])
     choice = IntPrompt.ask("请输入要下载的分组前面的数字")
     return manga_group_path_word_list[choice - 1]
+
+
+def manga_chapter(manga_path_word, group_path_word):
+    response = requests.get(
+        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500&offset=0&platform=3",
+        headers=API_HEADER, proxies=PROXIES)
+    response.raise_for_status()
+    manga_chapter_json = response.json()
+    # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
+    return_json = {
+        "json": manga_chapter_json,
+        "start": None,
+        "end": None
+    }
+    # Todo 支持500+话的漫画(感觉并不太需要)
+    if manga_chapter_json['results']['total'] > 500:
+        print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/bold red]")
+        exit()
+    # 询问应该如何下载
+    want_to = int(Prompt.ask(f"获取到{manga_chapter_json['results']['total']}话内容，请问如何下载?"
+                             f"[italic yellow](0:全本下载,1:范围下载,2:单话下载)[/italic yellow]",
+                             choices=["0", "1", "2"], default="0"))
+    if want_to == 0:
+        return_json["start"] = -1
+        return_json["end"] = -1
+        return return_json
+    print(
+        "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/italic yellow]")
+    if want_to == 1:
+        return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
+        return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
+        return return_json
+    if want_to == 2:
+        return_json["start"] = int(Prompt.ask("请输入需要下载的话数")) - 1
+        return_json["end"] = return_json["start"]
+        return return_json
 
 
 # 设置相关
@@ -212,17 +248,19 @@ def set_settings():
         "api_url": api_urls[choice - 1]
     }
     home_dir = os.path.expanduser("~")
-    settings_path = os.path.join(home_dir, "copymanga-downloader.json")
+    if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
+        os.mkdir(os.path.join(home_dir, '.copymanga-downloader/'))
+    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
     # 写入settings.json文件
     with open(settings_path, "w") as f:
         json.dump(settings, f)
 
 
 def load_settings():
-    global SETTINGS
+    global SETTINGS, PROXIES
     # 获取用户目录的路径
     home_dir = os.path.expanduser("~")
-    settings_path = os.path.join(home_dir, "copymanga-downloader.json")
+    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
     print(settings_path)
     # 检查是否有文件
     if not os.path.exists(settings_path):
@@ -235,8 +273,14 @@ def load_settings():
     necessary_fields = ["download_path", "authorization", "use_oversea_cdn", "use_webp", "proxies", "api_url"]
     for field in necessary_fields:
         if field not in settings:
-            return False, "copymanga-downloader.json中缺少必要字段{}".format(field)
+            return False, "settings.json中缺少必要字段{}".format(field)
     SETTINGS = settings
+    # 设置代理
+    if settings["proxies"]:
+        PROXIES = {
+            "http": settings["proxies"],
+            "https": settings["proxies"]
+        }
     return True, None
 
 
