@@ -2,6 +2,9 @@ import argparse
 import datetime
 import json
 import os
+import threading
+import time
+
 from rich import print as print
 from rich.console import Console
 from rich.prompt import Prompt, Confirm, IntPrompt
@@ -73,14 +76,15 @@ def parse_args():
 
 
 def welcome():
-    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/italic yellow]",
+    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/]",
                              choices=["0", "1", "2"], default="1"))
     if want_to == 0:
         print()
     if want_to == 1:
         choice_manga_path_word = search()
         manga_group_path_word = manga_group(choice_manga_path_word)
-        print(manga_chapter(choice_manga_path_word, manga_group_path_word))
+        manga_chapter_json = manga_chapter(choice_manga_path_word, manga_group_path_word)
+        chapter_allocation(manga_chapter_json)
     if want_to == 2:
         print()
 
@@ -105,7 +109,7 @@ def search():
             print("[{}] {}".format(i + 1, comic["name"]))
 
         # 让用户输入数字来选择comic
-        selection = Prompt.ask("请选择一个漫画[italic yellow]（输入Q退出,U为上一页,D为下一页）[/italic yellow]")
+        selection = Prompt.ask("请选择一个漫画[italic yellow]（输入Q退出,U为上一页,D为下一页）[/]")
         if selection.upper() == "Q":
             break
         try:
@@ -133,13 +137,12 @@ def search():
                     current_page_count += 1
             else:
                 # 处理输入错误的情况
-                print("[italic red]无效的选择！[italic red]")
+                print("[italic red]无效的选择！[/]")
 
 
 # 漫画详细相关
 
 def manga_group(manga_path_word):
-    manga_group_json = None
     response = requests.get(f"https://api.{SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
                             headers=API_HEADER, proxies=PROXIES)
     response.raise_for_status()
@@ -160,11 +163,13 @@ def manga_group(manga_path_word):
 
 def manga_chapter(manga_path_word, group_path_word):
     response = requests.get(
-        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500&offset=0&platform=3",
+        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500"
+        f"&offset=0&platform=3",
         headers=API_HEADER, proxies=PROXIES)
     response.raise_for_status()
     manga_chapter_json = response.json()
     # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
+    # Todo 在这里添加支持命令行参数的代码
     return_json = {
         "json": manga_chapter_json,
         "start": None,
@@ -172,18 +177,18 @@ def manga_chapter(manga_path_word, group_path_word):
     }
     # Todo 支持500+话的漫画(感觉并不太需要)
     if manga_chapter_json['results']['total'] > 500:
-        print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/bold red]")
+        print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/]")
         exit()
     # 询问应该如何下载
     want_to = int(Prompt.ask(f"获取到{manga_chapter_json['results']['total']}话内容，请问如何下载?"
-                             f"[italic yellow](0:全本下载,1:范围下载,2:单话下载)[/italic yellow]",
+                             f"[italic yellow](0:全本下载,1:范围下载,2:单话下载)[/]",
                              choices=["0", "1", "2"], default="0"))
     if want_to == 0:
         return_json["start"] = -1
         return_json["end"] = -1
         return return_json
     print(
-        "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/italic yellow]")
+        "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/]")
     if want_to == 1:
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
         return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
@@ -194,17 +199,84 @@ def manga_chapter(manga_path_word, group_path_word):
         return return_json
 
 
+def chapter_allocation(manga_chapter_json):
+    if manga_chapter_json['start'] < 0:
+        manga_chapter_list = manga_chapter_json['json']['results']['list']
+    elif manga_chapter_json['start'] == manga_chapter_json['end']:
+        # 转换为一个只包含一个元素的数组
+        manga_chapter_list = [manga_chapter_json['json']['results']['list'][manga_chapter_json['start']]]
+    else:
+        manga_chapter_list = manga_chapter_json['json']['results']['list'][
+                             manga_chapter_json['start']:manga_chapter_json['end']]
+    # 准备分配章节下载
+    for manga_chapter_info in manga_chapter_list:
+        response = requests.get(
+            f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_chapter_info['comic_path_word']}"
+            f"/chapter2/{manga_chapter_info['uuid']}?platform=3",
+            headers=API_HEADER, proxies=PROXIES)
+        response.raise_for_status()
+        manga_chapter_info_json = response.json()
+
+        img_url_contents = manga_chapter_info_json['results']['chapter']['contents']
+        img_words = manga_chapter_info_json['results']['chapter']['words']
+        manga_name = manga_chapter_info_json['results']['comic']['name']
+        num_images = len(img_url_contents)
+        download_path = SETTINGS['download_path']
+        chapter_name = manga_chapter_info_json['results']['chapter']['name']
+        # 检查漫画文件夹是否存在
+        if not os.path.exists(f"{download_path}/{manga_name}/"):
+            os.mkdir(f"{download_path}/{manga_name}/")
+        # 创建多线程
+        threads = []
+        with console.status(f"[bold yellow]正在下载:[{manga_name}]{chapter_name}[/]"):
+            for i in range(num_images):
+                url = img_url_contents[i]['url']
+                # 检查章节文件夹是否存在
+                if not os.path.exists(f"{download_path}/{manga_name}/{chapter_name}/"):
+                    os.mkdir(f"{download_path}/{manga_name}/{chapter_name}/")
+                # 组成下载路径
+                filename = f"{download_path}/{manga_name}/{chapter_name}/{img_words[i].zfill(3)+1}.jpg"
+                t = threading.Thread(target=download, args=(url, filename))
+                # 开始线程
+                threads.append(t)
+                # 限制线程数量(十分不建议修改，不然很可能会被禁止访问)
+                if len(threads) == 4 or i == num_images - 1:
+                    for t in threads:
+                        # 添加一点延迟，错峰请求
+                        time.sleep(0.5)
+                        t.start()
+                    for t in threads:
+                        time.sleep(0.5)
+                        t.join()
+                    threads.clear()
+
+
+# 下载相关
+
+def download(url, filename):
+    # 判断是否已经下载
+    if os.path.exists(filename):
+        print(f"[blue]您已经下载了{filename}，跳过下载[/]")
+        return
+    try:
+        response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
+        with open(filename, "wb") as f:
+            f.write(response.content)
+    except:
+        print(f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后重试或检查网络连接[/]")
+
+
 # 设置相关
 
 def get_org_url():
-    print("[italic yellow]正在获取CopyManga网站Url...[/italic yellow]")
+    print("[italic yellow]正在获取CopyManga网站Url...[/]")
     url = "https://cdn.jsdelivr.net/gh/misaka10843/copymanga-downloader@master/url.json"
     try:
         response = requests.get(url)
         response.raise_for_status()
         return response.json()
     except:
-        print("[bold yellow]无法链接至jsdelivr，准备直接访问Github[/bold yellow]")
+        print("[bold yellow]无法链接至jsdelivr，准备直接访问Github[/]")
         # 更换URL
         url = "https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
         try:
@@ -212,7 +284,7 @@ def get_org_url():
             response.raise_for_status()
             return response.json()
         except:
-            print("[bold red]无法链接至GitHub，请检查网络连接[/bold red]", )
+            print("[bold red]无法链接至GitHub，请检查网络连接[/]", )
             exit()
 
 
@@ -221,9 +293,9 @@ def set_settings():
     download_path = Prompt.ask("请输入保存路径")
     authorization = Prompt.ask("请输入账号Token")
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
-    use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/italic yellow]",
+    use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/italic yellow]")
+    proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
 
     api_urls = get_org_url()
     for i, url in enumerate(api_urls):
@@ -254,6 +326,7 @@ def set_settings():
     # 写入settings.json文件
     with open(settings_path, "w") as f:
         json.dump(settings, f)
+    print(f"[yellow]已将配置文件存放到{settings_path}中[/]")
 
 
 def load_settings():
@@ -261,7 +334,6 @@ def load_settings():
     # 获取用户目录的路径
     home_dir = os.path.expanduser("~")
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
-    print(settings_path)
     # 检查是否有文件
     if not os.path.exists(settings_path):
         return False, "settings.json文件不存在"
@@ -287,7 +359,7 @@ def load_settings():
 def main():
     loaded_settings = load_settings()
     if not loaded_settings[0]:
-        print(f"[bold red]{loaded_settings[1]},我们将重新为您设置[/bold red]")
+        print(f"[bold red]{loaded_settings[1]},我们将重新为您设置[/]")
         set_settings()
     welcome()
 
