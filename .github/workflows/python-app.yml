@@ -8,6 +8,7 @@ on:
       - master
     paths-ignore:
       - '*.md'
+      - '*.json'
 
 jobs:
   linux-build:
