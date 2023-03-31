@@ -49,11 +49,11 @@ OG_SETTINGS = {
     "API_COUNTER": 0
 }
 
+UPDATE_LIST = []
+
 API_COUNTER = 0
 
 
-# Todo 命令行模式的话其实可以直接输入choice_manga_path_word和manga_group_path_word给manga_chapter()，
-#  然后在此函数里面接收一下start与end，然后传给chapter_allocation()即可
 def parse_args():
     parser = argparse.ArgumentParser()
 
@@ -62,7 +62,7 @@ def parse_args():
         help='漫画的全拼，https://copymanga.site/comic/这部分')
     parser.add_argument(
         '--MangaGroup',
-        help='漫画的分组Path_Word，默认为default',default='default')
+        help='漫画的分组Path_Word，默认为default', default='default')
 
     parser.add_argument('--Url', help='copymanga的域名,如使用copymanga.site，那就输入site(默认为site)', default="site")
 
@@ -121,19 +121,143 @@ def command_mode():
 
 def welcome():
     choice_manga_path_word = None
-    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏)[/]",
-                             choices=["0", "1", "2"], default="1"))
+    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏,3:添加半自动更新)[/]",
+                             choices=["0", "1", "2", "3"], default="1"))
     if want_to == 0:
         print()
-        return
+    if want_to == 3:
+        updates()
+        exit()
     if want_to == 1:
         choice_manga_path_word = search()
-
     if want_to == 2:
         choice_manga_path_word = search_on_collect()
     manga_group_path_word = manga_group(choice_manga_path_word)
     manga_chapter_json = manga_chapter(choice_manga_path_word, manga_group_path_word)
     chapter_allocation(manga_chapter_json)
+
+
+# 自动更新相关
+def updates():
+    update_want_to = 0
+    have_list = load_updates()
+    if have_list:
+        update_list()
+        update_want_to = int(Prompt.ask("您是想添加漫画还是删除漫画？[italic yellow](0:添加,1:删除)[/]",
+                                        choices=["0", "1"], default="0"))
+    if update_want_to == 0:
+        new_update = add_updates()
+        save_updates(new_update[0], new_update[1], new_update[2], False)
+    else:
+        del_manga_int = int(Prompt.ask("请输入想要删除的漫画前面的序号"))
+        save_updates(UPDATE_LIST[del_manga_int - 1]['manga_path_word'],
+                     UPDATE_LIST[del_manga_int - 1]['manga_group_path_word'],
+                     UPDATE_LIST[del_manga_int - 1]['manga_name'], True)
+
+
+def add_updates():
+    search_content = Prompt.ask("您需要搜索添加什么漫画呢")
+    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
+        SETTINGS["api_url"], search_content)
+    offset = 0
+    current_page_count = 1
+    while True:
+        # 发送GET请求
+        response = requests.get(url.format(offset), headers=API_HEADER, proxies=PROXIES)
+        # 记录API访问量
+        api_restriction()
+        # 解析JSON数据
+        data = response.json()
+
+        console.rule(f"[bold blue]当前为第{current_page_count}页")
+        # 输出每个comic的名称和对应的序号
+        for i, comic in enumerate(data["results"]["list"]):
+            print("[{}] {}".format(i + 1, comic["name"]))
+
+        # 让用户输入数字来选择comic
+        selection = Prompt.ask("请选择一个漫画[italic yellow]（输入Q退出,U为上一页,D为下一页）[/]")
+        if selection.upper() == "Q":
+            break
+        try:
+            # 将用户输入的字符串转换为整数
+            index = int(selection) - 1
+            # 获取用户选择的comic的名称并输出
+            print("你选择了：{}".format(data["results"]["list"][index]["name"]))
+            # 让用户选择分组
+            manga_group_path_word = manga_group(data["results"]["list"][index]["path_word"])
+            # 返回两个pathWord与漫画名称
+            return data["results"]["list"][index]["path_word"], manga_group_path_word, data["results"]["list"][index][
+                "name"]
+
+        except (ValueError, IndexError):
+            # 判断是否是输入的U/D
+            # 根据用户输入更新offset
+            if selection.upper() == "U":
+                offset -= data["results"]["limit"]
+                if offset < 0:
+                    offset = 0
+                else:
+                    current_page_count -= 1
+            elif selection.upper() == "D":
+                offset += data["results"]["limit"]
+                if offset > data["results"]["total"]:
+                    offset = data["results"]["total"] - data["results"]["limit"]
+                else:
+                    current_page_count += 1
+            else:
+                # 处理输入错误的情况
+                print("[italic red]无效的选择！[/]")
+
+
+def load_updates():
+    global UPDATE_LIST
+    # 获取用户目录的路径
+    home_dir = os.path.expanduser("~")
+    updates_path = os.path.join(home_dir, ".copymanga-downloader/update.json")
+    # 检查是否有文件
+    if not os.path.exists(updates_path):
+        print("[yellow]update.json文件不存在,请添加需要更新的漫画[/]")
+        return False
+    # 读取json配置文件
+    with open(updates_path, 'r') as f:
+        UPDATE_LIST = json.load(f)
+    if len(UPDATE_LIST) <= 0:
+        print("[yellow]update.json文件为空,请添加需要更新的漫画[/]")
+        return False
+    return True
+
+
+def update_list():
+    for i, comic in enumerate(UPDATE_LIST):
+        print("[{}] {}".format(i + 1, comic["manga_name"]))
+
+
+def save_updates(manga_path_word, manga_group_path_word, manga_name, will_del):
+    home_dir = os.path.expanduser("~")
+    if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
+        os.mkdir(os.path.join(home_dir, '.copymanga-downloader/'))
+    updates_path = os.path.join(home_dir, ".copymanga-downloader/update.json")
+    # 是否删除漫画
+    if will_del:
+        for i, item in enumerate(UPDATE_LIST):
+            if item.get('manga_name') == manga_name:
+                del UPDATE_LIST[i]
+                break
+    else:
+        # 将新的漫画添加到LIST中
+        new_update = {
+            "manga_name": manga_name,
+            "manga_path_word": manga_path_word,
+            "manga_group_path_word": manga_group_path_word
+        }
+        UPDATE_LIST.append(new_update)
+    # 写入update.json文件
+    with open(updates_path, "w") as f:
+        json.dump(UPDATE_LIST, f)
+    if will_del:
+        print(f"[yellow]已将{manga_name}从自动更新列表中删除[/]")
+        return
+    print(f"[yellow]已将{manga_name}添加到自动更新列表中,请使用命令行参数‘--subscribe 1’进行自动更新[/]")
 
 
 # 搜索相关
@@ -279,7 +403,6 @@ def manga_chapter(manga_path_word, group_path_word):
     response.raise_for_status()
     manga_chapter_json = response.json()
     # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
-    # Todo 在这里添加支持命令行参数的代码
     return_json = {
         "json": manga_chapter_json,
         "start": None,
