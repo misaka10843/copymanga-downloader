@@ -37,6 +37,18 @@ SETTINGS = {
     "API_COUNTER": 0
 }
 
+# 全局化设置,备份,防止命令行参数导致设置错位
+OG_SETTINGS = {
+    "download_path": None,
+    "authorization": None,
+    "use_oversea_cdn": None,
+    "use_webp": None,
+    "proxies": None,
+    "api_url": None,
+    "api_time": 0.0,
+    "API_COUNTER": 0
+}
+
 API_COUNTER = 0
 
 
@@ -48,8 +60,11 @@ def parse_args():
     parser.add_argument(
         '--MangaPath',
         help='漫画的全拼，https://copymanga.site/comic/这部分')
+    parser.add_argument(
+        '--MangaGroup',
+        help='漫画的分组Path_Word，默认为default',default='default')
 
-    parser.add_argument('--Url', help='copymanga的域名,如使用copymanga.site，那就输入site')
+    parser.add_argument('--Url', help='copymanga的域名,如使用copymanga.site，那就输入site(默认为site)', default="site")
 
     parser.add_argument('--Output', help='输出文件夹')
 
@@ -69,18 +84,40 @@ def parse_args():
         help='是否使用海外cdn(1/0，默认关闭(0))',
         default="0")
 
-    parser.add_argument('--MangaStart', help='漫画开始下载话')
+    parser.add_argument('--MangaStart', help='漫画开始下载话(如果想全部下载请输入0)')
 
-    parser.add_argument('--MangaEnd', help='漫画结束下载话(如果只想下载一话请与MangaStart相同)')
-
-    parser.add_argument('--MangaList', help='漫画下载列表txt(每行一个漫画的全拼，具体请看Readme)')
+    parser.add_argument('--MangaEnd', help='漫画结束下载话(如果只想下载一话请与MangaStart相同,如果想全部下载请输入0)')
 
     parser.add_argument('--Proxy', help='设置代理')
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    return args
 
+# 命令行参数全局化
+
+ARGS = parse_args()
+
+
+# 命令行模式
+def command_mode():
+    global SETTINGS, PROXIES, API_HEADER
+    # 将命令行参数赋值到SETTINGS等相关全局变量
+    if ARGS.UseOSCdn or ARGS.UseWebp:
+        API_HEADER['use_oversea_cdn'] = ARGS.UseOSCdn
+        API_HEADER['use_webp'] = ARGS.UseWebp
+    if ARGS.Proxy:
+        PROXIES = {
+            "http": ARGS.Proxy,
+            "https": ARGS.Proxy
+        }
+    if ARGS.Output:
+        SETTINGS['download_path'] = ARGS.Output
+    manga_chapter_json = manga_chapter(ARGS.MangaPath, ARGS.MangaGroup)
+    chapter_allocation(manga_chapter_json)
+    print(f"[bold green][:white_check_mark: ]漫画已经下载完成！[/]")
+
+
+# 正常模式
 
 def welcome():
     choice_manga_path_word = None
@@ -97,7 +134,6 @@ def welcome():
     manga_group_path_word = manga_group(choice_manga_path_word)
     manga_chapter_json = manga_chapter(choice_manga_path_word, manga_group_path_word)
     chapter_allocation(manga_chapter_json)
-    print(f"[bold green][:white_check_mark: ]漫画已经下载完成！[/]")
 
 
 # 搜索相关
@@ -254,6 +290,11 @@ def manga_chapter(manga_path_word, group_path_word):
         print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/]")
         exit()
     # 询问应该如何下载
+    # 如果是命令行参数就直接返回对应
+    if ARGS:
+        return_json["start"] = int(ARGS.MangaStart) - 1
+        return_json["end"] = int(ARGS.MangaEnd)
+        return return_json
     want_to = int(Prompt.ask(f"获取到{manga_chapter_json['results']['total']}话内容，请问如何下载?"
                              f"[italic yellow](0:全本下载,1:范围下载,2:单话下载)[/]",
                              choices=["0", "1", "2"], default="0"))
@@ -265,7 +306,7 @@ def manga_chapter(manga_path_word, group_path_word):
         "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/]")
     if want_to == 1:
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
-        return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
+        return_json["end"] = int(Prompt.ask("请输入结束下载的话数"))
         return return_json
     if want_to == 2:
         return_json["start"] = int(Prompt.ask("请输入需要下载的话数")) - 1
@@ -282,6 +323,7 @@ def chapter_allocation(manga_chapter_json):
     else:
         manga_chapter_list = manga_chapter_json['json']['results']['list'][
                              manga_chapter_json['start']:manga_chapter_json['end']]
+    print(manga_chapter_list)
     # 准备分配章节下载
     for manga_chapter_info in manga_chapter_list:
         response = requests.get(
@@ -325,6 +367,7 @@ def chapter_allocation(manga_chapter_json):
                         time.sleep(0.5)
                         t.join()
                     threads.clear()
+        print(f"[bold green][:white_check_mark: ][{manga_name}]{chapter_name}下载完成！[/]")
 
 
 # API限制相关
@@ -333,17 +376,17 @@ def api_restriction():
     global API_COUNTER
     API_COUNTER += 1
     # 防止退出后立马再次运行
-    current_time = SETTINGS['api_time']
+    current_time = OG_SETTINGS['api_time']
     time_diff = current_time - time.time()
     # 判断是否超过60秒
-    if time_diff < 60:
-        API_COUNTER = API_COUNTER + SETTINGS['API_COUNTER']
+    if time_diff < 60 and API_COUNTER <= 1:
+        API_COUNTER = API_COUNTER + OG_SETTINGS['API_COUNTER']
     if API_COUNTER >= 15:
         API_COUNTER = 0
         print("[bold yellow]您已经触发到了API请求阈值，我们将等60秒后再进行[/]")
         time.sleep(60)
-    SETTINGS['API_COUNTER'] = API_COUNTER
-    SETTINGS['api_time'] = time.time()
+    OG_SETTINGS['API_COUNTER'] = API_COUNTER
+    OG_SETTINGS['api_time'] = time.time()
     # 将时间戳与API请求数量写入配置文件
     home_dir = os.path.expanduser("~")
     if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
@@ -351,7 +394,7 @@ def api_restriction():
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
     # 写入settings.json文件
     with open(settings_path, "w") as f:
-        json.dump(SETTINGS, f)
+        json.dump(OG_SETTINGS, f)
 
 
 # 下载相关
@@ -400,19 +443,18 @@ def set_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
     proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
-
     api_urls = get_org_url()
     for i, url in enumerate(api_urls):
         print(f"{i + 1}->{url}")
     choice = IntPrompt.ask("请输入要使用的API前面的数字")
 
     # input转bool
-    use_oversea_cdn = False
-    use_webp = False
-    if use_oversea_cdn_input == "Y":
-        use_oversea_cdn = True
-    if use_webp_input != "N":
-        use_webp = True
+    use_oversea_cdn = "0"
+    use_webp = "0"
+    if use_oversea_cdn_input:
+        use_oversea_cdn = "1"
+    if use_webp_input:
+        use_webp = "1"
 
     # 构造settings字典
     settings = {
@@ -436,7 +478,7 @@ def set_settings():
 
 
 def load_settings():
-    global SETTINGS, PROXIES
+    global SETTINGS, PROXIES, OG_SETTINGS, API_HEADER
     # 获取用户目录的路径
     home_dir = os.path.expanduser("~")
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
@@ -453,6 +495,10 @@ def load_settings():
         if field not in settings:
             return False, "settings.json中缺少必要字段{}".format(field)
     SETTINGS = settings
+    OG_SETTINGS = settings
+    # 设置请求头
+    API_HEADER['use_oversea_cdn'] = settings['use_oversea_cdn']
+    API_HEADER['use_webp'] = settings['use_webp']
     # 设置代理
     if settings["proxies"]:
         PROXIES = {
@@ -463,10 +509,20 @@ def load_settings():
 
 
 def main():
+    global ARGS
     loaded_settings = load_settings()
     if not loaded_settings[0]:
         print(f"[bold red]{loaded_settings[1]},我们将重新为您设置[/]")
         set_settings()
+    parse_args()
+    if ARGS:
+        if ARGS.MangaPath and ARGS.MangaEnd and ARGS.MangaStart:
+            command_mode()
+            # 防止运行完成后又触发正常模式
+            exit()
+        else:
+            print("[bold red]命令行参数中缺少必要字段,将切换到普通模式[/]")
+            ARGS = None
     welcome()
 
 
