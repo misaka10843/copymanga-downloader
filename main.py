@@ -147,12 +147,12 @@ def updates():
                                         choices=["0", "1"], default="0"))
     if update_want_to == 0:
         new_update = add_updates()
-        save_updates(new_update[0], new_update[1], new_update[2], False)
+        save_updates(new_update[0], new_update[1], new_update[2], 0, False)
     else:
         del_manga_int = int(Prompt.ask("请输入想要删除的漫画前面的序号"))
         save_updates(UPDATE_LIST[del_manga_int - 1]['manga_path_word'],
                      UPDATE_LIST[del_manga_int - 1]['manga_group_path_word'],
-                     UPDATE_LIST[del_manga_int - 1]['manga_name'], True)
+                     UPDATE_LIST[del_manga_int - 1]['manga_name'], 0, True)
 
 
 def add_updates():
@@ -232,7 +232,8 @@ def update_list():
         print("[{}] {}".format(i + 1, comic["manga_name"]))
 
 
-def save_updates(manga_path_word, manga_group_path_word, manga_name, will_del):
+def save_updates(manga_path_word, manga_group_path_word, manga_name, now_chapter, will_del):
+    global UPDATE_LIST
     home_dir = os.path.expanduser("~")
     if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
         os.mkdir(os.path.join(home_dir, '.copymanga-downloader/'))
@@ -243,21 +244,75 @@ def save_updates(manga_path_word, manga_group_path_word, manga_name, will_del):
             if item.get('manga_name') == manga_name:
                 del UPDATE_LIST[i]
                 break
+        print(f"[yellow]已将{manga_name}从自动更新列表中删除[/]")
     else:
         # 将新的漫画添加到LIST中
         new_update = {
             "manga_name": manga_name,
             "manga_path_word": manga_path_word,
-            "manga_group_path_word": manga_group_path_word
+            "manga_group_path_word": manga_group_path_word,
+            "now_chapter": now_chapter
         }
         UPDATE_LIST.append(new_update)
+        print(f"[yellow]已将{manga_name}添加到自动更新列表中,请使用命令行参数‘--subscribe 1’进行自动更新[/]")
     # 写入update.json文件
     with open(updates_path, "w") as f:
         json.dump(UPDATE_LIST, f)
-    if will_del:
-        print(f"[yellow]已将{manga_name}从自动更新列表中删除[/]")
-        return
-    print(f"[yellow]已将{manga_name}添加到自动更新列表中,请使用命令行参数‘--subscribe 1’进行自动更新[/]")
+
+
+# 判断是否已经有了，此函数是为了追踪用户下载到哪一话
+def save_new_update(manga_path_word, now_chapter):
+    global UPDATE_LIST
+    home_dir = os.path.expanduser("~")
+    if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
+        os.mkdir(os.path.join(home_dir, '.copymanga-downloader/'))
+    updates_path = os.path.join(home_dir, ".copymanga-downloader/update.json")
+    for item in UPDATE_LIST:
+        if item['manga_path_word'] == manga_path_word:
+            item['now_chapter'] = now_chapter
+            with open(updates_path, "w") as f:
+                json.dump(UPDATE_LIST, f)
+            return
+
+
+def update_download():
+    load_settings()
+    if not load_updates():
+        print("[bold red]update.json并没有内容，请使用正常模式添加！[/]")
+        exit()
+    for comic in UPDATE_LIST:
+        print(f"[yellow]正在准备下载{comic['manga_name']}[/]")
+        manga_chapter_json = update_get_chapter(comic['manga_path_word'],
+                                                comic['manga_group_path_word'],
+                                                comic['now_chapter'])
+        if manga_chapter_json != 0:
+            chapter_allocation(manga_chapter_json)
+
+
+def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
+    # 因为将偏移设置到最后下载的章节，所以可以直接下载全本
+    response = requests.get(
+        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}/chapters?limit=500"
+        f"&offset={now_chapter}&platform=3",
+        headers=API_HEADER, proxies=PROXIES)
+    # 记录API访问量
+    api_restriction()
+    response.raise_for_status()
+    manga_chapter_json = response.json()
+    # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
+    return_json = {
+        "json": manga_chapter_json,
+        "start": -1,
+        "end": -1
+    }
+    # Todo 支持500+话的漫画(感觉并不太需要)
+    if not manga_chapter_json['results']['list']:
+        print(f"[bold blue]此漫画并未有新的章节，我们将跳过此漫画[/]")
+        return 0
+    if manga_chapter_json['results']['total'] > 500:
+        print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/]")
+        exit()
+    return return_json
 
 
 # 搜索相关
@@ -446,7 +501,6 @@ def chapter_allocation(manga_chapter_json):
     else:
         manga_chapter_list = manga_chapter_json['json']['results']['list'][
                              manga_chapter_json['start']:manga_chapter_json['end']]
-    print(manga_chapter_list)
     # 准备分配章节下载
     for manga_chapter_info in manga_chapter_list:
         response = requests.get(
@@ -490,6 +544,11 @@ def chapter_allocation(manga_chapter_json):
                         time.sleep(0.5)
                         t.join()
                     threads.clear()
+        # 实施添加下载进度
+        if ARGS.subscribe == "1":
+            save_new_update(manga_chapter_info_json['results']['chapter']['comic_path_word'],
+                            manga_chapter_info_json['results']['chapter']['index'] + 1)
+
         print(f"[bold green][:white_check_mark: ][{manga_name}]{chapter_name}下载完成！[/]")
 
 
@@ -639,6 +698,11 @@ def main():
         set_settings()
     parse_args()
     if ARGS:
+        if ARGS.subscribe == "1":
+            print(
+                "[bold purple]请注意！此模式下可能会导致部分img下载失败，如果遇见报错还请您自行删除更新列表然后重新添加后运行，此程序会重新下载并跳过已下载内容[/]")
+            update_download()
+            exit()
         if ARGS.MangaPath and ARGS.MangaEnd and ARGS.MangaStart:
             command_mode()
             # 防止运行完成后又触发正常模式
