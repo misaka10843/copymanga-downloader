@@ -6,8 +6,6 @@
 
 ## 前言💭
 
-在ReMake时发现copymanga似乎更改了许多东西，导致下载API无法正常开始下载，因为开发重心不在此，所以可能会缓慢维护！
-
 推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
 
 因为这样可以尽可能的保证下载稳定与订阅系统正常
@@ -15,9 +13,9 @@
 此程序只是方便下载，而不是进行订阅操作(下载与订阅系统不稳定)
 
 
-**我们已经正式基本支持命令行参数下载啦！**
+**我们已经正式基本支持命令行参数下载并且完全重构啦！**
 
-请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)的部分！
+请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)与[重大更新](https://github.com/misaka10843/copymanga-downloader#%E9%87%8D%E5%A4%A7%E6%9B%B4%E6%96%B0-)的部分！
 
 ## 下载
 
@@ -95,27 +93,25 @@ QQ `3594254539`（不常工作时间上线）
 您可以在命令行中输入 `{copymanga-downloader的文件名} -h`查看现在所支持的参数
 
 ```bash
-usage: main.py [-h] [--MangaPath MANGAPATH] [--Url URL] [--Output OUTPUT]
-               [--subscribe SUBSCRIBE] [--UseWebp USEWEBP]
-               [--UseOSCdn USEOSCDN] [--MangaStart MANGASTART]
-               [--MangaEnd MANGAEND] [--MangaList MANGALIST] [--Proxy PROXY]
+usage: main.py [-h] [--MangaPath MANGAPATH] [--MangaGroup MANGAGROUP] [--Url URL] [--Output OUTPUT] [--subscribe SUBSCRIBE] [--UseWebp USEWEBP] [--UseOSCdn USEOSCDN] [--MangaStart MANGASTART] [--MangaEnd MANGAEND] [--Proxy PROXY]
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --MangaPath MANGAPATH
                         漫画的全拼，https://copymanga.site/comic/这部分
-  --Url URL             copymanga的域名,如使用copymanga.site，那就输入site
+  --MangaGroup MANGAGROUP
+                        漫画的分组Path_Word，默认为default
+  --Url URL             copymanga的域名,如使用copymanga.site，那就输入site(默认为site)
   --Output OUTPUT       输出文件夹
   --subscribe SUBSCRIBE
                         是否切换到自动更新订阅模式(1/0，默认关闭(0))
   --UseWebp USEWEBP     是否使用Webp(1/0，默认开启(1))
   --UseOSCdn USEOSCDN   是否使用海外cdn(1/0，默认关闭(0))
   --MangaStart MANGASTART
-                        漫画开始下载话
-  --MangaEnd MANGAEND   漫画结束下载话(如果只想下载一话请与MangaStart相同)
-  --MangaList MANGALIST
-                        漫画下载列表txt(每行一个漫画的全拼，具体请看Readme)
+                        漫画开始下载话(如果想全部下载请输入0)
+  --MangaEnd MANGAEND   漫画结束下载话(如果只想下载一话请与MangaStart相同,如果想全部下载请输入0)
   --Proxy PROXY         设置代理
+
 ```
 
 其中，`MangaPath/MangaStart/MangaEnd`三个参数是**必填项**
@@ -137,7 +133,7 @@ optional arguments:
 
 我可以这样输入
 
-`python main.py --Url copymanga.site --MangaPath biekuamowangjiang --MangaStart 1 --MangaEnd 1 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
+`python main.py --Url site --MangaPath biekuamowangjiang --MangaStart 1 --MangaEnd 1 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
 
 或者输入精简版
 
@@ -147,7 +143,7 @@ optional arguments:
 
 我可以这样输入
 
-`python main.py --Url copymanga.site --MangaPath xinglingganying --MangaStart 1 --MangaEnd 38 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
+`python main.py --Url site --MangaPath xinglingganying --MangaStart 1 --MangaEnd 38 --Proxy http://127.0.0.1:10809 --UseOSCdn 1`
 
 或者输入精简版
 
@@ -155,15 +151,11 @@ optional arguments:
 
 **（注意！虽然说是下载全话，其实就是将范围定在了1话-最新话，所以如果下载其他漫画的全话请参考漫画更新到多少话了，然后再替换38）**
 
-## Todo List📝
-
-- [ ] 直接从对应文件进行获取所有需要下载的漫画，并且运行后自动下载
-
-其余可能在[Remake](https://github.com/misaka10843/copymanga-downloader/pull/38)分支
-
 ## 更新 🔬
 
 ### 重大更新 📈
+
+2023/3/31(重大):完全重构程序，添加多线程+自动更新等众多功能
 
 2023/1/6(重大):添加直接使用命令参数进行下载，并且使用命令参数进行下载时不会出现任何输入框，优化download，修复download中并未使用代理以及headers
 
