@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import os
+import sys
 import threading
 import time
 
@@ -127,7 +128,7 @@ def welcome():
         print()
     if want_to == 3:
         updates()
-        exit()
+        sys.exit()
     if want_to == 1:
         choice_manga_path_word = search()
     if want_to == 2:
@@ -279,7 +280,7 @@ def update_download():
     load_settings()
     if not load_updates():
         print("[bold red]update.json并没有内容，请使用正常模式添加！[/]")
-        exit()
+        sys.exit()
     for comic in UPDATE_LIST:
         print(f"[yellow]正在准备下载{comic['manga_name']}[/]")
         manga_chapter_json = update_get_chapter(comic['manga_path_word'],
@@ -311,7 +312,7 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
         return 0
     if manga_chapter_json['results']['total'] > 500:
         print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/]")
-        exit()
+        sys.exit()
     return return_json
 
 
@@ -387,7 +388,7 @@ def search_on_collect():
             settings_dir = os.path.join(os.path.expanduser("~"), ".copymanga-downloader/settings.json")
             print(f"[bold red]请求出现问题！疑似Token问题！[{data['message']}][/]")
             print(f"[bold red]请删除{settings_dir}来重新设置！(或者也可以自行修改配置文件)[/]")
-            exit()
+            sys.exit()
         console.rule(f"[bold blue]当前为第{current_page_count}页")
         # 输出每个comic的名称和对应的序号
         for i, comic in enumerate(data["results"]["list"]):
@@ -466,7 +467,7 @@ def manga_chapter(manga_path_word, group_path_word):
     # Todo 支持500+话的漫画(感觉并不太需要)
     if manga_chapter_json['results']['total'] > 500:
         print("[bold red]我们暂时不支持下载到500话以上，还请您去Github中创建Issue！[/]")
-        exit()
+        sys.exit()
     # 询问应该如何下载
     # 如果是命令行参数就直接返回对应
     if ARGS:
@@ -523,7 +524,8 @@ def chapter_allocation(manga_chapter_json):
             os.mkdir(f"{download_path}/{manga_name}/")
         # 创建多线程
         threads = []
-        with console.status(f"[bold yellow]正在下载:[{manga_name}]{chapter_name}[/]"):
+        with console.status(f"[bold yellow]正在下载:[{manga_name}]{chapter_name}(索引ID:"
+                            f"{manga_chapter_info_json['results']['chapter']['index']})[/]"):
             for i in range(num_images):
                 url = img_url_contents[i]['url']
                 # 检查章节文件夹是否存在
@@ -592,7 +594,7 @@ def download(url, filename):
         with open(filename, "wb") as f:
             f.write(response.content)
     except:
-        print(f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后重试或检查网络连接[/]")
+        print(f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID)[/]")
 
 
 # 设置相关
@@ -614,7 +616,7 @@ def get_org_url():
             return response.json()
         except:
             print("[bold red]无法链接至GitHub，请检查网络连接[/]", )
-            exit()
+            sys.exit()
 
 
 def set_settings():
@@ -702,11 +704,11 @@ def main():
             print(
                 "[bold purple]请注意！此模式下可能会导致部分img下载失败，如果遇见报错还请您自行删除更新列表然后重新添加后运行，此程序会重新下载并跳过已下载内容[/]")
             update_download()
-            exit()
+            sys.exit()
         if ARGS.MangaPath and ARGS.MangaEnd and ARGS.MangaStart:
             command_mode()
             # 防止运行完成后又触发正常模式
-            exit()
+            sys.exit()
         else:
             print("[bold red]命令行参数中缺少必要字段,将切换到普通模式[/]")
             ARGS = None
