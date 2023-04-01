@@ -55,6 +55,11 @@ QQ `3594254539`（不常工作时间上线）
 
 因为copymanga为简体/繁体中文的漫画网站，所以此程序预计不会添加其他语言，还请谅解
 
+为了尽可能的防止对服务器增加过大负担，我们将API请求限制为15次每分钟，还请谅解！（因为将API请求的时间与次数保存在设置中，您就算重新打开程序都会被限制的！）
+
+![image](https://user-images.githubusercontent.com/69132853/229278511-3b2fe97b-5e01-4df0-9a23-d276de440472.png)
+
+
 ## 技术栈 ⚒️
 
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
