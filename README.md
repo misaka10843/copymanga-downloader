@@ -33,10 +33,6 @@ or
 
 `git clone https://github.com/misaka10843/copymanga-downloader.git && cd copymanga-downloader && pip install -r requirements.txt && python main.py`
 
-## README 语言🌐
-
-**简体中文**|[English](https://github.com/misaka10843/copymanga-downloader/blob/master/README-EN.md)
-
 ## 声明 📢
 
 我们制作此工具是纯粹因为PC端无法下载漫画，我们并不希望个人用户一直依靠此工具并且长时间/多文件下载来增加服务器负担
