@@ -1,5 +1,7 @@
 **请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
 
+**因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
+
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
