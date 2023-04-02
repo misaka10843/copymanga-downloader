@@ -525,7 +525,7 @@ def chapter_allocation(manga_chapter_json):
         # 创建多线程
         threads = []
         with console.status(f"[bold yellow]正在下载:[{manga_name}]{chapter_name}(索引ID:"
-                            f"{manga_chapter_info_json['results']['chapter']['index']})[/]"):
+                            f"{int(manga_chapter_info_json['results']['chapter']['index']) + 1})[/]"):
             for i in range(num_images):
                 url = img_url_contents[i]['url']
                 # 检查章节文件夹是否存在
@@ -547,11 +547,11 @@ def chapter_allocation(manga_chapter_json):
                         t.join()
                     threads.clear()
         # 实施添加下载进度
-        if ARGS.subscribe == "1":
+        if ARGS and ARGS.subscribe == "1":
             save_new_update(manga_chapter_info_json['results']['chapter']['comic_path_word'],
                             manga_chapter_info_json['results']['chapter']['index'] + 1)
 
-        print(f"[bold green][:white_check_mark: ][{manga_name}]{chapter_name}下载完成！[/]")
+        print(f"[bold green][:white_check_mark:][{manga_name}]{chapter_name}下载完成！[/]")
 
 
 # API限制相关
@@ -561,7 +561,7 @@ def api_restriction():
     API_COUNTER += 1
     # 防止退出后立马再次运行
     current_time = OG_SETTINGS['api_time']
-    time_diff = current_time - time.time()
+    time_diff = time.time() - current_time
     # 判断是否超过60秒
     if time_diff < 60 and API_COUNTER <= 1:
         API_COUNTER = API_COUNTER + OG_SETTINGS['API_COUNTER']
