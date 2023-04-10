@@ -1,4 +1,5 @@
 import argparse
+import csv
 import datetime
 import json
 import os
@@ -125,10 +126,11 @@ def welcome():
     want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏,3:添加半自动更新)[/]",
                              choices=["0", "1", "2", "3"], default="1"))
     if want_to == 0:
-        print()
+        collect_expect()
+        return
     if want_to == 3:
         updates()
-        sys.exit()
+        return
     if want_to == 1:
         choice_manga_path_word = search()
     if want_to == 2:
@@ -426,6 +428,44 @@ def search_on_collect():
                 print("[italic red]无效的选择！[/]")
 
 
+def collect_expect():
+    url = f"https://api.{SETTINGS['api_url']}/api/v3/member/collect/comics"
+    params = {
+        "limit": 12,
+        "offset": 0
+    }
+    data = []
+    want_to = int(Prompt.ask(f"请问是输出json格式还是csv格式？"
+                             f"[italic yellow](0:json,1:csv)[/]",
+                             choices=["0", "1"], default="1"))
+    while True:
+        API_HEADER['authorization'] = SETTINGS['authorization']
+        res = requests.get(url, params=params, headers=API_HEADER)
+        res_json = json.loads(res.text)
+        if res_json["code"] != 200:
+            print(f"[bold red]无法获取到相关信息，请检查相关设置。Error:{res_json['message']}")
+            return
+        for item in res_json['results']['list']:
+            comic = item['comic']
+            data.append([comic['name'], comic['path_word'], comic['datetime_updated'], comic['last_chapter_name']])
+
+        if len(data) >= res_json['results']['total']:
+            break
+        else:
+            params['offset'] += 12
+    if want_to == 0:
+        # 输出到test.json
+        with open('collect.json', 'w') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        print("[green]已将您的收藏输出到运行目录下的collect.json中[/]")
+    else:
+        with open('collect.csv', 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(['Name', 'Path Word', 'Update Time', 'Last Chapter'])
+            writer.writerows(data)
+        print("[green]已将您的收藏输出到运行目录下的collect.csv中[/]")
+
+
 # 漫画详细相关
 
 def manga_group(manga_path_word):
@@ -594,7 +634,8 @@ def download(url, filename):
         with open(filename, "wb") as f:
             f.write(response.content)
     except:
-        print(f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID)[/]")
+        print(
+            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID)[/]")
 
 
 # 设置相关
@@ -603,7 +644,7 @@ def get_org_url():
     print("[italic yellow]正在获取CopyManga网站Url...[/]")
     url = "https://cdn.jsdelivr.net/gh/misaka10843/copymanga-downloader@master/url.json"
     try:
-        response = requests.get(url)
+        response = requests.get(url,proxies=PROXIES)
         response.raise_for_status()
         return response.json()
     except:
@@ -611,7 +652,7 @@ def get_org_url():
         # 更换URL
         url = "https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
         try:
-            response = requests.get(url)
+            response = requests.get(url,proxies=PROXIES)
             response.raise_for_status()
             return response.json()
         except:
@@ -620,6 +661,7 @@ def get_org_url():
 
 
 def set_settings():
+    global PROXIES
     # 获取用户输入
     download_path = Prompt.ask("请输入保存路径")
     authorization = Prompt.ask("请输入账号Token")
@@ -627,6 +669,11 @@ def set_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
     proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
+    if proxy:
+        PROXIES = {
+            "http": proxy,
+            "https": proxy
+        }
     api_urls = get_org_url()
     for i, url in enumerate(api_urls):
         print(f"{i + 1}->{url}")

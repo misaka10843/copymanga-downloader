@@ -1,11 +1,11 @@
 ### Python template
 # User file
-backup.csv
 backup.txt
-settings.json
-settings_old.json
 *.jpg
 *.webp
+*.csv
+*.json
+!url.json
 
 # Vscode
 .vscode/
