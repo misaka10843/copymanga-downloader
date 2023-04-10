@@ -10,6 +10,8 @@ on:
       - '*.md'
       - '*.json'
       - '*.txt'
+      - 'setup.py'
+      - 'pyproject.toml'
 
 jobs:
   linux-build:
