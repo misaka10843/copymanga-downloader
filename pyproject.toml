@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "copymanga-dl"
-version = "3.1"
+version = "3.2"
 description = "Copymanga Downloader"
 license = "GPL-3.0-or-later"
 authors = ["misaka10843 <misaka10843@outlook.jp>"]

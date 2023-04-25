@@ -53,6 +53,7 @@ OG_SETTINGS = {
 
 UPDATE_LIST = []
 
+# API限制相关
 API_COUNTER = 0
 IMG_API_COUNTER = 0
 IMG_CURRENT_TIME = 0
@@ -125,10 +126,14 @@ def command_mode():
 
 def welcome():
     choice_manga_path_word = None
-    want_to = int(Prompt.ask("您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏,3:添加半自动更新)[/]",
-                             choices=["0", "1", "2", "3"], default="1"))
+    want_to = int(Prompt.ask(
+        "您是想搜索还是查看您的收藏？[italic yellow](0:导出收藏,1:搜索,2:收藏,3:添加半自动更新,9:修改设置)[/]",
+        choices=["0", "1", "2", "3", "9"], default="1"))
     if want_to == 0:
         collect_expect()
+        return
+    if want_to == 9:
+        change_settings()
         return
     if want_to == 3:
         updates()
@@ -620,9 +625,9 @@ def download(url, filename):
         response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
         with open(filename, "wb") as f:
             f.write(response.content)
-    except:
+    except Exception as e:
         print(
-            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID)[/]")
+            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
 
 
 # 设置相关
@@ -634,7 +639,7 @@ def get_org_url():
         response = requests.get(url, proxies=PROXIES)
         response.raise_for_status()
         return response.json()
-    except:
+    except Exception as e:
         print("[bold yellow]无法链接至jsdelivr，准备直接访问Github[/]")
         # 更换URL
         url = "https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
@@ -642,8 +647,8 @@ def get_org_url():
             response = requests.get(url, proxies=PROXIES)
             response.raise_for_status()
             return response.json()
-        except:
-            print("[bold red]无法链接至GitHub，请检查网络连接[/]", )
+        except Exception as e:
+            print(f"[bold red]无法链接至GitHub，请检查网络连接,ErrMsg:{e}[/]", )
             sys.exit()
 
 
@@ -689,6 +694,58 @@ def set_settings():
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
     save_settings(settings)
     print(f"[yellow]已将配置文件存放到{settings_path}中[/]")
+
+
+def change_settings():
+    global PROXIES
+    # 获取用户输入
+    download_path = Prompt.ask("请输入保存路径", default=SETTINGS['download_path'])
+    authorization = Prompt.ask("请输入账号Token", default=SETTINGS['authorization'])
+    use_oversea_cdn = True
+    use_webp = True
+    if SETTINGS['use_oversea_cdn'] == "0":
+        use_oversea_cdn = False
+    if SETTINGS['use_webp'] == "0":
+        use_webp = False
+    use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=use_oversea_cdn)
+    use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
+                                 default=use_webp)
+    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=SETTINGS['proxies'])
+    if proxy != SETTINGS['proxies'] and proxy != "0":
+        PROXIES = {
+            "http": proxy,
+            "https": proxy
+        }
+    if proxy == "0":
+        proxy = ""
+    api_urls = get_org_url()
+    for i, url in enumerate(api_urls):
+        print(f"{i + 1}->{url}")
+    choice = IntPrompt.ask("请输入要使用的API前面的数字")
+    print(f"[yellow]我们正在更改您的设置中，请稍后[/]")
+    # input转bool
+    use_oversea_cdn = "0"
+    use_webp = "0"
+    if use_oversea_cdn_input:
+        use_oversea_cdn = "1"
+    if use_webp_input:
+        use_webp = "1"
+
+    # 构造settings字典
+    settings = {
+        "download_path": download_path,
+        "authorization": authorization,
+        "use_oversea_cdn": use_oversea_cdn,
+        "use_webp": use_webp,
+        "proxies": proxy,
+        "api_url": api_urls[choice - 1],
+        "api_time": 0.0,
+        "API_COUNTER": 0
+    }
+    home_dir = os.path.expanduser("~")
+    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
+    save_settings(settings)
+    print(f"[yellow]已将重新修改配置文件并存放到{settings_path}中[/]")
 
 
 def save_settings(settings):
