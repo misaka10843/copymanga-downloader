@@ -35,6 +35,7 @@ SETTINGS = {
     "use_webp": None,
     "proxies": None,
     "api_url": None,
+    "HC": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -47,6 +48,7 @@ OG_SETTINGS = {
     "use_webp": None,
     "proxies": None,
     "api_url": None,
+    "HC": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -622,6 +624,8 @@ def download(url, filename):
         print(f"[blue]您已经下载了{filename}，跳过下载[/]")
         return
     try:
+        if SETTINGS['HC'] == "1":
+            url = url.replace("c800x.jpg", "c1500x.jpg")
         response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
         with open(filename, "wb") as f:
             f.write(response.content)
@@ -661,6 +665,8 @@ def set_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
     proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
+    hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                           default=False)
     if proxy:
         PROXIES = {
             "http": proxy,
@@ -674,10 +680,13 @@ def set_settings():
     # input转bool
     use_oversea_cdn = "0"
     use_webp = "0"
+    hc = "0"
     if use_oversea_cdn_input:
         use_oversea_cdn = "1"
     if use_webp_input:
         use_webp = "1"
+    if hc_input:
+        hc = "1"
 
     # 构造settings字典
     settings = {
@@ -687,6 +696,7 @@ def set_settings():
         "use_webp": use_webp,
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
+        "HC": hc,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -711,6 +721,14 @@ def change_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=use_webp)
     proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=SETTINGS['proxies'])
+    if SETTINGS['HC'] is None:
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                               default=False)
+    else:
+        hc_c = True
+        if SETTINGS['HC'] == "0":
+            hc_c = False
+        hc_input = Confirm.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=hc_c)
     if proxy != SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
@@ -726,10 +744,13 @@ def change_settings():
     # input转bool
     use_oversea_cdn = "0"
     use_webp = "0"
+    hc = "0"
     if use_oversea_cdn_input:
         use_oversea_cdn = "1"
     if use_webp_input:
         use_webp = "1"
+    if hc_input:
+        hc = "1"
 
     # 构造settings字典
     settings = {
@@ -739,6 +760,7 @@ def change_settings():
         "use_webp": use_webp,
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
+        "HC": hc,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -776,6 +798,12 @@ def load_settings():
         if field not in settings:
             return False, "settings.json中缺少必要字段{}".format(field)
     SETTINGS = settings
+    if "HC" not in settings:
+        SETTINGS['HC'] = None
+        print("[bold yellow]我们更新了设置，请您按照需求重新设置一下，还请谅解[/]")
+        change_settings()
+        print("[bold yellow]感谢您的支持，重新启动本程序后新的设置将会生效[/]")
+        exit(0)
     OG_SETTINGS = settings
     # 设置请求头
     API_HEADER['use_oversea_cdn'] = settings['use_oversea_cdn']
