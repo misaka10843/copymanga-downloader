@@ -728,7 +728,7 @@ def change_settings():
         hc_c = True
         if SETTINGS['HC'] == "0":
             hc_c = False
-        hc_input = Confirm.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=hc_c)
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]", default=hc_c)
     if proxy != SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
