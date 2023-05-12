@@ -744,7 +744,7 @@ def change_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=use_webp)
     proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=SETTINGS['proxies'])
-    if SETTINGS['HC'] is None:
+    if SETTINGS.get('HC') is None:
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=False)
     else:
@@ -753,7 +753,7 @@ def change_settings():
             hc_c = False
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=hc_c)
-    if SETTINGS['CBZ'] is None:
+    if SETTINGS.get('CBZ') is None:
         cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
     else:
         cbz = True
