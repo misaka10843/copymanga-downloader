@@ -512,12 +512,16 @@ def manga_chapter(manga_path_word, group_path_word):
         "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/]")
     if want_to == 1:
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
-        return_json["end"] = int(Prompt.ask("请输入结束下载的话数"))
+        return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
         return return_json
     if want_to == 2:
         return_json["start"] = int(Prompt.ask("请输入需要下载的话数")) - 1
         return_json["end"] = return_json["start"]
         return return_json
+
+
+def get_chapter_name():
+    return
 
 
 def chapter_allocation(manga_chapter_json):
@@ -580,7 +584,8 @@ def chapter_allocation(manga_chapter_json):
                             manga_chapter_info_json['results']['chapter']['index'] + 1)
 
         print(f"[bold green][:white_check_mark:][{manga_name}]{chapter_name}下载完成！[/]")
-        createcbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1),chapter_name,manga_name,f"{download_path}/{manga_name}/{chapter_name}/","D:\漫画下载\dw\cbz\\")
+        createcbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1), chapter_name, manga_name,
+                  f"{download_path}/{manga_name}/{chapter_name}/", "D:\漫画下载\dw\cbz\\")
 
 
 # API限制相关
@@ -731,7 +736,8 @@ def change_settings():
         hc_c = True
         if SETTINGS['HC'] == "0":
             hc_c = False
-        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]", default=hc_c)
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                               default=hc_c)
     if proxy != SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
@@ -842,24 +848,29 @@ def main():
             ARGS = None
     welcome()
 
-#cbz格式转换
-#index为章节索引 titles为章节标题 savedir为章节储存路径 cbzdir为cbz储存路径 manganame为漫画名字
-def createcbz(indexs,titles,manganame,savedir,cbzdir):
-    xmldata="<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <Title><titles></Title>\n  <Series><manganame></Series>\n  <Number><index></Number>\n</ComicInfo>"
+
+# cbz格式转换
+# index为章节索引 titles为章节标题 savedir为章节储存路径 cbzdir为cbz储存路径 manganame为漫画名字
+def createcbz(indexs, titles, manganame, savedir, cbzdir):
+    xmldata = "<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <Title><titles></Title>\n  <Series><manganame></Series>\n  <Number><index></Number>\n</ComicInfo>"
     Pinyins = Pinyin()
-    xmldata=xmldata.replace("<titles>",Pinyins.get_pinyin(titles) ).replace("<index>",Pinyins.get_pinyin(indexs)).replace("<manganame>",Pinyins.get_pinyin(manganame))
-    fo = open(savedir+"ComicInfo.xml" ,"w")
+    xmldata = xmldata.replace("<titles>", Pinyins.get_pinyin(titles)).replace("<index>",
+                                                                              Pinyins.get_pinyin(indexs)).replace(
+        "<manganame>", Pinyins.get_pinyin(manganame))
+    fo = open(savedir + "ComicInfo.xml", "w")
     fo.write(xmldata)
     fo.close()
-    startdir = savedir  
-    file_news = cbzdir+manganame+titles +'.cbz' 
-    z = zipfile.ZipFile(file_news,'w',zipfile.ZIP_DEFLATED) 
+    startdir = savedir
+    file_news = cbzdir + manganame + titles + '.cbz'
+    z = zipfile.ZipFile(file_news, 'w', zipfile.ZIP_DEFLATED)
     for dirpath, dirnames, filenames in os.walk(startdir):
-        fpath = dirpath.replace(startdir,'') 
+        fpath = dirpath.replace(startdir, '')
         fpath = fpath and fpath + os.sep or ''
         for filename in filenames:
-            z.write(os.path.join(dirpath, filename),fpath+filename)
+            z.write(os.path.join(dirpath, filename), fpath + filename)
     z.close()
-    print(manganame+"的"+ titles+"成功转换为cbz文件")
+    print(manganame + "的" + titles + "成功转换为cbz文件")
+
+
 if __name__ == '__main__':
     main()
