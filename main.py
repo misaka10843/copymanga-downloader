@@ -758,7 +758,7 @@ def change_settings():
         cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
     else:
         cbz = True
-        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+        hc_input = Confirm.ask("是否下载后打包成CBZ？",
                                default=cbz)
     if cbz:
         if SETTINGS.get('cbz_path') is None:
