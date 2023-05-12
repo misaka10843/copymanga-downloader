@@ -8,7 +8,7 @@ except IOError:
 
 setup(
     name="copymanga-dl",
-    version="3.2",
+    version="3.3",
     description="Copymanga Downloader",
     long_description=long_description,
     license="GNU GENERAL PUBLIC LICENSE",
@@ -16,17 +16,18 @@ setup(
     author_email="misaka10843@outlook.jp",
     url="https://github.com/misaka10843/copymanga-downloader",
     py_modules=[
-      "main",
-      "Image_stitching",
-      ],
+        "main",
+        "Image_stitching",
+    ],
     packages=find_packages(),
     package_data={'': ['*.json', '*.md', '*.txt']},
     python_requires='>=3.10',
     install_requires=[
-      'requests',
-      'retrying',
-      'rich'
-      ],
+        'requests',
+        'retrying',
+        'rich',
+        'xpinyin'
+    ],
     entry_points={'console_scripts': ['copymanga-dl=main:main']},
     classifiers=[
         "Programming Language :: Python",
