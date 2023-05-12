@@ -6,6 +6,8 @@ import os
 import sys
 import threading
 import time
+import zipfile
+from xpinyin import Pinyin
 
 import retrying as retrying
 from rich import print as print
@@ -36,6 +38,8 @@ SETTINGS = {
     "proxies": None,
     "api_url": None,
     "HC": None,
+    "CBZ": None,
+    "cbz_path": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -49,6 +53,8 @@ OG_SETTINGS = {
     "proxies": None,
     "api_url": None,
     "HC": None,
+    "CBZ": None,
+    "cbz_path": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -510,11 +516,16 @@ def manga_chapter(manga_path_word, group_path_word):
         "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/]")
     if want_to == 1:
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
-        return_json["end"] = int(Prompt.ask("请输入结束下载的话数"))
+        print(f"[italic blue]您选择从[yellow]{manga_chapter_json['results']['list'][return_json['start']]['name']}"
+              f"[/yellow]开始下载[/]")
+        return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
+        print(f"[italic blue]您选择在[yellow]{manga_chapter_json['results']['list'][return_json['end']]['name']}"
+              f"[/yellow]结束下载[/]")
         return return_json
     if want_to == 2:
         return_json["start"] = int(Prompt.ask("请输入需要下载的话数")) - 1
         return_json["end"] = return_json["start"]
+        print(f"[italic blue]您选择下载[yellow]{manga_chapter_json['results']['list'][return_json['end']]['name']}[/]")
         return return_json
 
 
@@ -561,7 +572,6 @@ def chapter_allocation(manga_chapter_json):
                 t = threading.Thread(target=download, args=(url, filename))
                 # 开始线程
                 threads.append(t)
-                img_api_restriction()
                 # 限制线程数量(十分不建议修改，不然很可能会被禁止访问)
                 if len(threads) == 4 or i == num_images - 1:
                     for t in threads:
@@ -578,6 +588,31 @@ def chapter_allocation(manga_chapter_json):
                             manga_chapter_info_json['results']['chapter']['index'] + 1)
 
         print(f"[bold green][:white_check_mark:][{manga_name}]{chapter_name}下载完成！[/]")
+        if SETTINGS['CBZ']:
+            with console.status(f"[bold yellow]正在保存CBZ存档:[{manga_name}]{chapter_name}[/]"):
+                create_cbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1), chapter_name,
+                           manga_name, f"{manga_name}/{chapter_name}/", SETTINGS['cbz_path'])
+            print(f"[bold green][:white_check_mark:]已将[{manga_name}]{chapter_name}保存为CBZ存档[/]")
+
+
+# 下载相关
+
+@retrying.retry(stop_max_attempt_number=3)
+def download(url, filename):
+    # 判断是否已经下载
+    if os.path.exists(filename):
+        print(f"[blue]您已经下载了{filename}，跳过下载[/]")
+        return
+    try:
+        img_api_restriction()
+        if SETTINGS['HC'] == "1":
+            url = url.replace("c800x.jpg", "c1500x.jpg")
+        response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
+        with open(filename, "wb") as f:
+            f.write(response.content)
+    except Exception as e:
+        print(
+            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
 
 
 # API限制相关
@@ -615,25 +650,6 @@ def img_api_restriction():
         IMG_API_COUNTER = 0
 
 
-# 下载相关
-
-@retrying.retry(stop_max_attempt_number=3)
-def download(url, filename):
-    # 判断是否已经下载
-    if os.path.exists(filename):
-        print(f"[blue]您已经下载了{filename}，跳过下载[/]")
-        return
-    try:
-        if SETTINGS['HC'] == "1":
-            url = url.replace("c800x.jpg", "c1500x.jpg")
-        response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
-        with open(filename, "wb") as f:
-            f.write(response.content)
-    except Exception as e:
-        print(
-            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
-
-
 # 设置相关
 
 def get_org_url():
@@ -659,7 +675,7 @@ def get_org_url():
 def set_settings():
     global PROXIES
     # 获取用户输入
-    download_path = Prompt.ask("请输入保存路径")
+    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
     authorization = Prompt.ask("请输入账号Token")
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
@@ -667,6 +683,11 @@ def set_settings():
     proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
     hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                            default=False)
+    cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
+    if cbz:
+        cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
+    else:
+        cbz_path = None
     if proxy:
         PROXIES = {
             "http": proxy,
@@ -697,6 +718,8 @@ def set_settings():
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
         "HC": hc,
+        "CBZ": cbz,
+        "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -709,7 +732,8 @@ def set_settings():
 def change_settings():
     global PROXIES
     # 获取用户输入
-    download_path = Prompt.ask("请输入保存路径", default=SETTINGS['download_path'])
+    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
+                               default=SETTINGS['download_path'])
     authorization = Prompt.ask("请输入账号Token", default=SETTINGS['authorization'])
     use_oversea_cdn = True
     use_webp = True
@@ -721,14 +745,28 @@ def change_settings():
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=use_webp)
     proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=SETTINGS['proxies'])
-    if SETTINGS['HC'] is None:
+    if SETTINGS.get('HC') is None:
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=False)
     else:
         hc_c = True
         if SETTINGS['HC'] == "0":
             hc_c = False
-        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]", default=hc_c)
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                               default=hc_c)
+    if SETTINGS.get('CBZ') is None:
+        cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
+    else:
+        cbz = True
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                               default=cbz)
+    if cbz:
+        if SETTINGS.get('cbz_path') is None:
+            SETTINGS['cbz_path'] = None
+        cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
+                              default=SETTINGS['cbz_path'])
+    else:
+        cbz_path = None
     if proxy != SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
@@ -761,6 +799,8 @@ def change_settings():
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
         "HC": hc,
+        "CBZ": cbz,
+        "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -838,6 +878,35 @@ def main():
             print("[bold red]命令行参数中缺少必要字段,将切换到普通模式[/]")
             ARGS = None
     welcome()
+
+
+# cbz格式转换
+
+def create_cbz(index, title, manga_name, save_dir, cbz_dir):
+    pinyin = Pinyin()
+    xml_data = f"<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " \
+               f"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  " \
+               f"<Title>{pinyin.get_pinyin(title)}</Title>\n  " \
+               f"<Series>{pinyin.get_pinyin(manga_name)}</Series>\n  " \
+               f"<Number>{pinyin.get_pinyin(index)}</Number>\n" \
+               f"</ComicInfo>"
+    with open(os.path.join(os.path.join(SETTINGS['download_path'], save_dir), "ComicInfo.xml"), "w") as file:
+        file.write(xml_data)
+
+    start_dir = os.path.join(SETTINGS['download_path'], save_dir)
+    file_name = f"{save_dir}/{manga_name}{title}.cbz"
+    file_path = os.path.join(cbz_dir, file_name)
+
+    # 只添加指定类型的文件到zip文件中
+    allowed_ext = ['.xml', '.jpg', '.png', '.jpeg', '.webp']
+    with zipfile.ZipFile(file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for dir_path, dir_names, filenames in os.walk(start_dir):
+            fpath = dir_path.replace(start_dir, '')
+            fpath = fpath and fpath + os.sep or ''
+            for filename in filenames:
+                ext = os.path.splitext(filename)[1].lower()
+                if ext in allowed_ext:
+                    zip_file.write(os.path.join(dir_path, filename), fpath + filename)
 
 
 if __name__ == '__main__':
