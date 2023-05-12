@@ -908,8 +908,6 @@ def create_cbz(index, title, manga_name, save_dir, cbz_dir):
                 if ext in allowed_ext:
                     zip_file.write(os.path.join(dir_path, filename), fpath + filename)
 
-    print(f"{manga_name}的{title}成功转换为cbz文件")
-
 
 if __name__ == '__main__':
     main()
