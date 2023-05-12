@@ -512,16 +512,17 @@ def manga_chapter(manga_path_word, group_path_word):
         "[italic yellow]请注意！此话数包含了其他比如特别篇的话数，比如”第一话，特别篇，第二话“，那么第二话就是3，而不2[/]")
     if want_to == 1:
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
+        print(f"[italic blue]您选择从[yellow]{manga_chapter_json['results']['list'][return_json['start']]['name']}"
+              f"[/yellow]开始下载[/]")
         return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
+        print(f"[italic blue]您选择在[yellow]{manga_chapter_json['results']['list'][return_json['end']]['name']}"
+              f"[/yellow]结束下载[/]")
         return return_json
     if want_to == 2:
         return_json["start"] = int(Prompt.ask("请输入需要下载的话数")) - 1
         return_json["end"] = return_json["start"]
+        print(f"[italic blue]您选择下载[yellow]{manga_chapter_json['results']['list'][return_json['end']]['name']}[/]")
         return return_json
-
-
-def get_chapter_name():
-    return
 
 
 def chapter_allocation(manga_chapter_json):
