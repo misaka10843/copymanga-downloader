@@ -38,6 +38,8 @@ SETTINGS = {
     "proxies": None,
     "api_url": None,
     "HC": None,
+    "CBZ": None,
+    "cbz_path": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -51,6 +53,8 @@ OG_SETTINGS = {
     "proxies": None,
     "api_url": None,
     "HC": None,
+    "CBZ": None,
+    "cbz_path": None,
     "api_time": 0.0,
     "API_COUNTER": 0
 }
@@ -585,8 +589,11 @@ def chapter_allocation(manga_chapter_json):
                             manga_chapter_info_json['results']['chapter']['index'] + 1)
 
         print(f"[bold green][:white_check_mark:][{manga_name}]{chapter_name}下载完成！[/]")
-        createcbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1), chapter_name, manga_name,
-                  f"{download_path}/{manga_name}/{chapter_name}/", "D:\漫画下载\dw\cbz\\")
+        if SETTINGS['CBZ']:
+            with console.status(f"[bold yellow]正在保存CBZ存档:[{manga_name}]{chapter_name}[/]"):
+                create_cbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1), chapter_name,
+                           manga_name, f"{download_path}/{manga_name}/{chapter_name}/", SETTINGS['cbz_path'])
+            print(f"[bold green][:white_check_mark:]已将[{manga_name}]{chapter_name}保存为CBZ存档[/]")
 
 
 # API限制相关
@@ -676,6 +683,11 @@ def set_settings():
     proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
     hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                            default=False)
+    cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
+    if cbz:
+        cbz_path = Prompt.ask("请输入CBZ文件的保存路径")
+    else:
+        cbz_path = None
     if proxy:
         PROXIES = {
             "http": proxy,
@@ -706,6 +718,8 @@ def set_settings():
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
         "HC": hc,
+        "CBZ": cbz,
+        "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -739,6 +753,16 @@ def change_settings():
             hc_c = False
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=hc_c)
+    if SETTINGS['CBZ'] is None:
+        cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
+    else:
+        cbz = True
+        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
+                               default=cbz)
+    if cbz:
+        cbz_path = Prompt.ask("请输入CBZ文件的保存路径")
+    else:
+        cbz_path = None
     if proxy != SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
@@ -771,6 +795,8 @@ def change_settings():
         "proxies": proxy,
         "api_url": api_urls[choice - 1],
         "HC": hc,
+        "CBZ": cbz,
+        "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0
     }
@@ -851,26 +877,27 @@ def main():
 
 
 # cbz格式转换
-# index为章节索引 titles为章节标题 savedir为章节储存路径 cbzdir为cbz储存路径 manganame为漫画名字
-def createcbz(indexs, titles, manganame, savedir, cbzdir):
-    xmldata = "<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  <Title><titles></Title>\n  <Series><manganame></Series>\n  <Number><index></Number>\n</ComicInfo>"
-    Pinyins = Pinyin()
-    xmldata = xmldata.replace("<titles>", Pinyins.get_pinyin(titles)).replace("<index>",
-                                                                              Pinyins.get_pinyin(indexs)).replace(
-        "<manganame>", Pinyins.get_pinyin(manganame))
-    fo = open(savedir + "ComicInfo.xml", "w")
-    fo.write(xmldata)
-    fo.close()
-    startdir = savedir
-    file_news = cbzdir + manganame + titles + '.cbz'
-    z = zipfile.ZipFile(file_news, 'w', zipfile.ZIP_DEFLATED)
-    for dirpath, dirnames, filenames in os.walk(startdir):
-        fpath = dirpath.replace(startdir, '')
-        fpath = fpath and fpath + os.sep or ''
-        for filename in filenames:
-            z.write(os.path.join(dirpath, filename), fpath + filename)
-    z.close()
-    print(manganame + "的" + titles + "成功转换为cbz文件")
+
+def create_cbz(index, title, manga_name, save_dir, cbz_dir):
+    pinyin = Pinyin()
+    xml_data = f"<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " \
+               f"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  " \
+               f"<Title>{pinyin.get_pinyin(title)}</Title>\n  " \
+               f"<Series>{pinyin.get_pinyin(manga_name)}</Series>\n  " \
+               f"<Number>{pinyin.get_pinyin(index)}</Number>\n" \
+               f"</ComicInfo>"
+    with open(os.path.join(save_dir, "ComicInfo.xml"), "w") as file:
+        file.write(xml_data)
+
+    start_dir = save_dir
+    file_name = f"{manga_name}{title}.cbz"
+    file_path = os.path.join(cbz_dir, file_name)
+    with zipfile.ZipFile(file_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for dirpath, dirnames, filenames in os.walk(start_dir):
+            fpath = dirpath.replace(start_dir, '')
+            fpath = fpath and fpath + os.sep or ''
+            for filename in filenames:
+                zip_file.write(os.path.join(dirpath, filename), fpath + filename)
 
 
 if __name__ == '__main__':
