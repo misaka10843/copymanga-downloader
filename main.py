@@ -165,7 +165,16 @@ def updates():
                                         choices=["0", "1"], default="0"))
     if update_want_to == 0:
         new_update = add_updates()
-        save_updates(new_update[0], new_update[1], new_update[2], 0, False)
+        response = requests.get(
+        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}/chapters?limit=500"
+        f"&offset=0&platform=3",
+        headers=API_HEADER, proxies=PROXIES)
+        # 记录API访问量
+        api_restriction()
+        response.raise_for_status()
+        manga_chapter_json = response.json()
+        manga_now=int(Prompt.ask(f"当前漫画有{manga_chapter_json['results']['total']}话的内容，请问您目前看到多少话了"))
+        save_updates(new_update[0], new_update[1], new_update[2], manga_now, False)
     else:
         del_manga_int = int(Prompt.ask("请输入想要删除的漫画前面的序号"))
         save_updates(UPDATE_LIST[del_manga_int - 1]['manga_path_word'],
