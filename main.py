@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 import zipfile
+import string
 from xpinyin import Pinyin
 
 import retrying as retrying
@@ -561,6 +562,8 @@ def chapter_allocation(manga_chapter_json):
         img_url_contents = manga_chapter_info_json['results']['chapter']['contents']
         img_words = manga_chapter_info_json['results']['chapter']['words']
         manga_name = manga_chapter_info_json['results']['comic']['name']
+        special_chars = string.punctuation + ' '
+        manga_name = ''.join(c for c in manga_name if c not in special_chars)
         num_images = len(img_url_contents)
         download_path = SETTINGS['download_path']
         chapter_name = manga_chapter_info_json['results']['chapter']['name']
