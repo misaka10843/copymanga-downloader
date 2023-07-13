@@ -165,7 +165,16 @@ def updates():
                                         choices=["0", "1"], default="0"))
     if update_want_to == 0:
         new_update = add_updates()
-        save_updates(new_update[0], new_update[1], new_update[2], 0, False)
+        response = requests.get(
+        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}/chapters?limit=500"
+        f"&offset=0&platform=3",
+        headers=API_HEADER, proxies=PROXIES)
+        # 记录API访问量
+        api_restriction()
+        response.raise_for_status()
+        manga_chapter_json = response.json()
+        manga_now=int(Prompt.ask(f"当前漫画有{manga_chapter_json['results']['total']}话的内容，请问您目前看到多少话了"))
+        save_updates(new_update[0], new_update[1], new_update[2], manga_now, False)
     else:
         del_manga_int = int(Prompt.ask("请输入想要删除的漫画前面的序号"))
         save_updates(UPDATE_LIST[del_manga_int - 1]['manga_path_word'],
@@ -671,6 +680,12 @@ def get_org_url():
             print(f"[bold red]无法链接至GitHub，请检查网络连接,ErrMsg:{e}[/]", )
             sys.exit()
 
+#检查字符串是否包含中文
+def is_contains_chinese(strs):
+    for _char in strs:
+        if '\u4e00' <= _char <= '\u9fa5':
+            return True
+    return False
 
 def set_settings():
     global PROXIES
@@ -685,7 +700,12 @@ def set_settings():
                            default=False)
     cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
     if cbz:
-        cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
+        while (True):
+            cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
+            if (is_contains_chinese(cbz_path)):
+                print("路径请不要包含中文")
+            else:
+                break
     else:
         cbz_path = None
     if proxy:
@@ -763,8 +783,13 @@ def change_settings():
     if cbz:
         if SETTINGS.get('cbz_path') is None:
             SETTINGS['cbz_path'] = None
-        cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
+        while (True):
+            cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
                               default=SETTINGS['cbz_path'])
+            if (is_contains_chinese(cbz_path)):
+                print("路径请不要包含中文")
+            else:
+                break
     else:
         cbz_path = None
     if proxy != SETTINGS['proxies'] and proxy != "0":
@@ -894,7 +919,7 @@ def create_cbz(index, title, manga_name, save_dir, cbz_dir):
         file.write(xml_data)
 
     start_dir = os.path.join(SETTINGS['download_path'], save_dir)
-    file_name = f"{save_dir}/{manga_name}{title}.cbz"
+    file_name = f"{save_dir}/{pinyin.get_pinyin(manga_name)}/{manga_name}{title}.cbz"
     file_path = os.path.join(cbz_dir, file_name)
 
     # 只添加指定类型的文件到zip文件中
