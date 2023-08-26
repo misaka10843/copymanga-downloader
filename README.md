@@ -2,6 +2,8 @@
 
 **因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
 
+**如果需要稳定的下载器，请使用tachidesk以及配套的插件进行下载，本仓库仅为方便命令行直接下载而创建的**
+
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
