@@ -424,6 +424,7 @@ def search():
 # 收藏相关
 
 def search_on_collect():
+
     url = "https://%s/api/v3/member/collect/comics?limit=12&offset={}&free_type=1&ordering=-datetime_modifier" % (
         SETTINGS["api_url"])
     API_HEADER['authorization'] = SETTINGS['authorization']
@@ -446,7 +447,9 @@ def search_on_collect():
             else:
                 res = login(**loginInformationBuilder(SETTINGS["username"], SETTINGS["password"], SETTINGS["api_url"], SETTINGS["salt"], PROXIES))
                 if res:
-                    API_HEADER['authorization'] = res
+                    API_HEADER['authorization'] = f"Token {res}"
+                    SETTINGS["authorization"] = f"Token {res}"
+                    save_settings(SETTINGS)
                     continue
                 time.sleep(2 ** retry_count)  # 重试时间指数
                 retry_count += 1
