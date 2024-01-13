@@ -444,7 +444,7 @@ def search_on_collect():
                 print(f"[bold red]请删除{settings_dir}来重新设置！(或者也可以自行修改配置文件)[/]")
                 sys.exit()
             else:
-                res = login(**loginInformationBuilder(SETTINGS["username"], SETTINGS["password"], SETTINGS["api_url"], SETTINGS["salt"]))
+                res = login(**loginInformationBuilder(SETTINGS["username"], SETTINGS["password"], SETTINGS["api_url"], SETTINGS["salt"], PROXIES))
                 if res:
                     API_HEADER['authorization'] = res
                     continue
