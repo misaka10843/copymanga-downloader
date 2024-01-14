@@ -65,6 +65,7 @@ or
 * [zhongfly](https://github.com/zhongfly)(贡献与提供一些问题解决方法和优化代码)
 * [zaazwm](https://github.com/zaazwm)(添加其他内容的下载)
 * [blacklein](https://github.com/blacklein)(添加setup.py与发布到pypi)
+* [TwoOnefour](https://github.com/TwoOnefour)(添加打包为epub及推送到kindle设备)
 
 ## 简介 🗒️
 
@@ -86,7 +87,15 @@ or
 
 ![image](https://user-images.githubusercontent.com/69132853/234908370-93ca24f7-aa4c-4fa2-8e9e-d0c236ffa379.png)
 
+## 如何配置kindle推送📚
 
+详细请看[copymanga-downloader自动推送到kindle的使用教程](https://www.pursuecode.cn/archives/1705162565893)
+
+请注意，在实现转换为epub时使用了第三方库[KCC](https://github.com/ciromattia/kcc/)，您需要自行在[kcc/releases](https://github.com/ciromattia/kcc/releases)下载对应平台的执行程序
+
+(windows平台需要下载`kcc_c2e_{版本号}.exe`)
+
+然后根据上方的使用教程进行配置
 
 ## 命令行参数🖥️
 
@@ -154,6 +163,8 @@ options:
 ## 更新 🔬
 
 ### 重大更新 📈
+
+2024/1/14: [@TwoOnefour](https://github.com/TwoOnefour)添加账号密码登陆和转换为epub并推送到kindle的功能
 
 2023/5/12: 添加CBZ支持，优化图片API限制，添加批量下载与单话下载的章节名称提示
 
