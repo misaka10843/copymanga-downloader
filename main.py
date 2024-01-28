@@ -1,6 +1,5 @@
 import argparse
 import csv
-import datetime
 import json
 import os
 import string
@@ -11,33 +10,22 @@ import time
 import requests as requests
 from rich import print as print
 from rich.console import Console
-from rich.prompt import Prompt, Confirm, IntPrompt
+from rich.progress import track
+from rich.prompt import Prompt, IntPrompt
 
 import config
 from cbz import create_cbz
-from epub import epub_transformerhelper, set_kindle_config
-from login import login, login_information_builder, loginhelper
+from epub import epub_transformerhelper
+from function import img_api_restriction, api_restriction
+from login import login, login_information_builder
+from settings import save_settings, load_settings, set_settings, change_settings
 
 console = Console(color_system='256', style=None)
-# 全局化headers，节省空间
-
-API_HEADER = {
-    'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, '
-                  'like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
-    'version': datetime.datetime.now().strftime("%Y.%m.%d"),
-    'region': '0',
-    'webp': '0',
-    "platform": "1",
-    "referer": "https://www.copymanga.site/"
-}
-PROXIES = {}
 
 UPDATE_LIST = []
 
+
 # API限制相关
-API_COUNTER = 0
-IMG_API_COUNTER = 0
-IMG_CURRENT_TIME = 0
 
 
 def parse_args():
@@ -86,12 +74,11 @@ ARGS = parse_args()
 
 # 命令行模式
 def command_mode():
-    global PROXIES, API_HEADER
     if ARGS.UseOSCdn or ARGS.UseWebp:
-        API_HEADER['use_oversea_cdn'] = ARGS.UseOSCdn
-        API_HEADER['use_webp'] = ARGS.UseWebp
+        config.API_HEADER['use_oversea_cdn'] = ARGS.UseOSCdn
+        config.API_HEADER['use_webp'] = ARGS.UseWebp
     if ARGS.Proxy:
-        PROXIES = {
+        config.PROXIES = {
             "http": ARGS.Proxy,
             "https": ARGS.Proxy
         }
@@ -140,7 +127,7 @@ def updates():
         response = requests.get(
             f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}"
             f"/chapters?limit=500&offset=0&platform=3",
-            headers=API_HEADER, proxies=PROXIES)
+            headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
         response.raise_for_status()
@@ -270,7 +257,7 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
     response = requests.get(
         f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}"
         f"/chapters?limit=500&offset={now_chapter}&platform=3",
-        headers=API_HEADER, proxies=PROXIES)
+        headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
     response.raise_for_status()
@@ -294,7 +281,7 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
 # 搜索相关
 
 def search_list(url, offset, current_page_count):
-    response = requests.get(url.format(offset), headers=API_HEADER, proxies=PROXIES)
+    response = requests.get(url.format(offset), headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
     # 解析JSON数据
@@ -363,13 +350,13 @@ def search():
 def search_on_collect():
     url = "https://%s/api/v3/member/collect/comics?limit=12&offset={}&free_type=1&ordering=-datetime_modifier" % (
         config.SETTINGS["api_url"])
-    API_HEADER['authorization'] = config.SETTINGS['authorization']
+    config.API_HEADER['authorization'] = config.SETTINGS['authorization']
     offset = 0
     current_page_count = 1
     retry_count = 0
     while True:
         # 发送GET请求
-        response = requests.get(url.format(offset), headers=API_HEADER, proxies=PROXIES)
+        response = requests.get(url.format(offset), headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
         # 解析JSON数据
@@ -383,9 +370,9 @@ def search_on_collect():
             else:
                 res = login(**login_information_builder(config.SETTINGS["username"], config.SETTINGS["password"],
                                                         config.SETTINGS["api_url"],
-                                                        config.SETTINGS["salt"], PROXIES))
+                                                        config.SETTINGS["salt"], config.PROXIES))
                 if res:
-                    API_HEADER['authorization'] = f"Token {res}"
+                    config.API_HEADER['authorization'] = f"Token {res}"
                     config.SETTINGS["authorization"] = f"Token {res}"
                     save_settings(config.SETTINGS)
                     continue
@@ -426,8 +413,8 @@ def collect_expect():
                              f"[italic yellow](0:json,1:csv)[/]",
                              choices=["0", "1"], default="1"))
     while True:
-        API_HEADER['authorization'] = config.SETTINGS['authorization']
-        res = requests.get(url, params=params, headers=API_HEADER)
+        config.API_HEADER['authorization'] = config.SETTINGS['authorization']
+        res = requests.get(url, params=params, headers=config.API_HEADER)
         res_json = json.loads(res.text)
         if res_json["code"] != 200:
             print(f"[bold red]无法获取到相关信息，请检查相关设置。Error:{res_json['message']}")
@@ -457,7 +444,7 @@ def collect_expect():
 
 def manga_group(manga_path_word):
     response = requests.get(f"https://api.{config.SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
-                            headers=API_HEADER, proxies=PROXIES)
+                            headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
     response.raise_for_status()
@@ -480,7 +467,7 @@ def manga_chapter(manga_path_word, group_path_word):
     response = requests.get(
         f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}"
         f"/chapters?limit=500&offset=0&platform=3",
-        headers=API_HEADER, proxies=PROXIES)
+        headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
     response.raise_for_status()
@@ -515,7 +502,7 @@ def manga_chapter(manga_path_word, group_path_word):
         return_json["start"] = int(Prompt.ask("请输入开始下载的话数")) - 1
         print(f"[italic blue]您选择从[yellow]{manga_chapter_json['results']['list'][return_json['start']]['name']}"
               f"[/yellow]开始下载[/]")
-        return_json["end"] = int(Prompt.ask("请输入结束下载的话数")) - 1
+        return_json["end"] = int(Prompt.ask("请输入结束下载的话数"))
         print(f"[italic blue]您选择在[yellow]{manga_chapter_json['results']['list'][return_json['end']]['name']}"
               f"[/yellow]结束下载[/]")
         return return_json
@@ -540,7 +527,7 @@ def chapter_allocation(manga_chapter_json):
         response = requests.get(
             f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_chapter_info['comic_path_word']}"
             f"/chapter2/{manga_chapter_info['uuid']}?platform=3",
-            headers=API_HEADER, proxies=PROXIES)
+            headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
         response.raise_for_status()
@@ -560,28 +547,28 @@ def chapter_allocation(manga_chapter_json):
             os.mkdir(f"{download_path}/{manga_name}/")
         # 创建多线程
         threads = []
-        with console.status(f"[bold yellow]正在下载:[{manga_name}]{chapter_name}(索引ID:"
-                            f"{int(manga_chapter_info_json['results']['chapter']['index']) + 1})[/]"):
-            for i in range(num_images):
-                url = img_url_contents[i]['url']
-                # 检查章节文件夹是否存在
-                if not os.path.exists(f"{download_path}/{manga_name}/{chapter_name}/"):
-                    os.mkdir(f"{download_path}/{manga_name}/{chapter_name}/")
-                # 组成下载路径
-                filename = f"{download_path}/{manga_name}/{chapter_name}/{str(img_words[i] + 1).zfill(3)}.jpg"
-                t = threading.Thread(target=download, args=(url, filename))
-                # 开始线程
-                threads.append(t)
-                # 限制线程数量(十分不建议修改，不然很可能会被禁止访问)
-                if len(threads) == 4 or i == num_images - 1:
-                    for t in threads:
-                        # 添加一点延迟，错峰请求
-                        time.sleep(0.5)
-                        t.start()
-                    for t in threads:
-                        time.sleep(0.5)
-                        t.join()
-                    threads.clear()
+        for i in track(range(num_images), description=f"[bold yellow]正在下载:[{manga_name}]{chapter_name}(索引ID:"
+                                                      f"{int(manga_chapter_info_json['results']['chapter']['index']) + 1})[/]"):
+            url = img_url_contents[i]['url']
+            # 检查章节文件夹是否存在
+            if not os.path.exists(f"{download_path}/{manga_name}/{chapter_name}/"):
+                os.mkdir(f"{download_path}/{manga_name}/{chapter_name}/")
+            # 组成下载路径
+            filename = f"{download_path}/{manga_name}/{chapter_name}/{str(img_words[i] + 1).zfill(3)}.jpg"
+            t = threading.Thread(target=download, args=(url, filename))
+            # 开始线程
+            threads.append(t)
+            # 限制线程数量(十分不建议修改，不然很可能会被禁止访问)
+            if len(threads) == 4 or i == num_images - 1:
+                for t in threads:
+                    # 添加一点延迟，错峰请求
+                    time.sleep(0.5)
+                    t.start()
+                for t in threads:
+                    time.sleep(0.5)
+                    t.join()
+                threads.clear()
+        print(manga_chapter_info_json['results']['chapter']['comic_path_word'])
         # 实施添加下载进度
         if ARGS and ARGS.subscribe == "1":
             save_new_update(manga_chapter_info_json['results']['chapter']['comic_path_word'],
@@ -608,353 +595,20 @@ def download(url, filename, overwrite=False):
         url = url.replace("c800x.jpg", "c1500x.jpg")
     try:
 
-        response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
+        response = requests.get(url, headers=config.API_HEADER, proxies=config.PROXIES)
         with open(filename, "wb") as f:
             f.write(response.content)
     except Exception as e:
         # 重新尝试一次
         try:
             time.sleep(5)
-            response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
+            response = requests.get(url, headers=config.API_HEADER, proxies=config.PROXIES)
             with open(filename, "wb") as f:
                 f.write(response.content)
         except Exception as e:
 
             print(
                 f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
-
-
-# API限制相关
-
-def api_restriction():
-    global API_COUNTER, IMG_API_COUNTER
-    API_COUNTER += 1
-    # 防止退出后立马再次运行
-    current_time = config.OG_SETTINGS['api_time']
-    time_diff = time.time() - current_time
-    # 判断是否超过60秒
-    if time_diff < 60 and API_COUNTER <= 1:
-        API_COUNTER = API_COUNTER + config.OG_SETTINGS['API_COUNTER']
-    if API_COUNTER >= 15:
-        API_COUNTER = 0
-        print("[bold yellow]您已经触发到了API请求阈值，我们将等60秒后再进行[/]")
-        time.sleep(60)
-    config.OG_SETTINGS['API_COUNTER'] = API_COUNTER
-    config.OG_SETTINGS['api_time'] = time.time()
-    # 将时间戳与API请求数量写入配置文件
-    save_settings(config.OG_SETTINGS)
-
-
-def img_api_restriction():
-    global IMG_API_COUNTER, IMG_CURRENT_TIME
-    IMG_API_COUNTER += 1
-    # 防止退出后立马再次运行
-
-    time_diff = time.time() - IMG_CURRENT_TIME
-    # 判断是否超过60秒
-    if time_diff < 60 and IMG_API_COUNTER >= 100:
-        print("[bold yellow]您已经触发到了图片服务器API请求阈值，我们将等60秒后再进行[/]")
-        time.sleep(60)
-        IMG_CURRENT_TIME = 0
-        IMG_API_COUNTER = 0
-
-
-# 设置相关
-
-def get_org_url():
-    print("[italic yellow]正在获取CopyManga网站Url...[/]")
-    url = "https://ghproxy.net/https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
-    try:
-        response = requests.get(url, proxies=PROXIES)
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        print("[bold yellow]无法链接至ghproxy.net，准备直接访问Github[/]")
-        # 更换URL
-        url = "https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
-        try:
-            response = requests.get(url, proxies=PROXIES)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            print(f"[bold red]无法链接至GitHub，请检查网络连接,ErrMsg:{e}[/]", )
-            sys.exit()
-
-
-def is_contains_chinese(strs):
-    for _char in strs:
-        if '\u4e00' <= _char <= '\u9fa5':
-            return True
-    return False
-
-
-def set_settings():
-    global PROXIES
-    # 获取用户输入
-    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
-                               default=os.path.split(os.path.realpath(__file__))[0])
-    use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
-    use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
-                                 default=True)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过，包括协议头)[/]")
-    hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
-                           default=False)
-    cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
-    send_to_kindle = Confirm.ask("是否启用半自动更新自动发送至kindle功能[italic yellow][/]", default=False)
-    if cbz:
-        while True:
-            cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
-            if is_contains_chinese(cbz_path):
-                print("路径请不要包含中文")
-            else:
-                break
-    else:
-        cbz_path = None
-    if proxy:
-        PROXIES = {
-            "http": proxy,
-            "https": proxy
-        }
-    if send_to_kindle:
-        set_kindle_config()
-
-    api_urls = get_org_url()
-    for i, url in enumerate(api_urls):
-        print(f"{i + 1}->{url}")
-    choice = IntPrompt.ask("请输入要使用的API前面的数字")
-
-    # input转bool
-    use_oversea_cdn = "0"
-    use_webp = "0"
-    hc = "0"
-    if use_oversea_cdn_input:
-        use_oversea_cdn = "1"
-    if use_webp_input:
-        use_webp = "1"
-    if hc_input:
-        hc = "1"
-    # 构造settings字典
-    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default="1")
-    if login_pattern == "1":
-        authorization = Prompt.ask("请输入token")
-    elif login_pattern == "2":
-        while True:
-            username = Prompt.ask("请输入账号").strip()
-            password = Prompt.ask("请输入密码").strip()
-            if username == "" or password == "":
-                print("请输入账号密码")
-                continue
-            else:
-                res = loginhelper(username, password, api_urls[choice - 1])
-                if res["token"]:
-                    authorization = f"Token {res['token']}"
-                    salt = res["salt"]
-                    password = res["password_enc"]
-                    break
-    if not os.path.exists(download_path):
-        os.mkdir(download_path)
-    settings = {
-        "download_path": download_path,
-        "authorization": authorization,
-        "use_oversea_cdn": use_oversea_cdn,
-        "use_webp": use_webp,
-        "proxies": proxy,
-        "api_url": api_urls[choice - 1],
-        "HC": hc,
-        "CBZ": cbz,
-        "cbz_path": cbz_path,
-        "api_time": 0.0,
-        "API_COUNTER": 0,
-        "loginPattern": login_pattern,
-        "salt": salt if login_pattern == "2" else None,
-        "username": username if login_pattern == "2" else None,
-        "password": password if login_pattern == "2" else None,
-        "send_to_kindle": send_to_kindle,
-        "kcc_cmd": config.SETTINGS["kcc_cmd"],
-        "email_address": config.SETTINGS["email_address"],
-        "email_passwd": config.SETTINGS["email_passwd"],
-        "email_smtp_address": config.SETTINGS["email_smtp_address"],
-        "kindle_address": config.SETTINGS["kindle_address"]
-    }
-    home_dir = os.path.expanduser("~")
-    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
-    save_settings(settings)
-    print(f"[yellow]已将配置文件存放到{settings_path}中[/]")
-
-
-def change_settings():
-    global PROXIES
-    # 获取用户输入
-    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
-                               default=config.SETTINGS['download_path'])
-
-    use_oversea_cdn = True
-    use_webp = True
-    if config.SETTINGS['use_oversea_cdn'] == "0":
-        use_oversea_cdn = False
-    if config.SETTINGS['use_webp'] == "0":
-        use_webp = False
-    use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=use_oversea_cdn)
-    use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
-                                 default=use_webp)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0,输入时需包括协议头)[/]", default=config.SETTINGS['proxies'])
-    if config.SETTINGS.get('HC') is None:
-        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
-                               default=False)
-    else:
-        hc_c = True
-        if config.SETTINGS['HC'] == "0":
-            hc_c = False
-        hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
-                               default=hc_c)
-    if config.SETTINGS.get('CBZ') is None or not config.SETTINGS.get("CBZ"):
-        cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
-    else:
-        cbz = True
-        hc_input = Confirm.ask("是否下载后打包成CBZ？",
-                               default=cbz)
-    send_to_kindle_modify = Confirm.ask("是否需要修改kindle自动推送相关设置？[italic yellow][/]", default=False)
-    if cbz:
-        if config.SETTINGS.get('cbz_path') is None:
-            config.SETTINGS['cbz_path'] = None
-
-        while True:
-            cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
-                                  default=config.SETTINGS['cbz_path'])
-            if is_contains_chinese(cbz_path):
-                print("路径请不要包含中文")
-            else:
-                break
-    else:
-        cbz_path = None
-    if proxy != config.SETTINGS['proxies'] and proxy != "0":
-        PROXIES = {
-            "http": proxy,
-            "https": proxy
-        }
-    if proxy == "0":
-        proxy = ""
-    api_urls = get_org_url()
-    for i, url in enumerate(api_urls):
-        print(f"{i + 1}->{url}")
-    choice = IntPrompt.ask("请输入要使用的API前面的数字")
-    if send_to_kindle_modify:
-        config.SETTINGS["send_to_kindle"] = Confirm.ask("是否继续使用kindle推送？[italic yellow][/]", default=True)
-        if config.SETTINGS["send_to_kindle"]:
-            set_kindle_config()
-
-    # 构造settings字典
-
-    login_change = Confirm.ask("是否要修改登陆方式？", default=False)
-    if login_change:
-        login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)",
-                                   default=config.SETTINGS["loginPattern"])
-        if login_pattern == "1":
-            authorization = Prompt.ask("请输入token")
-        elif login_pattern == "2":
-            while True:
-                username = Prompt.ask("请输入账号").strip()
-                password = Prompt.ask("请输入密码").strip()
-                if username == "" or password == "":
-                    print("请输入账号密码")
-                    continue
-                else:
-                    res = loginhelper(username, password, api_urls[choice - 1])
-                    if res["token"]:
-                        config.SETTINGS["username"] = f"Token {res['token']}"
-                        config.SETTINGS["salt"] = res["salt"]
-                        config.SETTINGS["password"] = res["password_enc"]
-                        break
-    else:
-        login_pattern = config.SETTINGS["loginPattern"]
-        authorization = config.SETTINGS["authorization"]
-    print(f"[yellow]我们正在更改您的设置中，请稍后[/]")
-    # input转bool
-    use_oversea_cdn = "0"
-    use_webp = "0"
-    hc = "0"
-    if use_oversea_cdn_input:
-        use_oversea_cdn = "1"
-    if use_webp_input:
-        use_webp = "1"
-    if hc_input:
-        hc = "1"
-    if not os.path.exists(download_path):
-        os.mkdir(download_path)
-    settings = {
-        "download_path": download_path,
-        "authorization": authorization,
-        "use_oversea_cdn": use_oversea_cdn,
-        "use_webp": use_webp,
-        "proxies": proxy,
-        "api_url": api_urls[choice - 1],
-        "HC": hc,
-        "CBZ": cbz,
-        "cbz_path": cbz_path,
-        "api_time": 0.0,
-        "API_COUNTER": 0,
-        "loginPattern": login_pattern,
-        "salt": config.SETTINGS["salt"] if login_pattern == "2" else None,
-        "username": config.SETTINGS["username"] if login_pattern == "2" else None,
-        "password": config.SETTINGS["password"] if login_pattern == "2" else None,
-        "send_to_kindle": config.SETTINGS["send_to_kindle"],
-        "kcc_cmd": config.SETTINGS["kcc_cmd"] if config.SETTINGS["send_to_kindle"] else None,
-        "email_address": config.SETTINGS["email_address"] if config.SETTINGS["send_to_kindle"] else None,
-        "email_passwd": config.SETTINGS["email_passwd"] if config.SETTINGS["send_to_kindle"] else None,
-        "email_smtp_address": config.SETTINGS["email_smtp_address"] if config.SETTINGS["send_to_kindle"] else None,
-        "kindle_address": config.SETTINGS["kindle_address"] if config.SETTINGS["send_to_kindle"] else None
-    }
-    home_dir = os.path.expanduser("~")
-    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
-    save_settings(settings)
-    print(f"[yellow]已将重新修改配置文件并存放到{settings_path}中[/]")
-
-
-def save_settings(settings):
-    home_dir = os.path.expanduser("~")
-    if not os.path.exists(os.path.join(home_dir, '.copymanga-downloader/')):
-        os.mkdir(os.path.join(home_dir, '.copymanga-downloader/'))
-    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
-    # 写入settings.json文件
-    with open(settings_path, "w") as f:
-        json.dump(settings, f)
-
-
-def load_settings():
-    global PROXIES, API_HEADER
-    # 获取用户目录的路径
-    home_dir = os.path.expanduser("~")
-    settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
-    # 检查是否有文件
-    if not os.path.exists(settings_path):
-        return False, "settings.json文件不存在"
-    # 读取json配置文件
-    with open(settings_path, 'r') as f:
-        settings = json.load(f)
-
-    # 判断必要的字段是否存在
-    necessary_fields = ["download_path", "authorization", "use_oversea_cdn", "use_webp", "proxies", "api_url"]
-    for field in necessary_fields:
-        if field not in settings:
-            return False, "settings.json中缺少必要字段{}".format(field)
-    config.SETTINGS = settings
-    if "HC" not in settings:
-        config.SETTINGS['HC'] = None
-        print("[bold yellow]我们更新了设置，请您按照需求重新设置一下，还请谅解[/]")
-        change_settings()
-        print("[bold yellow]感谢您的支持，重新启动本程序后新的设置将会生效[/]")
-        exit(0)
-    config.OG_SETTINGS = settings
-    # 设置请求头
-    API_HEADER['use_oversea_cdn'] = settings['use_oversea_cdn']
-    API_HEADER['use_webp'] = settings['use_webp']
-    # 设置代理
-    if settings["proxies"]:
-        PROXIES = {
-            "http": settings["proxies"],
-            "https": settings["proxies"]
-        }
-    return True, None
 
 
 def main():
