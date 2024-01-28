@@ -20,9 +20,10 @@ Describe the bug in detail so that everyone can understand it
 清晰描述复现步骤，让别人也能看到问题
 Clearly describe the reproduction steps so that others can see the problem
 -->
-1. 
-2. 
-3. 
+
+1.
+2.
+3.
 
 ### 📄 [异常/日志]信息([Exception/Log] Information)
 

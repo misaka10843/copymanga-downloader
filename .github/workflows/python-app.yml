@@ -2,7 +2,7 @@ name: python compile(Linux&Windows)
 
 on:
   release:
-    types: [published]
+    types: [ published ]
   push:
     branches:
       - master
