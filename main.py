@@ -130,7 +130,11 @@ def updates():
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            time.sleep(5)
+            response.raise_for_status()
         manga_chapter_json = response.json()
         manga_now = int(
             Prompt.ask(f"当前漫画有{manga_chapter_json['results']['total']}话的内容，请问您目前看到多少话了"))
@@ -260,7 +264,11 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
         headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except Exception as e:
+        time.sleep(5)
+        response.raise_for_status()
     manga_chapter_json = response.json()
     # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
     return_json = {
@@ -447,7 +455,11 @@ def manga_group(manga_path_word):
                             headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except Exception as e:
+        time.sleep(5)
+        response.raise_for_status()
     manga_group_json = response.json()
     # 判断是否只有默认组
     if len(manga_group_json["results"]["groups"]) == 1:
@@ -470,7 +482,11 @@ def manga_chapter(manga_path_word, group_path_word):
         headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except Exception as e:
+        time.sleep(5)
+        response.raise_for_status()
 
     manga_chapter_json = response.json()
     # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
@@ -530,7 +546,11 @@ def chapter_allocation(manga_chapter_json):
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except Exception as e:
+            time.sleep(5)
+            response.raise_for_status()
         manga_chapter_info_json = response.json()
 
         img_url_contents = manga_chapter_info_json['results']['chapter']['contents']

@@ -4,6 +4,9 @@
 # @Email   : twoonefour@pursuecode.cn
 # @File    : login.py
 import requests
+from rich import print as print
+
+import config
 
 
 def login(**information: dict[{"username": None, "password": None, "url": None, "salt": None, "proxy": None}]) -> str:
@@ -49,7 +52,7 @@ def loginhelper(username: str, password: str, url: str) -> dict:
     password_enc = password + f"-{salt}"
     password_enc = b64encode(password_enc.encode()).decode()
     # 登录
-    res = login(**{"username": username, "password": password_enc, "url": url, "salt": salt, "proxy": PROXIES})
+    res = login(**{"username": username, "password": password_enc, "url": url, "salt": salt, "proxy": config.PROXIES})
     return {"token": res, "salt": salt, "password_enc": password_enc}
 
 
