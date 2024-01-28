@@ -1,8 +1,10 @@
-**请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
+> [!WARNING]
+>  **在2023.1.28更新之后，cbz功能的保存路径被改变，请所有使用cbz功能的用户最好[查看修改内容](https://github.com/misaka10843/copymanga-downloader/pull/89#issue-2104150068)了解新路径以及元信息问题！**
 
-**因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
-
-**如果需要稳定的下载器，请使用tachidesk以及配套的插件进行下载，本仓库仅为方便命令行直接下载而创建的**
+> [!NOTE]
+> **请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
+> 
+> **因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
 
 # copymanga-downloader
 
@@ -10,16 +12,17 @@
 
 ## 前言💭
 
-推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)，与[Copymanga插件](https://github.com/stevenyomi/copymanga)，并使用tachiyomi下载！
+推荐在模拟器/WSA/安卓手机中安装[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)
+与[Copymanga插件](https://github.com/stevenyomi/copymanga)并使用tachiyomi下载！
 
 因为这样可以尽可能的保证下载稳定与订阅系统正常
 
 此程序只是方便下载，而不是进行订阅操作(下载与订阅系统不稳定)
 
-
 **我们已经正式基本支持命令行参数下载并且完全重构啦！**
 
-请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)与[重大更新](https://github.com/misaka10843/copymanga-downloader#%E9%87%8D%E5%A4%A7%E6%9B%B4%E6%96%B0-)的部分！
+请看[命令行参数](https://github.com/misaka10843/copymanga-downloader#%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%82%E6%95%B0%EF%B8%8F)
+与[重大更新](https://github.com/misaka10843/copymanga-downloader#%E9%87%8D%E5%A4%A7%E6%9B%B4%E6%96%B0-)的部分！
 
 ## 下载
 
@@ -53,7 +56,6 @@ or
 
 ![image](https://user-images.githubusercontent.com/69132853/229278511-3b2fe97b-5e01-4df0-9a23-d276de440472.png)
 
-
 ## 技术栈 ⚒️
 
 ![python](https://img.shields.io/badge/Python-3.0+-326c9c?style=for-the-badge&logo=Python&logoColor=326c9c)
@@ -79,9 +81,12 @@ or
 
 （如果不是那就重新下载一遍，如果还有的话就发**issuse**吧qwq）
 
-如果您是安卓用户，那么您可以使用[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)客户端尝试下载（但是需要安装 `copymanga`的插件）
+如果您是安卓用户，那么您可以使用[tachiyomi](https://github.com/tachiyomiorg/tachiyomi)
+客户端尝试下载（但是需要安装 `copymanga`的插件）
 
-如果您需要**从右到左**的拼接图片，并且两张为一组的话，您可以尝试使用[这个版本](https://github.com/misaka10843/copymanga-downloader/releases/tag/v2.2)中的 `Image_stitching.exe`来实现(只提供简单功能，并未做出优化)
+如果您需要**从右到左**的拼接图片，
+并且两张为一组的话，您可以尝试使用[这个版本](https://github.com/misaka10843/copymanga-downloader/releases/tag/v2.2)
+中的 `Image_stitching.exe`来实现(只提供简单功能，并未做出优化)
 
 如果发现无法获取/下载的时候，请多试几次，如果不行的话请重新设置一下配置，选择您能访问的API地址
 
@@ -91,7 +96,8 @@ or
 
 详细请看[copymanga-downloader自动推送到kindle的使用教程](https://www.pursuecode.cn/archives/1705162565893)
 
-请注意，在实现转换为epub时使用了第三方库[KCC](https://github.com/ciromattia/kcc/)，您需要自行在[kcc/releases](https://github.com/ciromattia/kcc/releases)下载对应平台的执行程序
+请注意，在实现转换为epub时使用了第三方库[KCC](https://github.com/ciromattia/kcc/)
+，您需要自行在[kcc/releases](https://github.com/ciromattia/kcc/releases)下载对应平台的执行程序
 
 (windows平台需要下载`kcc_c2e_{版本号}.exe`)
 
@@ -135,7 +141,6 @@ options:
 
 ![img](https://s2.loli.net/2023/01/06/FWklObHX6523CYs.png)
 
-
 ### 命令示例
 
 #### 如果我想下载*別哭啊魔王醬*的第一话
@@ -158,7 +163,8 @@ options:
 
 `python main.py --MangaPath xinglingganying --MangaStart 1 --MangaEnd 38`
 
-**（注意！虽然说是下载全话，其实就是将范围定在了1话-最新话，所以如果下载其他漫画的全话请参考漫画更新到多少话了，然后再替换38）**
+**（注意！虽然说是下载全话，其实就是将范围定在了1话-最新话，所以如果下载其他漫画的全话请参考漫画更新到多少话了，然后再替换38）
+**
 
 ## 更新 🔬
 
@@ -186,7 +192,8 @@ options:
 
 2022/3/29: 在 [@zhongfly](https://github.com/zhongfly) 帮助下支持了一些功能，并~~可能~~修复了问题，而且还顺便帮忙优化了下代码www
 
-2022/3/24: 暂时支持设置一个功能(但是大概率无法下载，请注意，如果出现问题请在[这里](https://github.com/misaka10843/copymanga-downloader/issues/)提交相关信息
+2022/3/24: 暂时支持设置一个功能(
+但是大概率无法下载，请注意，如果出现问题请在[这里](https://github.com/misaka10843/copymanga-downloader/issues/)提交相关信息
 
 2022/2/25: 修复copymanga的url问题（copymanga.com似乎已经被弃用，已更换到copymanga.net）
 
@@ -198,15 +205,27 @@ options:
 
 ## 放几张截图qwq（时效性不敢保证）
 
-第一次初始化
+更改设置
 
-![图片.png](https://s2.loli.net/2022/03/31/qKhZVtbguEAwQcJ.png)
+![image](https://github.com/misaka10843/copymanga-downloader/assets/69132853/c3c97f7c-7202-4f17-acf3-6b06edd556b8)
+
+下载进度条
+
+![image](https://github.com/misaka10843/copymanga-downloader/assets/69132853/f618f9cc-58d6-4bc8-a86d-1a67ff37b2ec)
+
+漫画搜索
+
+![image](https://github.com/misaka10843/copymanga-downloader/assets/69132853/583b0d12-9017-4115-b210-2a13d7fc7027)
+
+
 
 ## 如何使用 🖥️
 
 ### 立即使用(Windows)
 
-1.点击[这里](https://github.com/misaka10843/copymanga-downloader/releases/latest)下载最新的从作者电脑中编译的exe版本，或者下载GitHub中的编译文件[actions](https://github.com/misaka10843/copymanga-downloader/actions/)(稳定无法保证)
+1.点击[这里](https://github.com/misaka10843/copymanga-downloader/releases/latest)
+下载最新的从作者电脑中编译的exe版本，或者下载GitHub中的编译文件[actions](https://github.com/misaka10843/copymanga-downloader/actions/)(
+稳定无法保证)
 
 2.将此程序放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
@@ -214,7 +233,8 @@ options:
 
 ### 立即使用(Linux,无法保证能否运行)
 
-1.点击[actions](https://github.com/misaka10843/copymanga-downloader/actions)选择最新的编译(100%同步更新，但不能保障是否能运行)
+1.点击[actions](https://github.com/misaka10843/copymanga-downloader/actions)选择最新的编译(
+100%同步更新，但不能保障是否能运行)
 
 2.下载 `附件`中的 `copymanga-download-Linux`压缩包
 
@@ -227,6 +247,7 @@ options:
 ### 编译/原代码使用(所有系统均支持)
 
 ⭐️ 建议pip安装（如果有本地有多个Python版本，建议用pipx安装）
+
 ```bash
 # macOS安装pipx
 brew install pipx
@@ -274,7 +295,8 @@ pipx install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-do
 
 3.找到类似 `comics?limit=12&offset=0&free_type=1&ordering=-datetime_modifier`的文件(?)后点击
 
-4.在**请求标头**中找到 `authorization: Token {各有各的不同}`，复制 `Token {各有各的不同}`即可，如 `Token 1293asd123s8adhh2juhsada2`
+4.在**请求标头**中找到 `authorization: Token {各有各的不同}`，复制 `Token {各有各的不同}`
+即可，如 `Token 1293asd123s8adhh2juhsada2`
 
 图片（[大图查看](https://i.loli.net/2021/11/18/Tv85D4a7GO9jNbn.png)）：
 

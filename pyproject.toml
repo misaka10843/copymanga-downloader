@@ -10,16 +10,16 @@ repository = "https://github.com/misaka10843/copymanga-downloader"
 documentation = ""
 keywords = ["copymanga", "downloader"]
 classifiers = [
-  "Topic :: Internet :: WWW/HTTP",
-  "Topic :: Utilities",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Operating System :: MacOS",
-  "Operating System :: Microsoft :: Windows",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
 ]
 packages = [
-  {include = "main.py"},
-  {include = "Image_stitching.py"},
+    { include = "main.py" },
+    { include = "Image_stitching.py" },
 ]
 
 [tool.poetry.dependencies]
