@@ -717,7 +717,7 @@ def img_api_restriction():
 
 def get_org_url():
     print("[italic yellow]正在获取CopyManga网站Url...[/]")
-    url = "https://cdn.jsdelivr.net/gh/misaka10843/copymanga-downloader@master/url.json"
+    url = "https://ghproxy.net/https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
     try:
         response = requests.get(url, proxies=PROXIES)
         response.raise_for_status()
@@ -902,7 +902,7 @@ def change_settings():
 
     login_change = Confirm.ask("是否要修改登陆方式？", default=False)
     if login_change:
-        loginPattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default=SETTINGS["loginPattern"])
+        loginPattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)", default=SETTINGS["loginPattern"])
         if loginPattern == "1":
             authorization = Prompt.ask("请输入token")
         elif loginPattern == "2":
