@@ -119,29 +119,29 @@ def set_kindle_config() -> None:
                 "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893,默认为copymanga-downloader目录)[/]",
                 default=path) + "/kcc_c2e"
         if is_contains_chinese(tmp):
-            print("kcc_c2e路径请不要包含中文")
+            print("[bold yellow]kcc_c2e路径请不要包含中文[/]")
             continue
 
         if os.path.exists(tmp):
             devices = "K1, K2, K34, K578, KDX, KPW, KPW5, KV, KO, K11, KS, KoMT, KoG, KoGHD, KoA, KoAHD, KoAH2O, KoAO, KoN, KoC, KoL, KoF, KoS, KoE"
             deviceset = set(devices.split(", "))
             while True:
-                device = Prompt.ask(f"请输入kcc设备参数, 支持的设备有{devices}[italic yellow][/]", default=False)
+                device = Prompt.ask(f"请输入kcc设备参数, 支持的设备有[italic yellow]{devices}[/]", default=False)
                 device = device.strip()
                 if device not in deviceset:
-                    print("设备不存在，请重新输入")
+                    print("[bold red]设备不存在，请重新输入[/]")
                 else:
                     break
             config.SETTINGS["kcc_cmd"] = f"{tmp} -p {device} -f EPUB"
             break
         else:
-            print("kcc_c2e不存在，请确认程序名称是否为kcc_c2e或是否安装kcc_c2e并且路径不含中文")
+            print("[bold red]kcc_c2e不存在，请确认程序名称是否为kcc_c2e或是否安装kcc_c2e并且路径不含中文[/]")
 
-    check = Confirm.ask("是否需要发送验证码到kindle验证[italic yellow][/]", default=False)
+    check = Confirm.ask("是否需要发送验证码到kindle验证", default=False)
     while True:
         email_address = Prompt.ask("请输入邮箱smtp账号[italic yellow](建议查看配置教程)[/]")
-        email_passwd = Prompt.ask("请输入邮箱smtp密码[italic yellow][/]")
-        email_smtp_address = Prompt.ask("请输入邮箱smtp的地址[italic yellow][/]")
+        email_passwd = Prompt.ask("请输入邮箱smtp密码")
+        email_smtp_address = Prompt.ask("请输入邮箱smtp的地址")
         kindle_address = Prompt.ask(
             "请输入kindle推送邮件地址[italic yellow](如twoonefour_ABCDQA@kindle.com，具体请查看amazon设置)[/]")
         # email_address = "489643427@qq.com"
@@ -151,11 +151,11 @@ def set_kindle_config() -> None:
         if check:
             code = str(random.randint(100000, 999999))
             if mailtest(email_address, email_passwd, kindle_address, email_smtp_address, code):
-                if code == Prompt.ask("请输入kindle上显示的验证码[italic yellow][/]"):
-                    print("验证码正确，验证成功")
+                if code == Prompt.ask("请输入kindle上显示的验证码"):
+                    print("[bold green]验证码正确，验证成功[/]")
                     break
                 else:
-                    print("验证码错误，请重新输入配置")
+                    print("[bold red]验证码错误，请重新输入配置[/]")
         else:
             break
     config.SETTINGS["email_address"] = email_address
