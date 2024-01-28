@@ -23,6 +23,7 @@ from email import encoders
 from email.header import Header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
+import config
 
 console = Console(color_system='256', style=None)
 # 全局化headers，节省空间
@@ -37,63 +38,7 @@ API_HEADER = {
     "referer": "https://www.copymanga.site/"
 }
 PROXIES = {}
-# 全局化设置
-SETTINGS = {
-    "download_path": None,
-    "authorization": None,
-    "use_oversea_cdn": None,
-    "use_webp": None,
-    "proxies": None,
-    "api_url": None,
-    "HC": None,
-    "CBZ": None,
-    "cbz_path": None,
-    "api_time": 0.0,
-    "API_COUNTER": 0,
-    "loginPattern": "0",
-    "salt": None,
-    "username": None,
-    "password": None,
-    "send_to_kindle": None,
-    "kcc_cmd": None,
-    "email_address": None,
-    "email_passwd": None,
-    "kindle_address": None,
-    "email_smtp_address": None
-}
 
-# '''
-#     "epub_and_mail_to_kindle": None,
-#     "kcc_cmd": None,
-#     "email_address": None,
-#     "email_passwd": None,
-#     "kindle_address": None,
-# '''
-
-# 全局化设置,备份,防止命令行参数导致设置错位
-OG_SETTINGS = {
-    "download_path": None,
-    "authorization": None,
-    "use_oversea_cdn": None,
-    "use_webp": None,
-    "proxies": None,
-    "api_url": None,
-    "HC": None,
-    "CBZ": None,
-    "cbz_path": None,
-    "api_time": 0.0,
-    "API_COUNTER": 0,
-    "loginPattern": "0",
-    "salt": None,
-    "username": None,
-    "password": None,
-    "send_to_kindle": None,
-    "kcc_cmd": None,
-    "email_address": None,
-    "email_passwd": None,
-    "kindle_address": None,
-    "email_smtp_address": None
-}
 
 UPDATE_LIST = []
 
@@ -149,8 +94,7 @@ ARGS = parse_args()
 
 # 命令行模式
 def command_mode():
-    global SETTINGS, PROXIES, API_HEADER
-    # 将命令行参数赋值到SETTINGS等相关全局变量
+    global PROXIES, API_HEADER
     if ARGS.UseOSCdn or ARGS.UseWebp:
         API_HEADER['use_oversea_cdn'] = ARGS.UseOSCdn
         API_HEADER['use_webp'] = ARGS.UseWebp
@@ -160,7 +104,7 @@ def command_mode():
             "https": ARGS.Proxy
         }
     if ARGS.Output:
-        SETTINGS['download_path'] = ARGS.Output
+        config.SETTINGS['download_path'] = ARGS.Output
     manga_chapter_json = manga_chapter(ARGS.MangaPath, ARGS.MangaGroup)
     chapter_allocation(manga_chapter_json)
     print(f"[bold green][:white_check_mark: ]漫画已经下载完成！[/]")
@@ -202,14 +146,15 @@ def updates():
     if update_want_to == 0:
         new_update = add_updates()
         response = requests.get(
-        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}/chapters?limit=500"
-        f"&offset=0&platform=3",
-        headers=API_HEADER, proxies=PROXIES)
+            f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}/chapters?limit=500"
+            f"&offset=0&platform=3",
+            headers=API_HEADER, proxies=PROXIES)
         # 记录API访问量
         api_restriction()
         response.raise_for_status()
         manga_chapter_json = response.json()
-        manga_now=int(Prompt.ask(f"当前漫画有{manga_chapter_json['results']['total']}话的内容，请问您目前看到多少话了"))
+        manga_now = int(
+            Prompt.ask(f"当前漫画有{manga_chapter_json['results']['total']}话的内容，请问您目前看到多少话了"))
         save_updates(new_update[0], new_update[1], new_update[2], manga_now, False)
     else:
         del_manga_int = int(Prompt.ask("请输入想要删除的漫画前面的序号"))
@@ -221,7 +166,7 @@ def updates():
 def add_updates():
     search_content = Prompt.ask("您需要搜索添加什么漫画呢")
     url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
-        SETTINGS["api_url"], search_content)
+        config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
     while True:
@@ -331,7 +276,7 @@ def update_download():
 def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
     # 因为将偏移设置到最后下载的章节，所以可以直接下载全本
     response = requests.get(
-        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}/chapters"
+        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}/chapters"
         f"?limit=500&offset={now_chapter}&platform=3",
         headers=API_HEADER, proxies=PROXIES)
     # 记录API访问量
@@ -397,7 +342,7 @@ def page_turning(selection, offset, data, current_page_count):
 def search():
     search_content = Prompt.ask("您需要搜索什么漫画呢")
     url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
-        SETTINGS["api_url"], search_content)
+        config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
     while True:
@@ -424,10 +369,9 @@ def search():
 # 收藏相关
 
 def search_on_collect():
-
     url = "https://%s/api/v3/member/collect/comics?limit=12&offset={}&free_type=1&ordering=-datetime_modifier" % (
-        SETTINGS["api_url"])
-    API_HEADER['authorization'] = SETTINGS['authorization']
+        config.SETTINGS["api_url"])
+    API_HEADER['authorization'] = config.SETTINGS['authorization']
     offset = 0
     current_page_count = 1
     retry_count = 0
@@ -440,16 +384,17 @@ def search_on_collect():
         data = response.json()
         if data['code'] == 401:
             settings_dir = os.path.join(os.path.expanduser("~"), ".copymanga-downloader/settings.json")
-            if SETTINGS["loginPattern"] == "1":
+            if config.SETTINGS["login_pattern"] == "1":
                 print(f"[bold red]请求出现问题！疑似Token问题！[{data['message']}][/]")
                 print(f"[bold red]请删除{settings_dir}来重新设置！(或者也可以自行修改配置文件)[/]")
                 sys.exit()
             else:
-                res = login(**loginInformationBuilder(SETTINGS["username"], SETTINGS["password"], SETTINGS["api_url"], SETTINGS["salt"], PROXIES))
+                res = login(**login_information_builder(config.SETTINGS["username"], config.SETTINGS["password"], config.SETTINGS["api_url"],
+                                                      config.SETTINGS["salt"], PROXIES))
                 if res:
                     API_HEADER['authorization'] = f"Token {res}"
-                    SETTINGS["authorization"] = f"Token {res}"
-                    save_settings(SETTINGS)
+                    config.SETTINGS["authorization"] = f"Token {res}"
+                    save_settings(config.SETTINGS)
                     continue
                 time.sleep(2 ** retry_count)  # 重试时间指数
                 retry_count += 1
@@ -478,7 +423,7 @@ def search_on_collect():
 
 
 def collect_expect():
-    url = f"https://api.{SETTINGS['api_url']}/api/v3/member/collect/comics"
+    url = f"https://api.{config.SETTINGS['api_url']}/api/v3/member/collect/comics"
     params = {
         "limit": 12,
         "offset": 0
@@ -488,7 +433,7 @@ def collect_expect():
                              f"[italic yellow](0:json,1:csv)[/]",
                              choices=["0", "1"], default="1"))
     while True:
-        API_HEADER['authorization'] = SETTINGS['authorization']
+        API_HEADER['authorization'] = config.SETTINGS['authorization']
         res = requests.get(url, params=params, headers=API_HEADER)
         res_json = json.loads(res.text)
         if res_json["code"] != 200:
@@ -518,7 +463,7 @@ def collect_expect():
 # 漫画详细相关
 
 def manga_group(manga_path_word):
-    response = requests.get(f"https://api.{SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
+    response = requests.get(f"https://api.{config.SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
                             headers=API_HEADER, proxies=PROXIES)
     # 记录API访问量
     api_restriction()
@@ -540,7 +485,7 @@ def manga_group(manga_path_word):
 
 def manga_chapter(manga_path_word, group_path_word):
     response = requests.get(
-        f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500"
+        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500"
         f"&offset=0&platform=3",
         headers=API_HEADER, proxies=PROXIES)
     # 记录API访问量
@@ -600,7 +545,7 @@ def chapter_allocation(manga_chapter_json):
     # 准备分配章节下载
     for manga_chapter_info in manga_chapter_list:
         response = requests.get(
-            f"https://api.{SETTINGS['api_url']}/api/v3/comic/{manga_chapter_info['comic_path_word']}"
+            f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_chapter_info['comic_path_word']}"
             f"/chapter2/{manga_chapter_info['uuid']}?platform=3",
             headers=API_HEADER, proxies=PROXIES)
         # 记录API访问量
@@ -614,7 +559,7 @@ def chapter_allocation(manga_chapter_json):
         special_chars = string.punctuation + ' '
         manga_name = ''.join(c for c in manga_name if c not in special_chars)
         num_images = len(img_url_contents)
-        download_path = SETTINGS['download_path']
+        download_path = config.SETTINGS['download_path']
         chapter_name = manga_chapter_info_json['results']['chapter']['name']
         # 检查漫画文件夹是否存在
 
@@ -650,11 +595,11 @@ def chapter_allocation(manga_chapter_json):
                             manga_chapter_info_json['results']['chapter']['index'] + 1)
 
         print(f"[bold green][:white_check_mark:][{manga_name}]{chapter_name}下载完成！[/]")
-        epubTransformerhelper(download_path, manga_name, chapter_name)
-        if SETTINGS['CBZ']:
+        epub_transformerhelper(download_path, manga_name, chapter_name)
+        if config.SETTINGS['CBZ']:
             with console.status(f"[bold yellow]正在保存CBZ存档:[{manga_name}]{chapter_name}[/]"):
                 create_cbz(str(int(manga_chapter_info_json['results']['chapter']['index']) + 1), chapter_name,
-                           manga_name, f"{manga_name}/{chapter_name}/", SETTINGS['cbz_path'])
+                           manga_name, f"{manga_name}/{chapter_name}/", config.SETTINGS['cbz_path'])
             print(f"[bold green][:white_check_mark:]已将[{manga_name}]{chapter_name}保存为CBZ存档[/]")
 
 
@@ -668,7 +613,7 @@ def download(url, filename):
         return
     try:
         img_api_restriction()
-        if SETTINGS['HC'] == "1":
+        if config.SETTINGS['HC'] == "1":
             url = url.replace("c800x.jpg", "c1500x.jpg")
         response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
         with open(filename, "wb") as f:
@@ -684,19 +629,19 @@ def api_restriction():
     global API_COUNTER, IMG_API_COUNTER
     API_COUNTER += 1
     # 防止退出后立马再次运行
-    current_time = OG_SETTINGS['api_time']
+    current_time = config.OG_SETTINGS['api_time']
     time_diff = time.time() - current_time
     # 判断是否超过60秒
     if time_diff < 60 and API_COUNTER <= 1:
-        API_COUNTER = API_COUNTER + OG_SETTINGS['API_COUNTER']
+        API_COUNTER = API_COUNTER + config.OG_SETTINGS['API_COUNTER']
     if API_COUNTER >= 15:
         API_COUNTER = 0
         print("[bold yellow]您已经触发到了API请求阈值，我们将等60秒后再进行[/]")
         time.sleep(60)
-    OG_SETTINGS['API_COUNTER'] = API_COUNTER
-    OG_SETTINGS['api_time'] = time.time()
+    config.OG_SETTINGS['API_COUNTER'] = API_COUNTER
+    config.OG_SETTINGS['api_time'] = time.time()
     # 将时间戳与API请求数量写入配置文件
-    save_settings(OG_SETTINGS)
+    save_settings(config.OG_SETTINGS)
 
 
 def img_api_restriction():
@@ -735,7 +680,7 @@ def get_org_url():
             sys.exit()
 
 
-#检查字符串是否包含中文
+# 检查字符串是否包含中文
 def is_contains_chinese(strs):
     for _char in strs:
         if '\u4e00' <= _char <= '\u9fa5':
@@ -746,7 +691,8 @@ def is_contains_chinese(strs):
 def set_settings():
     global PROXIES
     # 获取用户输入
-    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]", default=os.path.split(os.path.realpath(__file__))[0])
+    download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
+                               default=os.path.split(os.path.realpath(__file__))[0])
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
@@ -756,9 +702,9 @@ def set_settings():
     cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
     send_to_kindle = Confirm.ask("是否启用半自动更新自动发送至kindle功能[italic yellow][/]", default=False)
     if cbz:
-        while (True):
+        while True:
             cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]")
-            if (is_contains_chinese(cbz_path)):
+            if is_contains_chinese(cbz_path):
                 print("路径请不要包含中文")
             else:
                 break
@@ -788,10 +734,10 @@ def set_settings():
     if hc_input:
         hc = "1"
     # 构造settings字典
-    loginPattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default="1")
-    if loginPattern == "1":
+    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default="1")
+    if login_pattern == "1":
         authorization = Prompt.ask("请输入token")
-    elif loginPattern == "2":
+    elif login_pattern == "2":
         while True:
             username = Prompt.ask("请输入账号").strip()
             password = Prompt.ask("请输入密码").strip()
@@ -819,16 +765,16 @@ def set_settings():
         "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0,
-        "loginPattern": loginPattern,
-        "salt": salt if loginPattern == "2" else None,
-        "username": username if loginPattern == "2" else None,
-        "password": password if loginPattern == "2" else None,
+        "login_pattern": login_pattern,
+        "salt": salt if login_pattern == "2" else None,
+        "username": username if login_pattern == "2" else None,
+        "password": password if login_pattern == "2" else None,
         "send_to_kindle": send_to_kindle,
-        "kcc_cmd": SETTINGS["kcc_cmd"],
-        "email_address": SETTINGS["email_address"],
-        "email_passwd": SETTINGS["email_passwd"],
-        "email_smtp_address": SETTINGS["email_smtp_address"],
-        "kindle_address": SETTINGS["kindle_address"]
+        "kcc_cmd": config.SETTINGS["kcc_cmd"],
+        "email_address": config.SETTINGS["email_address"],
+        "email_passwd": config.SETTINGS["email_passwd"],
+        "email_smtp_address": config.SETTINGS["email_smtp_address"],
+        "kindle_address": config.SETTINGS["kindle_address"]
     }
     home_dir = os.path.expanduser("~")
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
@@ -840,28 +786,28 @@ def change_settings():
     global PROXIES
     # 获取用户输入
     download_path = Prompt.ask("请输入保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
-                               default=SETTINGS['download_path'])
+                               default=config.SETTINGS['download_path'])
 
     use_oversea_cdn = True
     use_webp = True
-    if SETTINGS['use_oversea_cdn'] == "0":
+    if config.SETTINGS['use_oversea_cdn'] == "0":
         use_oversea_cdn = False
-    if SETTINGS['use_webp'] == "0":
+    if config.SETTINGS['use_webp'] == "0":
         use_webp = False
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=use_oversea_cdn)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=use_webp)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=SETTINGS['proxies'])
-    if SETTINGS.get('HC') is None:
+    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=config.SETTINGS['proxies'])
+    if config.SETTINGS.get('HC') is None:
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=False)
     else:
         hc_c = True
-        if SETTINGS['HC'] == "0":
+        if config.SETTINGS['HC'] == "0":
             hc_c = False
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=hc_c)
-    if SETTINGS.get('CBZ') is None or not SETTINGS.get("CBZ"):
+    if config.SETTINGS.get('CBZ') is None or not config.SETTINGS.get("CBZ"):
         cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
     else:
         cbz = True
@@ -869,19 +815,19 @@ def change_settings():
                                default=cbz)
     send_to_kindle_modify = Confirm.ask("是否需要修改kindle自动推送相关设置？[italic yellow][/]", default=False)
     if cbz:
-        if SETTINGS.get('cbz_path') is None:
-            SETTINGS['cbz_path'] = None
+        if config.SETTINGS.get('cbz_path') is None:
+            config.SETTINGS['cbz_path'] = None
 
-        while (True):
+        while True:
             cbz_path = Prompt.ask("请输入CBZ文件的保存路径[italic yellow](最后一个字符不能为斜杠)[/]",
-                              default=SETTINGS['cbz_path'])
-            if (is_contains_chinese(cbz_path)):
+                                  default=config.SETTINGS['cbz_path'])
+            if is_contains_chinese(cbz_path):
                 print("路径请不要包含中文")
             else:
                 break
     else:
         cbz_path = None
-    if proxy != SETTINGS['proxies'] and proxy != "0":
+    if proxy != config.SETTINGS['proxies'] and proxy != "0":
         PROXIES = {
             "http": proxy,
             "https": proxy
@@ -893,19 +839,19 @@ def change_settings():
         print(f"{i + 1}->{url}")
     choice = IntPrompt.ask("请输入要使用的API前面的数字")
     if send_to_kindle_modify:
-        SETTINGS["send_to_kindle"] = Confirm.ask("是否继续使用kindle推送？[italic yellow][/]", default=True)
-        if SETTINGS["send_to_kindle"]:
+        config.SETTINGS["send_to_kindle"] = Confirm.ask("是否继续使用kindle推送？[italic yellow][/]", default=True)
+        if config.SETTINGS["send_to_kindle"]:
             set_kindle_config()
 
     # 构造settings字典
 
-
     login_change = Confirm.ask("是否要修改登陆方式？", default=False)
     if login_change:
-        loginPattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)", default=SETTINGS["loginPattern"])
-        if loginPattern == "1":
+        login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)",
+                                  default=config.SETTINGS["login_pattern"])
+        if login_pattern == "1":
             authorization = Prompt.ask("请输入token")
-        elif loginPattern == "2":
+        elif login_pattern == "2":
             while True:
                 username = Prompt.ask("请输入账号").strip()
                 password = Prompt.ask("请输入密码").strip()
@@ -915,13 +861,13 @@ def change_settings():
                 else:
                     res = loginhelper(username, password, api_urls[choice - 1])
                     if res["token"]:
-                        SETTINGS["username"] = f"Token {res['token']}"
-                        SETTINGS["salt"] = res["salt"]
-                        SETTINGS["password"] = res["password_enc"]
+                        config.SETTINGS["username"] = f"Token {res['token']}"
+                        config.SETTINGS["salt"] = res["salt"]
+                        config.SETTINGS["password"] = res["password_enc"]
                         break
     else:
-        loginPattern = SETTINGS["loginPattern"]
-        authorization = SETTINGS["authorization"]
+        login_pattern = config.SETTINGS["login_pattern"]
+        authorization = config.SETTINGS["authorization"]
     print(f"[yellow]我们正在更改您的设置中，请稍后[/]")
     # input转bool
     use_oversea_cdn = "0"
@@ -947,16 +893,16 @@ def change_settings():
         "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0,
-        "loginPattern": loginPattern,
-        "salt": SETTINGS["salt"] if loginPattern == "2" else None,
-        "username": SETTINGS["username"] if loginPattern == "2" else None,
-        "password": SETTINGS["password"] if loginPattern == "2" else None,
-        "send_to_kindle": SETTINGS["send_to_kindle"],
-        "kcc_cmd": SETTINGS["kcc_cmd"] if SETTINGS["send_to_kindle"] else None,
-        "email_address": SETTINGS["email_address"] if SETTINGS["send_to_kindle"] else None,
-        "email_passwd": SETTINGS["email_passwd"] if SETTINGS["send_to_kindle"] else None,
-        "email_smtp_address": SETTINGS["email_smtp_address"] if SETTINGS["send_to_kindle"] else None,
-        "kindle_address": SETTINGS["kindle_address"] if SETTINGS["send_to_kindle"] else None
+        "login_pattern": login_pattern,
+        "salt": config.SETTINGS["salt"] if login_pattern == "2" else None,
+        "username": config.SETTINGS["username"] if login_pattern == "2" else None,
+        "password": config.SETTINGS["password"] if login_pattern == "2" else None,
+        "send_to_kindle": config.SETTINGS["send_to_kindle"],
+        "kcc_cmd": config.SETTINGS["kcc_cmd"] if config.SETTINGS["send_to_kindle"] else None,
+        "email_address": config.SETTINGS["email_address"] if config.SETTINGS["send_to_kindle"] else None,
+        "email_passwd": config.SETTINGS["email_passwd"] if config.SETTINGS["send_to_kindle"] else None,
+        "email_smtp_address": config.SETTINGS["email_smtp_address"] if config.SETTINGS["send_to_kindle"] else None,
+        "kindle_address": config.SETTINGS["kindle_address"] if config.SETTINGS["send_to_kindle"] else None
     }
     home_dir = os.path.expanduser("~")
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
@@ -975,7 +921,7 @@ def save_settings(settings):
 
 
 def load_settings():
-    global SETTINGS, PROXIES, OG_SETTINGS, API_HEADER
+    global PROXIES, API_HEADER
     # 获取用户目录的路径
     home_dir = os.path.expanduser("~")
     settings_path = os.path.join(home_dir, ".copymanga-downloader/settings.json")
@@ -991,14 +937,14 @@ def load_settings():
     for field in necessary_fields:
         if field not in settings:
             return False, "settings.json中缺少必要字段{}".format(field)
-    SETTINGS = settings
+    config.SETTINGS = settings
     if "HC" not in settings:
-        SETTINGS['HC'] = None
+        config.SETTINGS['HC'] = None
         print("[bold yellow]我们更新了设置，请您按照需求重新设置一下，还请谅解[/]")
         change_settings()
         print("[bold yellow]感谢您的支持，重新启动本程序后新的设置将会生效[/]")
         exit(0)
-    OG_SETTINGS = settings
+    config.OG_SETTINGS = settings
     # 设置请求头
     API_HEADER['use_oversea_cdn'] = settings['use_oversea_cdn']
     API_HEADER['use_webp'] = settings['use_webp']
@@ -1044,10 +990,10 @@ def create_cbz(index, title, manga_name, save_dir, cbz_dir):
                f"<Series>{pinyin.get_pinyin(manga_name)}</Series>\n  " \
                f"<Number>{pinyin.get_pinyin(index)}</Number>\n" \
                f"</ComicInfo>"
-    with open(os.path.join(os.path.join(SETTINGS['download_path'], save_dir), "ComicInfo.xml"), "w") as file:
+    with open(os.path.join(os.path.join(config.SETTINGS['download_path'], save_dir), "ComicInfo.xml"), "w") as file:
         file.write(xml_data)
 
-    start_dir = os.path.join(SETTINGS['download_path'], save_dir)
+    start_dir = os.path.join(config.SETTINGS['download_path'], save_dir)
     file_name = f"{save_dir}/{pinyin.get_pinyin(manga_name)}/{manga_name}{title}.cbz"
     file_path = os.path.join(cbz_dir, file_name)
 
@@ -1084,7 +1030,7 @@ def loginhelper(username: str, password: str, url: str) -> dict:
     return {"token": res, "salt": salt, "password_enc": password_enc}
 
 
-def loginInformationBuilder(username: str, password: str, url: str, salt: str, proxy: dict) -> dict:
+def login_information_builder(username: str, password: str, url: str, salt: str, proxy: dict) -> dict:
     """
     辅助函数，构建dict对象用于登录
 
@@ -1098,7 +1044,7 @@ def loginInformationBuilder(username: str, password: str, url: str, salt: str, p
     return {"username": username, "password": password, "url": url, "salt": salt, "proxy": proxy}
 
 
-def epubTransformer(path: str, name: str, chapter: str) -> None:
+def epub_transformer(path: str, name: str, chapter: str) -> None:
     """
     将下载好的图片转化为epub待发送
 
@@ -1107,13 +1053,12 @@ def epubTransformer(path: str, name: str, chapter: str) -> None:
     :param chapter: 漫画的章节
     :return: 空
     """
-    global SETTINGS
     # 定义命令和参数
     # command = SETTINGS["kcc_cmd"]
-    arguments = ["-o", f'{path}/{name}/{chapter}/{name} {chapter}.epub', "-t", f"{name} {chapter}", f'{path}/{name}/{chapter}']
-    command = SETTINGS["kcc_cmd"].split(" ") + arguments
+    arguments = ["-o", f'{path}/{name}/{chapter}/{name} {chapter}.epub', "-t", f"{name} {chapter}",
+                 f'{path}/{name}/{chapter}']
+    command = config.SETTINGS["kcc_cmd"].split(" ") + arguments
     subprocess.run(command, shell=True, capture_output=True, text=True)
-
 
 
 def mailtest(sender: str, passwd: str, receiver: str, smtp_address: str, message: str) -> bool:
@@ -1160,7 +1105,6 @@ def mail(fd) -> bool:
     :param fd: io文件句柄
     :return: 发送成功为真，否则为假
     """
-    global SETTINGS
     try:
         message = MIMEMultipart()
         file = MIMEBase('application', 'octet-stream')
@@ -1168,11 +1112,11 @@ def mail(fd) -> bool:
         file.set_payload(fd.read())
         encoders.encode_base64(file)
         message.attach(file)
-        message['From'] = Header(SETTINGS["email_address"])
+        message['From'] = Header(config.SETTINGS["email_address"])
 
-        server = smtplib.SMTP_SSL(SETTINGS["email_smtp_address"], 465)
-        server.login(SETTINGS["email_address"], SETTINGS["email_passwd"])
-        server.sendmail(SETTINGS["email_address"], SETTINGS["kindle_address"], message.as_string())
+        server = smtplib.SMTP_SSL(config.SETTINGS["email_smtp_address"], 465)
+        server.login(config.SETTINGS["email_address"], config.SETTINGS["email_passwd"])
+        server.sendmail(config.SETTINGS["email_address"], config.SETTINGS["kindle_address"], message.as_string())
         server.quit()
 
     except Exception as e:
@@ -1186,16 +1130,17 @@ def set_kindle_config() -> None:
 
     :return: 空
     """
-    global SETTINGS
     system = platform.system()
     path = os.path.split(os.path.realpath(__file__))[0]
-    while not SETTINGS['kcc_cmd']:
+    while not config.SETTINGS['kcc_cmd']:
         if system == "Windows":
-            tmp = Prompt.ask("请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893，默认为copymanga-downloader目录)[/]",
-                             default=path) + "/kcc_c2e.exe"
+            tmp = Prompt.ask(
+                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893，默认为copymanga-downloader目录)[/]",
+                default=path) + "/kcc_c2e.exe"
         else:
-            tmp = Prompt.ask("请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893,默认为copymanga-downloader目录)[/]",
-                             default=path) + "/kcc_c2e"
+            tmp = Prompt.ask(
+                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893,默认为copymanga-downloader目录)[/]",
+                default=path) + "/kcc_c2e"
         if is_contains_chinese(tmp):
             print("kcc_c2e路径请不要包含中文")
             continue
@@ -1210,7 +1155,7 @@ def set_kindle_config() -> None:
                     print("设备不存在，请重新输入")
                 else:
                     break
-            SETTINGS["kcc_cmd"] = f"{tmp} -p {device} -f EPUB"
+            config.SETTINGS["kcc_cmd"] = f"{tmp} -p {device} -f EPUB"
             break
         else:
             print("kcc_c2e不存在，请确认程序名称是否为kcc_c2e或是否安装kcc_c2e并且路径不含中文")
@@ -1220,7 +1165,8 @@ def set_kindle_config() -> None:
         email_address = Prompt.ask("请输入邮箱smtp账号[italic yellow](建议查看配置教程)[/]")
         email_passwd = Prompt.ask("请输入邮箱smtp密码[italic yellow][/]")
         email_smtp_address = Prompt.ask("请输入邮箱smtp的地址[italic yellow][/]")
-        kindle_address = Prompt.ask("请输入kindle推送邮件地址[italic yellow](如twoonefour_ABCDQA@kindle.com，具体请查看amazon设置)[/]")
+        kindle_address = Prompt.ask(
+            "请输入kindle推送邮件地址[italic yellow](如twoonefour_ABCDQA@kindle.com，具体请查看amazon设置)[/]")
         # email_address = "489643427@qq.com"
         # email_passwd = "xulsahtupltibjbh"
         # email_smtp_address = "smtp.qq.com"
@@ -1235,13 +1181,13 @@ def set_kindle_config() -> None:
                     print("验证码错误，请重新输入配置")
         else:
             break
-    SETTINGS["email_address"] = email_address
-    SETTINGS["email_passwd"] = email_passwd
-    SETTINGS["kindle_address"] = kindle_address
-    SETTINGS["email_smtp_address"] = email_smtp_address
+    config.SETTINGS["email_address"] = email_address
+    config.SETTINGS["email_passwd"] = email_passwd
+    config.SETTINGS["kindle_address"] = kindle_address
+    config.SETTINGS["email_smtp_address"] = email_smtp_address
 
 
-def epubTransformerhelper(download_path, manga_name, chapter_name) -> None:
+def epub_transformerhelper(download_path, manga_name, chapter_name) -> None:
     """
     辅助函数，用于转换epub
 
@@ -1250,10 +1196,9 @@ def epubTransformerhelper(download_path, manga_name, chapter_name) -> None:
     :param chapter_name:
     :return:
     """
-    global SETTINGS
-    if SETTINGS["send_to_kindle"]:
+    if config.SETTINGS["send_to_kindle"]:
         if not os.path.exists(f'{download_path}/{manga_name}/{chapter_name}/{manga_name} {chapter_name}.epub'):
-            epubTransformer(path=download_path, name=manga_name, chapter=chapter_name)
+            epub_transformer(path=download_path, name=manga_name, chapter=chapter_name)
         with open(f'{download_path}/{manga_name}/{chapter_name}/{manga_name} {chapter_name}.epub', "rb") as f:
             mail(f)
 
