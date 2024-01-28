@@ -11,7 +11,13 @@ from email.mime.multipart import MIMEMultipart
 from rich.prompt import Prompt, Confirm
 
 import config
-from main import is_contains_chinese
+
+
+def is_contains_chinese(strs):
+    for _char in strs:
+        if '\u4e00' <= _char <= '\u9fa5':
+            return True
+    return False
 
 
 def epub_transformer(path: str, name: str, chapter: str) -> None:

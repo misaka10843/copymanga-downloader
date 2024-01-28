@@ -9,7 +9,6 @@ import threading
 import time
 
 import requests as requests
-import retrying as retrying
 from rich import print as print
 from rich.console import Console
 from rich.prompt import Prompt, Confirm, IntPrompt
@@ -139,8 +138,8 @@ def updates():
     if update_want_to == 0:
         new_update = add_updates()
         response = requests.get(
-            f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}/chapters?limit=500"
-            f"&offset=0&platform=3",
+            f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}"
+            f"/chapters?limit=500&offset=0&platform=3",
             headers=API_HEADER, proxies=PROXIES)
         # 记录API访问量
         api_restriction()
@@ -269,8 +268,8 @@ def update_download():
 def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
     # 因为将偏移设置到最后下载的章节，所以可以直接下载全本
     response = requests.get(
-        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}/chapters"
-        f"?limit=500&offset={now_chapter}&platform=3",
+        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}"
+        f"/chapters?limit=500&offset={now_chapter}&platform=3",
         headers=API_HEADER, proxies=PROXIES)
     # 记录API访问量
     api_restriction()
@@ -377,7 +376,7 @@ def search_on_collect():
         data = response.json()
         if data['code'] == 401:
             settings_dir = os.path.join(os.path.expanduser("~"), ".copymanga-downloader/settings.json")
-            if config.SETTINGS["login_pattern"] == "1":
+            if config.SETTINGS["loginPattern"] == "1":
                 print(f"[bold red]请求出现问题！疑似Token问题！[{data['message']}][/]")
                 print(f"[bold red]请删除{settings_dir}来重新设置！(或者也可以自行修改配置文件)[/]")
                 sys.exit()
@@ -479,8 +478,8 @@ def manga_group(manga_path_word):
 
 def manga_chapter(manga_path_word, group_path_word):
     response = requests.get(
-        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}/chapters?limit=500"
-        f"&offset=0&platform=3",
+        f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}"
+        f"/chapters?limit=500&offset=0&platform=3",
         headers=API_HEADER, proxies=PROXIES)
     # 记录API访问量
     api_restriction()
@@ -599,22 +598,30 @@ def chapter_allocation(manga_chapter_json):
 
 # 下载相关
 
-@retrying.retry(stop_max_attempt_number=3)
-def download(url, filename):
+def download(url, filename, overwrite=False):
     # 判断是否已经下载
-    if os.path.exists(filename):
+    if not overwrite and os.path.exists(filename):
         print(f"[blue]您已经下载了{filename}，跳过下载[/]")
         return
+    img_api_restriction()
+    if config.SETTINGS['HC'] == "1":
+        url = url.replace("c800x.jpg", "c1500x.jpg")
     try:
-        img_api_restriction()
-        if config.SETTINGS['HC'] == "1":
-            url = url.replace("c800x.jpg", "c1500x.jpg")
+
         response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
         with open(filename, "wb") as f:
             f.write(response.content)
     except Exception as e:
-        print(
-            f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
+        # 重新尝试一次
+        try:
+            time.sleep(5)
+            response = requests.get(url, headers=API_HEADER, proxies=PROXIES)
+            with open(filename, "wb") as f:
+                f.write(response.content)
+        except Exception as e:
+
+            print(
+                f"[bold red]无法下载{filename}，似乎是CopyManga暂时屏蔽了您的IP，请稍后手动下载对应章节(章节话数为每话下载输出的索引ID),ErrMsg:{e}[/]")
 
 
 # API限制相关
@@ -662,7 +669,7 @@ def get_org_url():
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        print("[bold yellow]无法链接至jsdelivr，准备直接访问Github[/]")
+        print("[bold yellow]无法链接至ghproxy.net，准备直接访问Github[/]")
         # 更换URL
         url = "https://raw.githubusercontent.com/misaka10843/copymanga-downloader/master/url.json"
         try:
@@ -674,7 +681,6 @@ def get_org_url():
             sys.exit()
 
 
-# 检查字符串是否包含中文
 def is_contains_chinese(strs):
     for _char in strs:
         if '\u4e00' <= _char <= '\u9fa5':
@@ -690,7 +696,7 @@ def set_settings():
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=False)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=True)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过)[/]")
+    proxy = Prompt.ask("请输入代理地址[italic yellow](没有的话可以直接回车跳过，包括协议头)[/]")
     hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                            default=False)
     cbz = Confirm.ask("是否下载后打包成CBZ？", default=False)
@@ -759,7 +765,7 @@ def set_settings():
         "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0,
-        "login_pattern": login_pattern,
+        "loginPattern": login_pattern,
         "salt": salt if login_pattern == "2" else None,
         "username": username if login_pattern == "2" else None,
         "password": password if login_pattern == "2" else None,
@@ -791,7 +797,7 @@ def change_settings():
     use_oversea_cdn_input = Confirm.ask("是否使用海外CDN？", default=use_oversea_cdn)
     use_webp_input = Confirm.ask("是否使用Webp？[italic yellow](可以节省服务器资源,下载速度也会加快)[/]",
                                  default=use_webp)
-    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0)[/]", default=config.SETTINGS['proxies'])
+    proxy = Prompt.ask("请输入代理地址[italic yellow](如果需要清除请输入0,输入时需包括协议头)[/]", default=config.SETTINGS['proxies'])
     if config.SETTINGS.get('HC') is None:
         hc_input = Confirm.ask("是否下载高分辨率图片[italic yellow](不选择可以节省服务器资源,下载速度也会加快)[/]",
                                default=False)
@@ -842,7 +848,7 @@ def change_settings():
     login_change = Confirm.ask("是否要修改登陆方式？", default=False)
     if login_change:
         login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)",
-                                   default=config.SETTINGS["login_pattern"])
+                                   default=config.SETTINGS["loginPattern"])
         if login_pattern == "1":
             authorization = Prompt.ask("请输入token")
         elif login_pattern == "2":
@@ -860,7 +866,7 @@ def change_settings():
                         config.SETTINGS["password"] = res["password_enc"]
                         break
     else:
-        login_pattern = config.SETTINGS["login_pattern"]
+        login_pattern = config.SETTINGS["loginPattern"]
         authorization = config.SETTINGS["authorization"]
     print(f"[yellow]我们正在更改您的设置中，请稍后[/]")
     # input转bool
@@ -887,7 +893,7 @@ def change_settings():
         "cbz_path": cbz_path,
         "api_time": 0.0,
         "API_COUNTER": 0,
-        "login_pattern": login_pattern,
+        "loginPattern": login_pattern,
         "salt": config.SETTINGS["salt"] if login_pattern == "2" else None,
         "username": config.SETTINGS["username"] if login_pattern == "2" else None,
         "password": config.SETTINGS["password"] if login_pattern == "2" else None,
