@@ -6,19 +6,20 @@ from xpinyin import Pinyin
 import config
 
 
-def create_cbz(index, title, manga_name, save_dir, cbz_dir):
+def create_cbz(index, title, manga_name, save_dir, cbz_dir, path_word):
     pinyin = Pinyin()
-    xml_data = f"<?xml version=\"1.0\"?>\n<ComicInfo xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " \
-               f"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n  " \
-               f"<Title>{pinyin.get_pinyin(title)}</Title>\n  " \
-               f"<Series>{pinyin.get_pinyin(manga_name)}</Series>\n  " \
-               f"<Number>{pinyin.get_pinyin(index)}</Number>\n" \
-               f"</ComicInfo>"
-    with open(os.path.join(os.path.join(config.SETTINGS['download_path'], save_dir), "ComicInfo.xml"), "w") as file:
+    xml_data = f'<?xml version="1.0"?>' \
+               '<ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' \
+               f'<Title>{title}</Title>' \
+               f'<Series>{manga_name}</Series>' \
+               f'<Number>{index}</Number>' \
+               f'/ComicInfo>"'
+    with open(os.path.join(os.path.join(config.SETTINGS['download_path'], save_dir), "ComicInfo.xml"), "w",
+              encoding='utf8') as file:
         file.write(xml_data)
 
     start_dir = os.path.join(config.SETTINGS['download_path'], save_dir)
-    file_name = f"{save_dir}/{pinyin.get_pinyin(manga_name)}/{manga_name}{title}.cbz"
+    file_name = f"{save_dir}/{path_word}/{manga_name}{title}.cbz"
     file_path = os.path.join(cbz_dir, file_name)
 
     # 只添加指定类型的文件到zip文件中
