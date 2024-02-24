@@ -8,8 +8,8 @@ from email.header import Header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 
-from rich.prompt import Prompt, Confirm
 from rich import print as print
+from rich.prompt import Prompt, Confirm
 
 import config
 

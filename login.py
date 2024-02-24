@@ -9,7 +9,7 @@ from rich import print as print
 import config
 
 
-def login(**information: dict[{"username": None, "password": None, "url": None, "salt": None, "proxy": None}]) -> str:
+def login(**information: dict) -> str:
     """
     登录函数，实际访问登录获取token
 

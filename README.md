@@ -1,9 +1,11 @@
 > [!WARNING]
->  **在2023.1.28更新之后，cbz功能的保存路径被改变，请所有使用cbz功能的用户最好[查看修改内容](https://github.com/misaka10843/copymanga-downloader/pull/89#issue-2104150068)了解新路径以及元信息问题！**
+> *
+*在2023.1.28更新之后，cbz功能的保存路径被改变，请所有使用cbz功能的用户最好[查看修改内容](https://github.com/misaka10843/copymanga-downloader/pull/89#issue-2104150068)
+了解新路径以及元信息问题！**
 
 > [!NOTE]
 > **请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
-> 
+>
 > **因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
 
 # copymanga-downloader
@@ -25,8 +27,6 @@
 与[重大更新](https://github.com/misaka10843/copymanga-downloader#%E9%87%8D%E5%A4%A7%E6%9B%B4%E6%96%B0-)的部分！
 
 ## 下载
-
-[pypi(稳定)](https://pypi.org/project/copymanga-dl)
 
 [releases(稳定)](https://github.com/misaka10843/copymanga-downloader/releases)
 
@@ -216,8 +216,6 @@ options:
 漫画搜索
 
 ![image](https://github.com/misaka10843/copymanga-downloader/assets/69132853/583b0d12-9017-4115-b210-2a13d7fc7027)
-
-
 
 ## 如何使用 🖥️
 

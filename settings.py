@@ -3,8 +3,8 @@ import os
 import sys
 
 import requests
-from rich.prompt import Prompt, Confirm, IntPrompt
 from rich import print as print
+from rich.prompt import Prompt, Confirm, IntPrompt
 
 import config
 from epub import set_kindle_config
