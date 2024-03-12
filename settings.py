@@ -83,7 +83,12 @@ def set_settings():
     if hc_input:
         hc = "1"
     # 构造settings字典
-    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default="1")
+    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，3为不登录)", default="1")
+    # 先申明变量
+    authorization = None
+    salt = None
+    username = None
+    password = None
     if login_pattern == "1":
         authorization = Prompt.ask("请输入token")
     elif login_pattern == "2":
@@ -100,6 +105,9 @@ def set_settings():
                     salt = res["salt"]
                     password = res["password_enc"]
                     break
+    else:
+        authorization = None
+        login_pattern = "3"
     if not os.path.exists(download_path):
         os.mkdir(download_path)
     settings = {
@@ -195,6 +203,7 @@ def change_settings():
     # 构造settings字典
 
     login_change = Confirm.ask("是否要修改登陆方式？", default=False)
+    authorization = config.SETTINGS["authorization"]
     if login_change:
         login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)",
                                    default=config.SETTINGS["loginPattern"])
@@ -281,7 +290,8 @@ def load_settings():
         settings = json.load(f)
 
     # 判断必要的字段是否存在
-    necessary_fields = ["download_path", "authorization", "use_oversea_cdn", "use_webp", "proxies", "api_url"]
+    necessary_fields = ["download_path", "authorization", "use_oversea_cdn", "use_webp", "proxies", "api_url",
+                        "loginPattern"]
     for field in necessary_fields:
         if field not in settings:
             return False, "settings.json中缺少必要字段{}".format(field)

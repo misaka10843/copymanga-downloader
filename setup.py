@@ -8,7 +8,7 @@ except IOError:
 
 setup(
     name="copymanga-dl",
-    version="3.5",
+    version="3.5.1",
     description="Copymanga Downloader",
     long_description=long_description,
     license="GNU GENERAL PUBLIC LICENSE",
