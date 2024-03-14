@@ -10,6 +10,8 @@ on:
       - '*.md'
       - '*.json'
       - '*.txt'
+      - '*.yml'
+      - '*.yaml'
       - 'setup.py'
       - 'pyproject.toml'
 
