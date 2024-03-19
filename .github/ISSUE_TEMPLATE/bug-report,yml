@@ -1,66 +1,74 @@
----
-name: "Bug Report \U0001F41B"
+name: Bug Report 🐛
 description: 创建 Bug 报告以帮助我们改进 / Create a report to help us improve
-title: "\U0001F41B[BUG] "
-labels: ["bug"]
-assignees:
-    - misaka10843
+title: 🐛[BUG]
 body:
-    - type: textarea
-      attributes:
-          label: 🐛 描述(Description)
-          placeholder: 详细地描述 bug，让大家都能理解/Describe the bug in detail so that everyone can understand it
-
-      validations:
-          required: true
-    - type: textarea
-      attributes:
-          label: 📷 复现步骤(Steps to Reproduce)
-          placeholder: 清晰描述复现步骤，让别人也能看到问题/Clearly describe the reproduction steps so that others can see the problem
-
-      validations:
-          required: true
-    - type: textarea
-      attributes:
-          label: 📄 [异常/日志]信息([Exception/Log] Information)
-          placeholder: 如报错等其他信息可以贴在这里/Other information such as crash can be posted here
-      validations:
-          required: false
-    - type: markdown
-      attributes:
-          value: "## 🚑 基本信息(Basic Information)"
-    - type: input
-      attributes:
-          label: 程序版本/Program version
-          placeholder: e.g. v3.5
-      validations:
-          required: true
-    - type: dropdown
-      attributes:
-          label: 系统/OS
-          multiple: true
-          options:
-              - Windows10+
-              - Windows7-
-              - MacOS
-              - Linux
-              - Other
-      validations:
-          required: true
-    - type: dropdown
-      attributes:
-          label: 是否使用了代理/Are agents used
-          multiple: false
-          options:
-              - 是/yes
-              - 否/no
-      validations:
-          required: true
-    - type: textarea
-      attributes:
-          label: 📄 配置文件(Configuration file)
-          placeholder: 最好请上传脱敏(删除salt，username，password，email_address，email_passwd，email_smtp_address，kindle_address，proxies)之后的配置文件/It's best to upload the profile after desensitization (remove salt, username, password, email_address, email_passwd, email_smtp_address, kindle_address, proxies)
-    - type: textarea
-      attributes:
-          label: 🖼 截图(Screenshots)
-          placeholder: 截图可以贴在这里/Screenshots can be posted here
+  - type: textarea
+    attributes:
+      label: 🐛 描述(Description)
+      description: >-
+        详细地描述 bug，让大家都能理解/Describe the bug in detail so that everyone can
+        understand it
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📷 复现步骤(Steps to Reproduce)
+      description: >-
+        清晰描述复现步骤，让别人也能看到问题/Clearly describe the reproduction steps so that
+        others can see the problem
+      value: |-
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ' 📄 [异常/日志]信息([Exception/Log] Information)'
+      description: 如报错等其他信息可以贴在这里/Other information such as crash can be posted here
+      render: Shell
+  - type: markdown
+    attributes:
+      value: '## 🚑 **基本信息(Basic Information)**'
+  - type: input
+    attributes:
+      label: 程序版本(Program version)
+      description: >-
+        请填写当前程序的版本号、哈希号 / Please enter the version number/hash number of the
+        current program
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: 系统(OS)
+      description: 在哪些系统中出现此问题/In which systems does this problem occur
+      multiple: true
+      options:
+        - Windows10~+
+        - Windows7~-
+        - MacOS
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: 是否使用了代理(Whether a proxy is used)
+      description: 如果使用了代理请选择yes否则选no/Select yes if proxy is used otherwise select no
+      options:
+        - 'No'
+        - 'Yes'
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📄 配置文件(Configuration file)
+      description: 最好请上传脱敏之后的配置文件/It's best to upload the profile after desensitization
+      placeholder: >-
+        删除salt，username，password，email_address，email_passwd，email_smtp_address，kindle_address，proxies
+        / remove salt, username, password, email_address, email_passwd,
+        email_smtp_address, kindle_address, proxies
+  - type: textarea
+    attributes:
+      label: ' 🖼 截图(Screenshots)'
+      description: 截图可以贴在这里/Screenshots can be posted here
