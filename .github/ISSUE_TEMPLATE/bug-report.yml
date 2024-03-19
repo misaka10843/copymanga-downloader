@@ -1,7 +1,8 @@
 name: Bug Report 🐛
 description: 创建 Bug 报告以帮助我们改进 / Create a report to help us improve
 title: 🐛[BUG]
-Assignees: misaka10843
+assignees: 
+  - misaka10843
 labels: bug
 body:
   - type: textarea
