@@ -1,4 +1,5 @@
-name: Bug Report \U0001F41B
+---
+name: "Bug Report \U0001F41B"
 description: 创建 Bug 报告以帮助我们改进 / Create a report to help us improve
 title: "\U0001F41B[BUG] "
 labels: ["bug"]
