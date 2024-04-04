@@ -205,7 +205,7 @@ def change_settings():
     login_change = Confirm.ask("是否要修改登陆方式？", default=False)
     authorization = config.SETTINGS["authorization"]
     if login_change:
-        login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接回车跳过)",
+        login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，或者直接输入其他数字跳过)",
                                    default=config.SETTINGS["loginPattern"])
         if login_pattern == "1":
             authorization = Prompt.ask("请输入token")
