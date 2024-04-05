@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-
+ 
 try:
     long_description = open("README.md").read()
 except IOError:
     long_description = "使用Python编译exe/bash来下载copymanga 拷贝漫画中的漫画，支持批量+选话下载和获取您收藏的漫画并下载！"
-
+ 
 setup(
     name="copymanga-dl",
     version="3.5.1",
@@ -16,15 +16,16 @@ setup(
     author_email="misaka10843@outlook.jp",
     url="https://github.com/misaka10843/copymanga-downloader",
     py_modules=[
-        "main",
+        "cbz",
         "config",
         "epub",
         "function",
         "login",
-        "settings"
+        "main",
+        "settings",
     ],
     packages=find_packages(),
-    package_data={'': ['*.json', '*.md', '*.txt']},
+    package_data={'': ['*.json', '*.md']},
     python_requires='>=3.8',
     install_requires=[
         'requests',
