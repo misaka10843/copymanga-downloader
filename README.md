@@ -56,6 +56,10 @@
 >
 > A7: 在提供之前请先查看是否与现有功能冲突，添加之后是否会出现问题，代码是否清晰，如果没有问题我会在看见之后测试成功就合并
 
+> Q8: 为什么更新了这么多却不在releases升级版本号？
+>
+> A8: 因为懒（不是），感觉没有更新什么实质性内容所以就没有更新，如果需要的话请在[Actions](https://github.com/misaka10843/copymanga-downloader/actions)中下载
+
 ## 下载
 
 [releases(稳定)](https://github.com/misaka10843/copymanga-downloader/releases)
