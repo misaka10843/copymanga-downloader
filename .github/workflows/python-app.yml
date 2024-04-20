@@ -60,4 +60,4 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: copymanga-downloader-windows
-          path: dist/copymanga-downloader.exe
+          path: dist/Windows-copymanga-downloader.exe
