@@ -29,7 +29,6 @@ setup(
     python_requires='>=3.8',
     install_requires=[
         'requests',
-        'retrying',
         'rich',
     ],
     entry_points={'console_scripts': ['copymanga-dl=main:main']},
