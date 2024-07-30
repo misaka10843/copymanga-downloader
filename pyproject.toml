@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "copymanga-downloader"
+version = "3.5.1"
+description = "使用Python编译exe/bash来下载copymanga 拷贝漫画中的漫画，支持批量+选话下载和获取您收藏的漫画并下载！"
+license = "GNU GENERAL PUBLIC LICENSE"
+authors = ["misaka10843 <misaka10843@outlook.jp>"]
+readme = "README.md"
+repository = "https://github.com/misaka10843/copymanga-downloader"
+keywords = ["copymanga", "downloader"]
+classifiers = [
+    "Topic :: Utilities",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: MacOS",
+]
+packages = [
+    { include = "*.py" },
+    { include = "*.json" },
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+rich = "*"
+requests = "*"
+setuptools = "*"
+
+[tool.poetry.scripts]
+copymanga-dl = 'main:main'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
