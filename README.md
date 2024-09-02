@@ -1,6 +1,6 @@
 > [!WARNING]
 > *
-*在2023.1.28更新之后，cbz功能的保存路径被改变，请所有使用cbz功能的用户最好[查看修改内容](https://github.com/misaka10843/copymanga-downloader/pull/89#issue-2104150068)
+*在2024.1.28更新之后，cbz功能的保存路径被改变，请所有使用cbz功能的用户最好[查看修改内容](https://github.com/misaka10843/copymanga-downloader/pull/89#issue-2104150068)
 了解新路径以及元信息问题！**
 
 > [!NOTE]
