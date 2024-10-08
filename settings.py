@@ -219,7 +219,8 @@ def change_settings():
                 else:
                     res = loginhelper(username, password, api_urls[choice - 1])
                     if res["token"]:
-                        config.SETTINGS["username"] = f"Token {res['token']}"
+                        config.SETTINGS["authorization"] = f"Token {res['token']}"
+                        config.SETTINGS["username"] = username
                         config.SETTINGS["salt"] = res["salt"]
                         config.SETTINGS["password"] = res["password_enc"]
                         break
