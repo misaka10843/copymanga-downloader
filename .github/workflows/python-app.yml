@@ -1,8 +1,6 @@
-name: python compile(Linux&Windows)
+name: Linux&Windows build
 
 on:
-  release:
-    types: [ published ]
   push:
     branches:
       - master
