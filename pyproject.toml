@@ -38,3 +38,17 @@ copymanga-dl = "main:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.builders.plugin"
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "cbz.py",
+    "epub.py",
+    "function.py",
+    "login.py",
+    "main.py",
+    "settings.py"
+]
