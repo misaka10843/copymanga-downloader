@@ -21,7 +21,7 @@ def api_restriction():
     # 判断是否超过60秒
     if time_diff < 60 and config.API_COUNTER <= 1:
         config.API_COUNTER = config.API_COUNTER + config.OG_SETTINGS['API_COUNTER']
-    if config.API_COUNTER >= 15:
+    if config.API_COUNTER >= 60:
         config.API_COUNTER = 0
         print("[bold yellow]您已经触发到了API请求阈值，我们将等60秒后再进行[/]")
         time.sleep(60)
