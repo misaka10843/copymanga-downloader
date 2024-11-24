@@ -8,10 +8,20 @@
 > **请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
 >
 > **因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
+>
+> **为了您能够更好的更新程序，建议直接运行`pip install copymanga-downloader`安装pip包后直接运行`copymanga-dl`来启动程序**
 
 # copymanga-downloader
 
 ![Head diagram](https://s2.loli.net/2022/03/30/b4eM9gArp5q2VKu.png)
+
+<p align="center">
+  <a href="https://pypi.org/project/copymanga-downloader/" target="_blank"><img alt="PyPI - Version" src="https://img.shields.io/pypi/v/copymanga-downloader?style=for-the-badge&logo=PyPI"></a>
+  <a href="https://github.com/misaka10843/copymanga-downloader/graphs/contributors" target="_blank"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/misaka10843/copymanga-downloader?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/misaka10843/copymanga-downloader/stargazers" target="_blank"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/misaka10843/copymanga-downloader?style=for-the-badge&label=%E2%AD%90STAR"></a>
+</p>
+
+
 
 ## 前言💭
 
@@ -62,6 +72,14 @@
 > A8: 因为懒（不是），感觉没有更新什么实质性内容所以就没有更新，如果需要的话请在[Actions](https://github.com/misaka10843/copymanga-downloader/actions)中下载
 
 ## 下载
+
+推荐使用pip进行包管理
+
+安装：`pip install copymanga-downloader`
+
+更新：`pip install --upgrade copymanga-downloader`
+
+启动命令：`copymanga-dl`
 
 [releases(稳定)](https://github.com/misaka10843/copymanga-downloader/releases)
 
