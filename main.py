@@ -496,7 +496,8 @@ def manga_chapter(manga_path_word, group_path_word):
         sys.exit()
     # 询问应该如何下载
     # 如果是命令行参数就直接返回对应
-    if config.ARGS:
+
+    if config.ARGS.MangaPath:
         return_json["start"] = int(config.ARGS.MangaStart) - 1
         return_json["end"] = int(config.ARGS.MangaEnd)
         return return_json
