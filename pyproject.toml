@@ -46,5 +46,6 @@ include = [
     "function.py",
     "login.py",
     "main.py",
-    "settings.py"
+    "settings.py",
+    "config.py"
 ]
