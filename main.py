@@ -265,13 +265,12 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
         time.sleep(5)
         response.raise_for_status()
     manga_chapter_json = response.json()
-    # Todo 创建传输的json,并且之后会将此json保存为temp.json修复这个问题https://github.com/misaka10843/copymanga-downloader/issues/35
     return_json = {
         "json": manga_chapter_json,
         "start": -1,
         "end": -1
     }
-    # Todo 支持500+话的漫画(感觉并不太需要)
+    # Todo 支持500+话的漫画(感觉并不太需要,如果真的要下的话就添加进半自动更新里面吧x)
     if not manga_chapter_json['results']['list']:
         print(f"[bold blue]此漫画并未有新的章节，我们将跳过此漫画[/]")
         return 0
@@ -496,7 +495,8 @@ def manga_chapter(manga_path_word, group_path_word):
         sys.exit()
     # 询问应该如何下载
     # 如果是命令行参数就直接返回对应
-    if config.ARGS:
+
+    if config.ARGS.MangaPath:
         return_json["start"] = int(config.ARGS.MangaStart) - 1
         return_json["end"] = int(config.ARGS.MangaEnd)
         return return_json

@@ -307,6 +307,8 @@ def load_settings():
     # 设置请求头
     config.API_HEADER['use_oversea_cdn'] = settings['use_oversea_cdn']
     config.API_HEADER['use_webp'] = settings['use_webp']
+    if 'UA' in settings:
+        config.API_HEADER['User-Agent'] = settings['UA']
     # 设置代理
     if settings["proxies"]:
         config.PROXIES = {
