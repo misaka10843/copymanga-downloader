@@ -557,7 +557,6 @@ def chapter_allocation(manga_chapter_json):
         download_path = config.SETTINGS['download_path']
         chapter_name = manga_chapter_info_json['results']['chapter']['name']
         # 检查漫画文件夹是否存在
-
         if not os.path.exists(f"{download_path}/{manga_name}/"):
             os.mkdir(f"{download_path}/{manga_name}/")
         # 创建多线程
@@ -570,6 +569,10 @@ def chapter_allocation(manga_chapter_json):
                 os.mkdir(f"{download_path}/{manga_name}/{chapter_name}/")
             # 组成下载路径
             filename = f"{download_path}/{manga_name}/{chapter_name}/{str(img_words[i] + 1).zfill(3)}.jpg"
+            # 判断是否已经下载
+            if os.path.exists(filename):
+                print(f"[blue]您已经下载了{filename}，跳过下载[/]")
+                continue
             t = threading.Thread(target=download, args=(url, filename))
             # 开始线程
             threads.append(t)
@@ -601,10 +604,6 @@ def chapter_allocation(manga_chapter_json):
 # 下载相关
 
 def download(url, filename, overwrite=False):
-    # 判断是否已经下载
-    if not overwrite and os.path.exists(filename):
-        print(f"[blue]您已经下载了{filename}，跳过下载[/]")
-        return
     img_api_restriction()
     if config.SETTINGS['HC'] == "1":
         url = url.replace("c800x.jpg", "c1500x.jpg")
