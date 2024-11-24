@@ -21,16 +21,9 @@ SETTINGS = {
     "email_address": None,
     "email_passwd": None,
     "kindle_address": None,
-    "email_smtp_address": None
+    "email_smtp_address": None,
+    "UA": None,
 }
-
-# '''
-#     "epub_and_mail_to_kindle": None,
-#     "kcc_cmd": None,
-#     "email_address": None,
-#     "email_passwd": None,
-#     "kindle_address": None,
-# '''
 
 # 全局化设置,备份,防止命令行参数导致设置错位
 OG_SETTINGS = {
@@ -54,19 +47,19 @@ OG_SETTINGS = {
     "email_address": None,
     "email_passwd": None,
     "kindle_address": None,
-    "email_smtp_address": None
+    "email_smtp_address": None,
+    "UA": None,
 }
 
 # 全局化headers，节省空间
 
 API_HEADER = {
-    'User-Agent': '"User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, '
-                  'like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44"',
+    'User-Agent': 'duoTuoCartoon/3.2.4 (iPhone; iOS 18.0.1; Scale/3.00) iDOKit/1.0.0 RSSX/1.0.0',
     'version': datetime.datetime.now().strftime("%Y.%m.%d"),
     'region': '0',
     'webp': '0',
     "platform": "1",
-    "referer": "https://www.copymanga.site/"
+    "referer": "https://www.copymanga.com/"
 }
 
 PROXIES = {}

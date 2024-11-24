@@ -205,6 +205,8 @@ options:
 
 ### 重大更新 📈
 
+2024/11/24: 添加UA设置(仅支持到配置文件中自定义)，修复多个bug
+
 2024/1/14: [@TwoOnefour](https://github.com/TwoOnefour)添加账号密码登陆和转换为epub并推送到kindle的功能
 
 2023/5/12: 添加CBZ支持，优化图片API限制，添加批量下载与单话下载的章节名称提示
