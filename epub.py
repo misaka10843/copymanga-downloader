@@ -112,11 +112,11 @@ def set_kindle_config() -> None:
     while not config.SETTINGS['kcc_cmd']:
         if system == "Windows":
             tmp = Prompt.ask(
-                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893，默认为copymanga-downloader目录)[/]",
+                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.voidval.com/archives/1705162565893，默认为copymanga-downloader目录)[/]",
                 default=path) + "/kcc_c2e.exe"
         else:
             tmp = Prompt.ask(
-                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.pursuecode.cn/archives/1705162565893,默认为copymanga-downloader目录)[/]",
+                "请输入kcc_c2e路径[italic yellow](建议先查看配置教程 https://www.voidval.com/archives/1705162565893,默认为copymanga-downloader目录)[/]",
                 default=path) + "/kcc_c2e"
         if is_contains_chinese(tmp):
             print("[bold yellow]kcc_c2e路径请不要包含中文[/]")
