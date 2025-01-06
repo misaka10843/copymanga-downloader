@@ -149,7 +149,7 @@ or
 
 ## 如何配置kindle推送📚
 
-详细请看[copymanga-downloader自动推送到kindle的使用教程](https://www.pursuecode.cn/archives/1705162565893)
+详细请看[copymanga-downloader自动推送到kindle的使用教程](https://www.voidval.com/archives/1705162565893)
 
 请注意，在实现转换为epub时使用了第三方库[KCC](https://github.com/ciromattia/kcc/)
 ，您需要自行在[kcc/releases](https://github.com/ciromattia/kcc/releases)下载对应平台的执行程序

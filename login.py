@@ -1,8 +1,3 @@
-# @Time    : 2024/1/8 22:51
-# @Author  : TwoOnefour
-# @blog    : https://www.pursuecode.cn
-# @Email   : twoonefour@pursuecode.cn
-# @File    : login.py
 import requests
 from rich import print as print
 
