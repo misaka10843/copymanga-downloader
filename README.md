@@ -1,5 +1,6 @@
 > [!WARNING]
 > **为了您能够更好的更新以及使用程序，建议直接运行`pip install copymanga-downloader`安装pip包后直接运行`copymanga-dl`来启动程序**
+> 
 > 我们十分十分建议直接通过pip进行安装，因为在Windows中可能会被WD等杀毒软件误杀
 
 > [!NOTE]
@@ -68,20 +69,6 @@
 > Q8: 为什么更新了这么多却不在releases升级版本号？
 >
 > A8: 因为懒（不是），感觉没有更新什么实质性内容所以就没有更新，如果需要的话请在[Actions](https://github.com/misaka10843/copymanga-downloader/actions)中下载
-
-## 下载
-
-推荐使用pip进行包管理
-
-安装：`pip install copymanga-downloader`
-
-更新：`pip install --upgrade copymanga-downloader`
-
-启动命令：`copymanga-dl`
-
-[releases(稳定)](https://github.com/misaka10843/copymanga-downloader/releases)
-
-[actions(测试)](https://github.com/misaka10843/copymanga-downloader/actions/workflows/python-app.yml)
 
 ## 声明 📢
 
@@ -203,41 +190,6 @@ options:
 4.将此程序放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
 
 5.运行即可qwq
-
-### 编译/原代码使用(所有系统均支持)
-
-⭐️ 建议pip安装（如果有本地有多个Python版本，建议用pipx安装）
-
-```bash
-# macOS安装pipx
-brew install pipx
-pipx ensurepath
-
-# Linux安装pipx
-python3 -m pip install --user pipx
-python3 -m pipx ensurepath
-
-# Windows安装pipx
-python -m pip install --user pipx
-
-# 从远程仓库安装copymanga-dl
-pip install git+https://github.com/misaka10843/copymanga-downloader.git
-或
-pipx install git+https://github.com/misaka10843/copymanga-downloader.git
-
-# 通过镜像站从远程仓库安装copymanga-dl
-pip install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-downloader.git
-或
-pipx install git+https://ghproxy.com/https://github.com/misaka10843/copymanga-downloader.git
-```
-
-1.点击[这里](https://github.com/misaka10843/copymanga-downloader/archive/refs/heads/master.zip)直接下载最新的源码包
-
-2.解压后放入一个空文件夹（不放也没问题，就是数据会写到当前文件夹中）
-
-3.先运行这个来安装依赖 `pip install requirements.txt`(其实也就只有个 `requests`需要安装，其他都是python自带的(￣▽￣))
-
-4.然后运行 `python main.py`即可
 
 ### 如何获取authorization(此为获取用户收藏漫画) 📒
 
