@@ -8,8 +8,7 @@ on:
       - '*.md'
       - '*.json'
       - '*.txt'
-      - '*.yml'
-      - '*.yaml'
+      - '.github/workflows/*.yaml'
       - 'setup.py'
       - 'pyproject.toml'
   workflow_dispatch:
