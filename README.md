@@ -2,6 +2,8 @@
 > **为了您能够更好的更新以及使用程序，建议直接运行`pip install copymanga-downloader`安装pip包后直接运行`copymanga-dl`来启动程序**
 > 
 > 我们十分十分建议直接通过pip进行安装，因为在Windows中可能会被WD等杀毒软件误杀
+>
+> 当前仓库除重大bug外将不会进行更新，具体原因可以查看[这个issue](https://github.com/misaka10843/copymanga-downloader/issues/116)
 
 > [!NOTE]
 > **请注意，在提交ISSUE前，请确保@misaka10843，以防止长时间未查看！**
