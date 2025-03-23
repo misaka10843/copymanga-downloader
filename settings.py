@@ -224,9 +224,8 @@ def change_settings():
                         config.SETTINGS["salt"] = res["salt"]
                         config.SETTINGS["password"] = res["password_enc"]
                         break
-    else:
-        login_pattern = config.SETTINGS["loginPattern"]
-        authorization = config.SETTINGS["authorization"]
+    login_pattern = config.SETTINGS["loginPattern"]
+    authorization = config.SETTINGS["authorization"]
     print(f"[yellow]我们正在更改您的设置中，请稍后[/]")
     # input转bool
     use_oversea_cdn = "0"

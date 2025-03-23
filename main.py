@@ -361,6 +361,9 @@ def search_on_collect():
         response = requests.get(url.format(offset), headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
+        if response.status_code != requests.codes.ok:
+            print(f"[bold red]请求出现问题！疑似Token问题！[{response.json()}][/]")
+            sys.exit()
         # 解析JSON数据
         data = response.json()
         if data['code'] == 401:
