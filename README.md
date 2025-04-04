@@ -11,6 +11,8 @@
 > **因为尽可能缓解copymanga服务器压力，此程序限制了每分钟只能访问15次API，还请理解！**
 >
 > **我并不希望此工具影响copymanga的正常运行，要是把copymanga的服务器下崩了或者怎么样那你还能在哪里看到收录这么全的网站？？？如果可以还请多多访问官网点点广告支持一下他们，对于使用绝大部份的第三方小网站的下载器都是同理，服务器流量真的很贵，如果为了用户体验可能还会套上cdn会更贵，如果爬虫泛滥可能还会用Cloudflare等手段阻止爬虫。**
+>
+> 需要能够在Nas等服务器上进行自动订阅下载？那就试试专为Nas而设计的[copymanga-nasdownloader](https://github.com/misaka10843/copymanga-nasdownloader)吧
 
 # copymanga-downloader
 
