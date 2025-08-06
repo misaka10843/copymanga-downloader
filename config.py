@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 SETTINGS = {
     "download_path": None,
@@ -54,12 +54,20 @@ OG_SETTINGS = {
 # 全局化headers，节省空间
 
 API_HEADER = {
-    'User-Agent': 'duoTuoCartoon/3.2.4 (iPhone; iOS 18.0.1; Scale/3.00) iDOKit/1.0.0 RSSX/1.0.0',
-    'version': datetime.datetime.now().strftime("%Y.%m.%d"),
-    'region': '0',
-    'webp': '0',
-    "platform": "1",
-    "referer": "https://www.copymanga.com/"
+    "User-Agent": "COPY/2.3.2",
+    "authorization": SETTINGS.get('authorization'),
+    "referer": "com.copymanga.app-2.3.2",
+    "source": "copyApp",
+    "version": "2.3.2",
+    "region": "1",
+    "device": "V417IR",
+    "umstring": "b4c89ca4104ea9a97750314d791520ac",
+    "platform": "3",
+    "dt": datetime.now().strftime("%Y.%m.%d"),
+    "deviceinfo": "24129PN74C-24129PN74C",
+    "accept-encoding": "gzip",
+    "webp": "1",
+    "pseudoid": "KNJT34xmmyOB6A4a",
 }
 
 PROXIES = {}

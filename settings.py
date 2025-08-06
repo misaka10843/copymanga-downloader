@@ -83,31 +83,31 @@ def set_settings():
     if hc_input:
         hc = "1"
     # 构造settings字典
-    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录，3为不登录)", default="1")
+    login_pattern = Prompt.ask("请输入登陆方式(1为token登录，2为账号密码持久登录)", default="1")
     # 先申明变量
     authorization = None
     salt = None
     username = None
     password = None
-    if login_pattern == "1":
-        authorization = Prompt.ask("请输入token")
-    elif login_pattern == "2":
-        while True:
-            username = Prompt.ask("请输入账号").strip()
-            password = Prompt.ask("请输入密码").strip()
-            if username == "" or password == "":
-                print("请输入账号密码")
-                continue
-            else:
-                res = loginhelper(username, password, api_urls[choice - 1])
-                if res["token"]:
-                    authorization = f"Token {res['token']}"
-                    salt = res["salt"]
-                    password = res["password_enc"]
-                    break
-    else:
-        authorization = None
-        login_pattern = "3"
+    while True:
+        if login_pattern == "1":
+            authorization = Prompt.ask("请输入token")
+            break
+        elif login_pattern == "2":
+            while True:
+                username = Prompt.ask("请输入账号").strip()
+                password = Prompt.ask("请输入密码").strip()
+                if username == "" or password == "":
+                    print("请输入账号密码")
+                    continue
+                else:
+                    res = loginhelper(username, password, api_urls[choice - 1])
+                    if res["token"]:
+                        authorization = f"Token {res['token']}"
+                        salt = res["salt"]
+                        password = res["password_enc"]
+                        break
+            break
     if not os.path.exists(download_path):
         os.mkdir(download_path)
     settings = {

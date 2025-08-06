@@ -121,7 +121,7 @@ def updates():
         new_update = add_updates()
         response = requests.get(
             f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}"
-            f"/chapters?limit=500&offset=0&platform=3",
+            f"/chapters?limit=500&offset=0&platform=3&in_mainland=false",
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
@@ -143,7 +143,7 @@ def updates():
 
 def add_updates():
     search_content = Prompt.ask("您需要搜索添加什么漫画呢")
-    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
+    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&in_mainland=false&limit=10&offset={}" % (
         config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
@@ -255,7 +255,7 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
     # 因为将偏移设置到最后下载的章节，所以可以直接下载全本
     response = requests.get(
         f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}"
-        f"/chapters?limit=500&offset={now_chapter}&platform=1",
+        f"/chapters?limit=500&offset={now_chapter}&platform=3&in_mainland=false",
         headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
     api_restriction()
@@ -322,7 +322,7 @@ def page_turning(selection, offset, data, current_page_count):
 
 def search():
     search_content = Prompt.ask("您需要搜索什么漫画呢")
-    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&limit=10&offset={}" % (
+    url = "https://api.%s/api/v3/search/comic?format=json&in_mainland=false&platform=3&q=%s&limit=10&offset={}" % (
         config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
@@ -538,9 +538,10 @@ def chapter_allocation(manga_chapter_json):
                              manga_chapter_json['start']:manga_chapter_json['end']]
     # 准备分配章节下载
     for manga_chapter_info in manga_chapter_list:
+        print(config.API_HEADER)
         response = requests.get(
             f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_chapter_info['comic_path_word']}"
-            f"/chapter2/{manga_chapter_info['uuid']}?platform=3",
+            f"/chapter2/{manga_chapter_info['uuid']}",
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
         api_restriction()
