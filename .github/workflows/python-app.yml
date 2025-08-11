@@ -77,15 +77,6 @@ jobs:
         with:
           name: copymanga-downloader-windows
           path: dist/Windows-copymanga-downloader.exe
-          
-      - name: Prepare GH Release Assets
-        if: github.event_name == 'release'
-        run: |-
-          for file in ./dist/*; do
-            md5sum ${file#./} >> ${file%.*}.md5
-            sha256sum ${file#./} >> ${file%.*}.sha256
-          done
-          ls -l
 
       - name: Upload GH Release Assets
         if: github.event_name == 'release'
