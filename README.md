@@ -4,6 +4,10 @@
 > 我们十分十分建议直接通过pip进行安装，因为在Windows中可能会被WD等杀毒软件误杀
 >
 > 当前仓库除重大bug外将不会进行更新，具体原因可以查看[这个issue](https://github.com/misaka10843/copymanga-downloader/issues/116)
+> 
+> 因为copymanga的封锁持续加重，只能获取到网页版的数据，这可能导致一些b站版权内容无法获取到，还请注意
+> 
+> 还有 fxck you,copymanga! 3.5.5版本及之后将去除掉api限制
 
 > [!NOTE]
 > 需要能够在Nas等服务器上进行自动订阅下载？那就试试专为Nas而设计的[copymanga-nasdownloader](https://github.com/misaka10843/copymanga-nasdownloader)吧

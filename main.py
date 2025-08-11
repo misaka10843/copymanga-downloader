@@ -16,7 +16,6 @@ from rich.prompt import Prompt, IntPrompt
 import config
 from cbz import create_cbz
 from epub import epub_transformerhelper
-from function import img_api_restriction, api_restriction
 from login import login, login_information_builder
 from settings import save_settings, load_settings, set_settings, change_settings
 
@@ -121,10 +120,10 @@ def updates():
         new_update = add_updates()
         response = requests.get(
             f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{new_update[0]}/group/{new_update[1]}"
-            f"/chapters?limit=500&offset=0&platform=3&in_mainland=false",
+            f"/chapters?limit=500&offset=0&platform=1",
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
-        api_restriction()
+
         try:
             response.raise_for_status()
         except Exception as e:
@@ -143,7 +142,7 @@ def updates():
 
 def add_updates():
     search_content = Prompt.ask("您需要搜索添加什么漫画呢")
-    url = "https://api.%s/api/v3/search/comic?format=json&platform=3&q=%s&in_mainland=false&limit=10&offset={}" % (
+    url = "https://api.%s/api/v3/search/comic?format=json&platform=1&q=%s&limit=10&offset={}" % (
         config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
@@ -255,10 +254,10 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
     # 因为将偏移设置到最后下载的章节，所以可以直接下载全本
     response = requests.get(
         f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{manga_group_path_word}"
-        f"/chapters?limit=500&offset={now_chapter}&platform=3&in_mainland=false",
+        f"/chapters?limit=500&offset={now_chapter}&platform=1",
         headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
-    api_restriction()
+
     try:
         response.raise_for_status()
     except Exception as e:
@@ -285,7 +284,7 @@ def update_get_chapter(manga_path_word, manga_group_path_word, now_chapter):
 def search_list(url, offset, current_page_count):
     response = requests.get(url.format(offset), headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
-    api_restriction()
+
     # 解析JSON数据
     data = response.json()
 
@@ -322,7 +321,7 @@ def page_turning(selection, offset, data, current_page_count):
 
 def search():
     search_content = Prompt.ask("您需要搜索什么漫画呢")
-    url = "https://api.%s/api/v3/search/comic?format=json&in_mainland=false&platform=3&q=%s&limit=10&offset={}" % (
+    url = "https://%s/api/kb/web/searchca/comics?offset=0&platform=2&limit=12&q=%s&limit=10&offset={}" % (
         config.SETTINGS["api_url"], search_content)
     offset = 0
     current_page_count = 1
@@ -360,7 +359,7 @@ def search_on_collect():
         # 发送GET请求
         response = requests.get(url.format(offset), headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
-        api_restriction()
+
         if response.status_code != requests.codes.ok:
             print(f"[bold red]请求出现问题！疑似Token问题！[{response.json()}][/]")
             sys.exit()
@@ -451,7 +450,7 @@ def manga_group(manga_path_word):
     response = requests.get(f"https://api.{config.SETTINGS['api_url']}/api/v3/comic2/{manga_path_word}",
                             headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
-    api_restriction()
+
     try:
         response.raise_for_status()
     except Exception as e:
@@ -475,10 +474,10 @@ def manga_group(manga_path_word):
 def manga_chapter(manga_path_word, group_path_word):
     response = requests.get(
         f"https://api.{config.SETTINGS['api_url']}/api/v3/comic/{manga_path_word}/group/{group_path_word}"
-        f"/chapters?limit=500&offset=0&platform=3",
+        f"/chapters?limit=500&offset=0&platform=1",
         headers=config.API_HEADER, proxies=config.PROXIES)
     # 记录API访问量
-    api_restriction()
+
     try:
         response.raise_for_status()
     except Exception as e:
@@ -544,7 +543,7 @@ def chapter_allocation(manga_chapter_json):
             f"/chapter2/{manga_chapter_info['uuid']}",
             headers=config.API_HEADER, proxies=config.PROXIES)
         # 记录API访问量
-        api_restriction()
+
         try:
             response.raise_for_status()
         except Exception as e:
@@ -608,7 +607,6 @@ def chapter_allocation(manga_chapter_json):
 # 下载相关
 
 def download(url, filename, overwrite=False):
-    img_api_restriction()
     if config.SETTINGS['HC'] == "1":
         url = url.replace("c800x.jpg", "c1500x.jpg")
     try:
