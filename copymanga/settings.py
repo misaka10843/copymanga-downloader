@@ -6,9 +6,9 @@ import requests
 from rich import print as print
 from rich.prompt import Prompt, Confirm, IntPrompt
 
-import config
-from epub import set_kindle_config
-from login import loginhelper
+from copymanga import config
+from copymanga.epub import set_kindle_config
+from copymanga.login import loginhelper
 
 
 def is_contains_chinese(strs):
