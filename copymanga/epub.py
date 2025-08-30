@@ -8,17 +8,11 @@ from email.header import Header
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 
+from copymanga.function import is_contains_chinese
 from rich import print as print
 from rich.prompt import Prompt, Confirm
 
-import config
-
-
-def is_contains_chinese(strs):
-    for _char in strs:
-        if '\u4e00' <= _char <= '\u9fa5':
-            return True
-    return False
+from copymanga import config
 
 
 def epub_transformer(path: str, name: str, chapter: str) -> None:

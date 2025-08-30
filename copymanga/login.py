@@ -1,7 +1,7 @@
 import requests
 from rich import print as print
 
-import config
+from copymanga import config
 
 
 def login(**information: dict) -> str:

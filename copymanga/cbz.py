@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-import config
+from copymanga import config
 
 
 def create_cbz(index, title, manga_name, save_dir, cbz_dir, path_word):

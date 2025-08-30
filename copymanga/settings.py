@@ -3,20 +3,13 @@ import os
 import sys
 
 import requests
+from copymanga.function import is_contains_chinese
 from rich import print as print
 from rich.prompt import Prompt, Confirm, IntPrompt
 
 from copymanga import config
 from copymanga.epub import set_kindle_config
 from copymanga.login import loginhelper
-
-
-def is_contains_chinese(strs):
-    for _char in strs:
-        if '\u4e00' <= _char <= '\u9fa5':
-            return True
-    return False
-
 
 def get_org_url():
     print("[italic yellow]正在获取CopyManga网站Url...[/]")

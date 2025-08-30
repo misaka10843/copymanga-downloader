@@ -13,11 +13,11 @@ from rich.console import Console
 from rich.progress import track
 from rich.prompt import Prompt, IntPrompt
 
-import config
-from cbz import create_cbz
-from epub import epub_transformerhelper
-from login import login, login_information_builder
-from settings import save_settings, load_settings, set_settings, change_settings
+from copymanga import config
+from copymanga.cbz import create_cbz
+from copymanga.epub import epub_transformerhelper
+from copymanga.login import login, login_information_builder
+from copymanga.settings import save_settings, load_settings, set_settings, change_settings
 
 console = Console(color_system='256', style=None)
 
@@ -534,7 +534,7 @@ def chapter_allocation(manga_chapter_json):
         manga_chapter_list = [manga_chapter_json['json']['results']['list'][manga_chapter_json['start']]]
     else:
         manga_chapter_list = manga_chapter_json['json']['results']['list'][
-                             manga_chapter_json['start']:manga_chapter_json['end']]
+            manga_chapter_json['start']:manga_chapter_json['end']]
     # 准备分配章节下载
     for manga_chapter_info in manga_chapter_list:
         print(config.API_HEADER)
