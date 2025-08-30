@@ -1,8 +1,6 @@
 [project]
 name = "copymanga-downloader"
-
-version = "3.5.5"
-
+version = "3.5.5.1"
 description = "使用python+copymanga API来下载copymanga(拷贝漫画)中的漫画，支持批量+选话下载和获取您收藏的漫画并下载！"
 license = {file = "LICENSE"}
 authors = [{name = "misaka10843", email = "misaka10843@outlook.jp"}]
@@ -22,18 +20,19 @@ classifiers = [
 
 requires-python = ">= 3.10"
 packages = [
-    { include = "*.py" },
+    { include = "copymanga" }
 ]
 dependencies = [
     "rich",
     "requests"
 ]
+
 [project.urls]
 Repository = "https://github.com/misaka10843/copymanga-downloader"
 Issues = "https://github.com/misaka10843/copymanga-downloader/issues"
 
 [project.scripts]
-copymanga-dl = "main:main"
+copymanga-dl = "copymanga.main:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -41,11 +40,11 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 include = [
-    "cbz.py",
-    "epub.py",
-    "function.py",
-    "login.py",
-    "main.py",
-    "settings.py",
-    "config.py"
+    "copymanga/cbz.py",
+    "copymanga/epub.py",
+    "copymanga/function.py",
+    "copymanga/login.py",
+    "copymanga/main.py",
+    "copymanga/settings.py",
+    "copymanga/config.py"
 ]
