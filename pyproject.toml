@@ -1,6 +1,6 @@
 [project]
 name = "copymanga-downloader"
-version = "3.5.5"
+version = "3.5.5.1"
 description = "使用python+copymanga API来下载copymanga(拷贝漫画)中的漫画，支持批量+选话下载和获取您收藏的漫画并下载！"
 license = {file = "LICENSE"}
 authors = [{name = "misaka10843", email = "misaka10843@outlook.jp"}]
