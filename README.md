@@ -1,3 +1,10 @@
+> [!CAUTION]
+> copymanga-downloader在近期并不会被积极维护，请转到[copymanga-nasdownloader](https://github.com/misaka10843/copymanga-nasdownloader)使用
+> 
+> 当前仓库会处于半归档状态，就算有无法使用的问题，只要不是在[copymanga-nasdownloader](https://github.com/misaka10843/copymanga-nasdownloader)中出现相同的问题的情况下并不会被主动修复
+> 
+> 您可以继续PR进行修复，也非常欢迎PR，但是我的开发重心会着重于多平台的nas/服务器无人值守下载
+
 > [!WARNING]
 > **为了您能够更好的更新以及使用程序，建议直接运行`pip install copymanga-downloader`安装pip包后直接运行`copymanga-dl`来启动程序**
 > 
