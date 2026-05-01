@@ -1,2 +1,2 @@
 rich>=13.3.2
-requests>=2.31.0
+requests>=2.33.1
